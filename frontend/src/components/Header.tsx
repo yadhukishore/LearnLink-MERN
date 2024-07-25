@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-
+import { Link } from 'react-router-dom';
 const Header: React.FC = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
   return (
@@ -17,20 +17,20 @@ const Header: React.FC = () => {
 
         {/* Navigation */}
         <nav className="hidden md:flex space-x-4">
-          <a href="#" className="hover:text-indigo-200">Home</a>
+          <Link to="/" className="hover:text-indigo-200">Home</Link>
           <a href="#" className="hover:text-indigo-200">About</a>
           <a href="#" className="hover:text-indigo-200">Services</a>
           <a href="#" className="hover:text-indigo-200">Contact</a>
         </nav>
 
-        {/* Buttons */}
-        <div className="flex items-center">
-          <button className="bg-white text-purple-600 px-3 py-1 rounded text-sm sm:text-base sm:px-4 sm:py-2 hover:bg-indigo-100 transition duration-300">
+         {/* Buttons */}
+         <div className="flex items-center">
+          <Link to="/login" className="bg-white text-purple-600 px-3 py-1 rounded text-sm sm:text-base sm:px-4 sm:py-2 hover:bg-indigo-100 transition duration-300">
             Login
-          </button>
-          <button className="ml-2 bg-indigo-500 text-white px-3 py-1 rounded text-sm sm:text-base sm:px-4 sm:py-2 hover:bg-indigo-600 transition duration-300">
+          </Link>
+          <Link to="/register" className="ml-2 bg-indigo-500 text-white px-3 py-1 rounded text-sm sm:text-base sm:px-4 sm:py-2 hover:bg-indigo-600 transition duration-300">
             Register
-          </button>
+          </Link>
         </div>
 
           {/* Mobile Menu Button */}
