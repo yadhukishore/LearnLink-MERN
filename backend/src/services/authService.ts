@@ -8,6 +8,8 @@ export const registerUser = async (userData: any) => {
     ...userData,
     password: hashedPassword,
   });
+  console.log("user in services",user);
+  
   await user.save();
   return user;
 };

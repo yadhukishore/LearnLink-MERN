@@ -1,9 +1,14 @@
 import express from 'express';
-import { register, login } from '../controllers/authController';
+import { register, login, verifyEmail, forgotPassword, verifyForgotPasswordOTP, resetPassword } from '../controllers/authController';
+import { validateRegister } from '../middlewares/validation';
 
 const router = express.Router();
 
-router.post('/register', register);
+router.post('/register',validateRegister, register);
+router.post('/verify-otp',verifyEmail);
 router.post('/login', login);
+router.post('/forgot-password',forgotPassword);
+router.post('/verify-otp-password',verifyForgotPasswordOTP);
+router.post('/reset-password',resetPassword);
 
 export default router;

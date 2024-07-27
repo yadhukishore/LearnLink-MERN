@@ -6,6 +6,7 @@ export interface IUser extends Document {
   email: string;
   password: string;
   comparePassword(candidatePassword: string): Promise<boolean>;
+  skipPasswordHashing?: boolean; 
 }
 
 const userSchema = new Schema({
@@ -16,9 +17,11 @@ const userSchema = new Schema({
 
 
 userSchema.pre<IUser>('save', async function (next) {
-  if (!this.isModified('password')) return next();
+  if (!this.isModified('password')|| this.skipPasswordHashing) return next();
   const salt = await bcrypt.genSalt(10);
   this.password = await bcrypt.hash(this.password, salt);
+  console.log("Password from model",this.password);
+  
   next();
 });
 
