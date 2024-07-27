@@ -90,8 +90,6 @@ export const login = async (req: Request, res: Response) => {
 
     console.log('User found:', { id: user._id, email: user.email });
     console.log('Stored hashed password:', user.password);
-
-    // Use the model's comparePassword method
     const isMatch = await user.comparePassword(password);
     console.log('Password match result:', isMatch);
 
@@ -137,12 +135,8 @@ export const forgotPassword = async (req: Request, res: Response) => {
     const otp = generateOTP();
     const otpExpires = new Date(Date.now() + 10 * 60 * 1000); // OTP valid for 10 minutes
     console.log("OTP:", otp);
-    
-    // Store OTP (use a database in production)
     otpStorage[email] = { otp, expires: otpExpires };
-
     await sendVerificationEmail(email, otp);
-
     res.status(200).json({ message: 'Password reset OTP sent to email' });
   } catch (error) {
     console.error('Server error during forgot password:', error);
@@ -164,7 +158,7 @@ export const verifyForgotPasswordOTP = async (req: Request, res: Response) => {
 
     console.log("OTP verified successfully");
 
-    // Clear OTP from storage
+  
     delete otpStorage[email];
 
     res.status(200).json({ message: 'OTP verified successfully' });
@@ -183,13 +177,11 @@ export const resetPassword = async (req: Request, res: Response) => {
       return res.status(404).json({ message: 'User not found' });
     }
 
-    // Hash the new password
+  
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
     console.log("reset hashed pass:",hashedPassword);
     
-
-    // Update the user's password
     user.password = hashedPassword;
     user.skipPasswordHashing = true;
     await user.save();
