@@ -8,6 +8,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 import GoogleAuthBtn from './GoogleAuthBtn';
+import TutorModal from '../TutorModal';
 
 const Register: React.FC = () => {
   const [name, setName] = useState('');
@@ -17,6 +18,11 @@ const Register: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const openModal = () => setIsModalOpen(true);
+  const closeModal = () => setIsModalOpen(false);
+
 
   const validateForm = () => {
     if (name.trim().length < 2) {
@@ -188,11 +194,21 @@ const Register: React.FC = () => {
                       <Link to="/login" className="font-medium text-indigo-200 hover:text-indigo-100">
                         Already have an account?
                       </Link>
+                <div className='mt-2'>
+                  <button
+                type="button"
+                onClick={openModal}
+                className="font-medium text-black hover:text-indigo-100"
+              >
+                Start as Tutor?
+              </button>
+              </div>
                     </div>
               </form>
             </div>
           </div>
           <ToastContainer />
+          <TutorModal isOpen={isModalOpen} onClose={closeModal} />
         </div>
       </div>
     </div>

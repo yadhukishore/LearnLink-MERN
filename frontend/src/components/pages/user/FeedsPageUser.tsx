@@ -1,8 +1,11 @@
-import React from 'react'
+// FeedsPageUser.jsx
+import React from 'react';
 import { useDispatch } from 'react-redux';
 import { logout } from '../../../features/auth/authSlice';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../hooks/useAuth';
+import Header from './HeaderUser';
+import Body from './BodyFeedsUser';
 
 const FeedsPageUser = () => {
   const isAuthenticated = useAuth();
@@ -19,11 +22,11 @@ const FeedsPageUser = () => {
   }
 
   return (
-    <div>
-      <div>FeedsPageUser</div>
-      <button onClick={handleLogout}>Logout</button>
+    <div className="min-h-screen bg-gradient-to-b from-[#071A2B] to-[#0A1E32] text-white">
+      <Header handleLogout={handleLogout} />
+      <Body />
     </div>
-  )
-}
+  );
+};
 
-export default FeedsPageUser
+export default FeedsPageUser;
