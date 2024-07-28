@@ -7,6 +7,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
+import GoogleAuthBtn from './GoogleAuthBtn';
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -132,6 +133,9 @@ const Login: React.FC = () => {
                   >
                     {isLoading ? 'Signing in...' : 'Sign in'}
                   </button>
+                  <div className='pt-1'>
+                <GoogleAuthBtn isLoginPage={true} />
+                </div>
                   <div className="flex items-center justify-between mt-4">
                     <div className="text-sm">
                       <Link to="/forgot-password" className="font-medium text-indigo-200 hover:text-indigo-100">

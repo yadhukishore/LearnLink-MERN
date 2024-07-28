@@ -7,6 +7,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
+import GoogleAuthBtn from './GoogleAuthBtn';
 
 const Register: React.FC = () => {
   const [name, setName] = useState('');
@@ -50,7 +51,6 @@ const Register: React.FC = () => {
       toast.error('Dont add spaces in your password!');
       return false;
     }
- 
     return true;
   };
 
@@ -71,8 +71,7 @@ const Register: React.FC = () => {
       if (response.status === 200) {
         console.log('Registration successful:', response.data);
         navigate('/verify-otp', { state: { email, name, password } });
-      }
-       else {
+      } else {
         console.error('Registration failed:', response.data.message);
         dispatch(setError(response.data.message));
       }
@@ -92,13 +91,14 @@ const Register: React.FC = () => {
       setIsLoading(false);
     }
   };
+
   return (
     <div className="min-h-screen flex flex-row justify-center items-center bg-gradient-to-br from-indigo-800 via-violet-700 to-fuchsia-900">
       <div className="absolute inset-0 backdrop-blur-sm z-0"></div>
       
       <div className="flex w-full max-w-7xl relative z-10">
         <div className="w-1/2 hidden md:flex items-center justify-center p-8">
-          <img src="/PinkHat.png" alt="Logo" className="w-full h-auto rounded-lg shadow-2xl" />
+          <img src="/PinkHat.png" alt="Logo" className="w-full h-auto rounded-lg shadow-2xl " />
         </div>
 
         <div className="w-full md:w-1/2 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
@@ -180,6 +180,9 @@ const Register: React.FC = () => {
                   >
                     {isLoading ? 'Signing up...(Wait)' : 'Sign up'}
                   </button>
+                </div>
+                <div>
+                <GoogleAuthBtn isLoginPage={false} />
                 </div>
                 <div className="text-sm text-right">
                       <Link to="/login" className="font-medium text-indigo-200 hover:text-indigo-100">

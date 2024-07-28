@@ -4,6 +4,7 @@ import jwt from 'jsonwebtoken';
 import User, { IUser } from '../models/User';
 import { sendVerificationEmail } from '../services/emailService'; 
 import { generateOTP,verifyOTP } from '../utils/otpUtils'; 
+import { generateAndHashPassword } from '../utils/passwordUtils';
 
 
 const otpStorage: { [email: string]: { otp: string; expires: Date } } = {};
@@ -33,6 +34,51 @@ export const register = async (req: Request, res: Response) => {
     res.status(500).json({ message: 'Server error' });
   }
 };
+export const googleAuth = async (req: Request, res: Response) => {
+  console.log('Received request for Google authentication:', req.body);
+  try {
+    const { name, email, googleId,loginPage } = req.body;
+    let user = await User.findOne({ email }) as IUser | null;
+    if (!user) {
+      const { plainPassword, hashedPassword } = await generateAndHashPassword(); 
+      user = new User({
+        name,
+        email,
+        password: hashedPassword,
+        googleId
+      });
+      await user.save();
+    } else if (!user.googleId) {
+      user.googleId = googleId;
+      await user.save();
+    } else if (user.googleId === googleId && !loginPage) {
+      return res.status(409).json({ message: 'User already exists' });
+    }
+
+    const token = jwt.sign(
+      { userId: user._id },
+      process.env.JWT_SECRET as string,
+      { expiresIn: '1h' }
+    );
+
+    console.log("Google authentication successful:", { token, user });
+
+    res.status(200).json({
+      message: 'Google authentication successful',
+      token,
+      user: {
+        _id: user._id,
+        name: user.name,
+        email: user.email
+      }
+    });
+  } catch (error) {
+    console.error('Server error during Google authentication:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+}
+
+
 export const verifyEmail = async (req: Request, res: Response) => {
   try {
     console.log("On verify email");

@@ -5,6 +5,8 @@ export interface IUser extends Document {
   name: string;
   email: string;
   password: string;
+  createdAt?: Date;
+  googleId?:string;
   comparePassword(candidatePassword: string): Promise<boolean>;
   skipPasswordHashing?: boolean; 
 }
@@ -12,7 +14,8 @@ export interface IUser extends Document {
 const userSchema = new Schema({
   name: { type: String, required: true },
   email: { type: String, required: true, unique: true },
-  password: { type: String, required: true }
+  password: { type: String, required: true },
+  googleId: {type:String},
 }, { timestamps: true });
 
 

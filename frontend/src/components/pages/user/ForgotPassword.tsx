@@ -34,7 +34,7 @@ const ForgotPassword: React.FC = () => {
       
       <div className="flex w-full max-w-7xl relative z-10">
         <div className="w-1/2 hidden md:flex items-center justify-center p-8">
-          <img src="/PinkHat.png" alt="Logo" className="w-full h-auto rounded-lg shadow-2xl" />
+          <img src="/PinkHat.png" alt="Logo" className="w-full h-auto rounded-lg shadow-2xl hover:scale-110 transform transition duration-1000" />
         </div>
 
         <div className="w-full md:w-1/2 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
