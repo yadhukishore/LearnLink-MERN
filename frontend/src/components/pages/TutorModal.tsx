@@ -11,7 +11,7 @@ const TutorModal: React.FC<TutorModalProps> = ({ isOpen, onClose }) => {
   const navigate = useNavigate();
 
   const handleAgree = () => {
-    navigate('/tutor');
+    navigate('/tutorRegister');
   };
 
   if (!isOpen) return null;

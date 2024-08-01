@@ -2,6 +2,14 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 const Header: React.FC = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+    const scrollToSection = (id: string) => {
+      const element = document.getElementById(id);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth' });
+      }
+      setIsMenuOpen(false);
+    };
   return (
     <header className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-lg">
       <div className="container mx-auto px-4 py-3 sm:py-4 flex justify-between items-center">
@@ -14,13 +22,12 @@ const Header: React.FC = () => {
           />
           <span className="ml-2 text-lg sm:text-xl md:text-2xl font-bold">LearnLink</span>
         </div>
-
-        {/* Navigation */}
-        <nav className="hidden md:flex space-x-4">
-          <Link to="/" className="hover:text-indigo-200">Home</Link>
-          <a href="#" className="hover:text-indigo-200">About</a>
-          <a href="#" className="hover:text-indigo-200">Services</a>
-          <a href="#" className="hover:text-indigo-200">Contact</a>
+   {/* Navigation */}
+   <nav className="hidden md:flex space-x-4">
+          <button onClick={() => scrollToSection('home')} className="hover:text-indigo-200">Home</button>
+          <button onClick={() => scrollToSection('about')} className="hover:text-indigo-200">About</button>
+          <button onClick={() => scrollToSection('services')} className="hover:text-indigo-200">Services</button>
+          <button onClick={() => scrollToSection('contact')} className="hover:text-indigo-200">Contact</button>
         </nav>
 
          {/* Buttons */}

@@ -11,12 +11,22 @@ import { useAuth } from './hooks/useAuth.ts';
 import ForgotPassword from './components/pages/user/ForgotPassword.tsx';
 import ResetPassword from './components/pages/user/ResetPassword.tsx';
 import VerifyOtpPassword from './components/pages/user/VerifyOtpPassword.tsx';
+import TutorRegister from './components/pages/tutor/TutorRegister.tsx';
+import TutorLogin from './components/pages/tutor/TutorLogin.tsx';
+import AdminLogin from './components/pages/admin/AdminLogin.tsx';
+import AdminDashboard from './components/pages/admin/AdminDashboard.tsx';
+import TutorFeeds from './components/pages/tutor/TutorFeeds.tsx';
+import AdminStudentList from './components/pages/admin/AdminStudentList.tsx';
+import TutorProofs from './components/pages/tutor/TutorProofs.tsx';
+import WaitingForApproval from './components/pages/tutor/WaitingForApproval.tsx';
+// import { checkAdminAuthStatus } from './features/admin/adminSlice.ts';
 
-// Create a wrapper component that uses Redux hooks
 
   const AppRoutes = () => {
     const isAuthenticated = useAuth();
     const isRegistered = useSelector((state: RootState) => state.auth.isRegistered);
+    const adminState = useSelector((state: RootState)=> state.admin);
+    const tutorState = useSelector((state:RootState)=> state.tutor);
   
     return (
       <Routes>
@@ -40,7 +50,29 @@ import VerifyOtpPassword from './components/pages/user/VerifyOtpPassword.tsx';
         <Route path='/verify-otp-password' element={<VerifyOtpPassword/>} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password" element={<ResetPassword />} />
-      </Routes>
+          <Route 
+        path='/tutorRegister' 
+        element={tutorState.isAuthenticated ? <Navigate to="/tutor" /> : <TutorRegister />} 
+      />
+      <Route 
+        path='/tutorLogin' 
+        element={tutorState.isAuthenticated ? <Navigate to="/tutor" /> : <TutorLogin />} 
+      />
+      <Route 
+        path='/tutor' 
+        element={tutorState.isAuthenticated ? <TutorFeeds /> : <Navigate to="/tutorRegister" />} 
+      />
+<Route 
+        path='/submit-tutor-proofs/:tutorId' 
+        element={<TutorProofs />} 
+      />
+<Route path='/waiting-for-approval' element={<WaitingForApproval/>}/>
+
+<Route path="/admin-login" element={<AdminLogin />} />
+<Route path="/adminDashboard" element={<AdminDashboard />} />
+<Route path="/adminStudentsList" element={<AdminStudentList/>}/>
+
+  </Routes>
     );
   };
 
