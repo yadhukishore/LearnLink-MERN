@@ -19,7 +19,7 @@ const Header: React.FC = () => {
     '/admin/courses': 'Courses',
     '/admin/feed': 'Feed Control',
     '/admin/financial-aids': 'Financial Aids',
-    '/admin/approve-tutor': 'Approve Tutor',
+    '/adminApprove-tutor': 'Approve Tutor',
     '/admin/tutors': 'Tutors',
     '/admin/events-offers': 'Events/Offers',
     '/admin/chat': 'Chat',

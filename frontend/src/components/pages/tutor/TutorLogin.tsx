@@ -1,21 +1,37 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
-
+import axios from 'axios';
+import { toast,ToastContainer } from 'react-toastify';
 const TutorLogin = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-
-  const handleSubmit = (e) => {
+  const navigate = useNavigate();
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-  };
-
+    try {
+      const response = await axios.post('http://localhost:8000/api/tutor/tutorLogin', { email, password });
+      if (response.data.success) {
+        localStorage.setItem('tutorToken', response.data.token);
+        toast.success('Login successful!');
+        navigate('/tutorFeedsPage'); // Navigate to tutor feeds page
+      } else {
+        toast.error(response.data.message);
+      }
+    } catch (error) {
+      if (axios.isAxiosError(error) && error.response) {
+        toast.error(error.response.data.message);
+      } else {
+        toast.error('An error occurred during login');
+      }
+    }
+  }
   return (
     <div className="min-h-screen flex flex-col md:flex-row bg-gradient-to-br from-teal-500 via-blue-600 to-indigo-800">
       {/* Left side with logo and welcome message */}
+      <ToastContainer />
       <div className="md:w-1/2 flex flex-col justify-center items-center p-8">
         <img src="https://cdni.iconscout.com/illustration/premium/thumb/indian-cleaning-man-with-namaste-hand-gesture-illustration-download-in-svg-png-gif-file-formats--welcoming-pack-people-illustrations-2209997.png" alt="Logo" className="h-64 mb-8" />
         <h1 className="text-4xl font-bold text-white text-center mb-4">

@@ -19,6 +19,8 @@ import TutorFeeds from './components/pages/tutor/TutorFeeds.tsx';
 import AdminStudentList from './components/pages/admin/AdminStudentList.tsx';
 import TutorProofs from './components/pages/tutor/TutorProofs.tsx';
 import WaitingForApproval from './components/pages/tutor/WaitingForApproval.tsx';
+import ApproveTutor from './components/pages/admin/ApproveTutor.tsx';
+import TutorDetails from './components/pages/admin/TutorDetails.tsx';
 // import { checkAdminAuthStatus } from './features/admin/adminSlice.ts';
 
 
@@ -56,7 +58,7 @@ import WaitingForApproval from './components/pages/tutor/WaitingForApproval.tsx'
       />
       <Route 
         path='/tutorLogin' 
-        element={tutorState.isAuthenticated ? <Navigate to="/tutor" /> : <TutorLogin />} 
+        element={tutorState.isAuthenticated ? <Navigate to="/tutorFeedsPage" /> : <TutorLogin />} 
       />
       <Route 
         path='/tutor' 
@@ -71,7 +73,8 @@ import WaitingForApproval from './components/pages/tutor/WaitingForApproval.tsx'
 <Route path="/admin-login" element={<AdminLogin />} />
 <Route path="/adminDashboard" element={<AdminDashboard />} />
 <Route path="/adminStudentsList" element={<AdminStudentList/>}/>
-
+<Route path="/adminApprove-tutor" element={<ApproveTutor/>}/>
+<Route path='/tutor-details/:tutorId' element={<TutorDetails/>}/>
   </Routes>
     );
   };
