@@ -95,16 +95,15 @@ const SubmitProofs: React.FC = () => {
   
   
       try {
-         // Compress images before converting to base64
          const compressedTeacherProof = teacherProof ? await compressImage(teacherProof) : null;
          const compressedQualifications = qualifications ? await compressImage(qualifications) : null;
          const compressedExperienceProofs = experienceProofs ? await compressImage(experienceProofs) : null;
  
-         // Convert compressed files to base64
+
          const teacherProofBase64 = compressedTeacherProof ? await fileToBase64(compressedTeacherProof) : null;
          const qualificationsBase64 = compressedQualifications ? await fileToBase64(compressedQualifications) : null;
          const experienceProofsBase64 = compressedExperienceProofs ? await fileToBase64(compressedExperienceProofs) : null;
-      // Prepare data object
+      
       const data = {
         teacherProof: teacherProofBase64,
         qualifications: qualificationsBase64,
@@ -137,7 +136,7 @@ const SubmitProofs: React.FC = () => {
       <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-2xl p-6">
         <div className="flex items-center mb-6">
           <img src="https://www.svgrepo.com/show/295402/user-profile.svg" alt="Profile" className="w-16 h-16 rounded-full mr-4" />
-          <h2 className="text-2xl font-bold">Upload your proofs</h2>
+          <h2 className="text-2xl font-bold">Upload Images of your proofs</h2>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">

@@ -126,11 +126,15 @@ export const tutorLogin = async (req: Request, res: Response) => {
       
       return res.status(400).json({ success: false, message: 'Invalid credentials' });
     }
+    console.log("name:",tutor.name);
+    
     const isMatch = await bcrypt.compare(password, tutor.password);
     if (!isMatch) {
+      console.log("Invalid credentials");
       return res.status(400).json({ success: false, message: 'Invalid credentials' });
     }
     if (!tutor.isApprovedByAdmin) {
+      console.log("Your account is pending approval by the admin");
       return res.status(403).json({ success: false, message: 'Your account is pending approval by the admin' });
     }
     const token = jwt.sign(
@@ -138,6 +142,7 @@ export const tutorLogin = async (req: Request, res: Response) => {
       process.env.JWT_SECRET as string,
       { expiresIn: '1d' }
     );
+console.log("Tokened");
 
     res.json({
       success: true,
@@ -149,6 +154,8 @@ export const tutorLogin = async (req: Request, res: Response) => {
         email: tutor.email
       }
     });
+   console.log("Logged");
+   
   } catch (error) {
     console.error('Login error:', error);
     res.status(500).json({ success: false, message: 'Server error during login' });

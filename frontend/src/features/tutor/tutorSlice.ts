@@ -1,9 +1,10 @@
-// src/features/tutor/tutorSlice.ts
+// tutorSlice.ts
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { jwtDecode } from 'jwt-decode';
 
 interface TutorState {
   isAuthenticated: boolean;
+  isRegistered: boolean;
   tutor: { id: string; name: string; email: string } | null;
   error: string | null;
   token: string | null;
@@ -11,6 +12,7 @@ interface TutorState {
 
 const initialState: TutorState = {
   isAuthenticated: false,
+  isRegistered: false,
   tutor: null,
   error: null,
   token: localStorage.getItem('tutorToken'),
@@ -26,6 +28,7 @@ const tutorSlice = createSlice({
       state.token = action.payload.token;
       state.error = null;
       localStorage.setItem('tutorToken', action.payload.token);
+      localStorage.setItem('tutor', JSON.stringify(action.payload.tutor));
     },
     tutorLogout(state) {
       state.isAuthenticated = false;
@@ -33,31 +36,40 @@ const tutorSlice = createSlice({
       state.error = null;
       state.token = null;
       localStorage.removeItem('tutorToken');
+      localStorage.removeItem('tutor');
     },
     setTutorError(state, action: PayloadAction<string>) {
       state.error = action.payload;
     },
-    checkTutorAuthStatus(state) {
+    tutorRegisterSuccess(state) {
+      state.isRegistered = true;
+    },
+       checkTutorAuthStatus(state) {
       const token = localStorage.getItem('tutorToken');
-      if (token) {
+      const tutor = localStorage.getItem('tutor');
+      if (token && tutor) {
         try {
           const decodedToken: any = jwtDecode(token);
           const currentTime = Date.now() / 1000;
           if (decodedToken.exp > currentTime) {
             state.isAuthenticated = true;
             state.token = token;
-            state.tutor = { id: decodedToken.id, name: decodedToken.name, email: decodedToken.email };
+            state.tutor = JSON.parse(tutor);
           } else {
+            console.log('Token expired, logging out');
             tutorSlice.caseReducers.tutorLogout(state);
           }
         } catch (error) {
-          console.error('Error decoding tutor token:', error);
+          console.error('Error decoding token:', error);
           tutorSlice.caseReducers.tutorLogout(state);
         }
+      } else {
+        console.log('No token found, logging out');
+        tutorSlice.caseReducers.tutorLogout(state);
       }
     },
   },
 });
 
-export const { tutorLoginSuccess, tutorLogout, setTutorError, checkTutorAuthStatus } = tutorSlice.actions;
+export const { tutorLoginSuccess, tutorLogout, setTutorError, tutorRegisterSuccess, checkTutorAuthStatus } = tutorSlice.actions;
 export default tutorSlice.reducer;

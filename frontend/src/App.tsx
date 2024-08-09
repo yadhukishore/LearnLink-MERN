@@ -21,8 +21,9 @@ import TutorProofs from './components/pages/tutor/TutorProofs.tsx';
 import WaitingForApproval from './components/pages/tutor/WaitingForApproval.tsx';
 import ApproveTutor from './components/pages/admin/ApproveTutor.tsx';
 import TutorDetails from './components/pages/admin/TutorDetails.tsx';
+import TutorHome from './components/pages/tutor/TutorHome.tsx';
 // import { checkAdminAuthStatus } from './features/admin/adminSlice.ts';
-
+import { checkTutorAuthStatus } from './features/tutor/tutorSlice';
 
   const AppRoutes = () => {
     const isAuthenticated = useAuth();
@@ -58,7 +59,7 @@ import TutorDetails from './components/pages/admin/TutorDetails.tsx';
       />
       <Route 
         path='/tutorLogin' 
-        element={tutorState.isAuthenticated ? <Navigate to="/tutorFeedsPage" /> : <TutorLogin />} 
+        element={tutorState.isAuthenticated ? <Navigate to="/tutorHome" /> : <TutorLogin />} 
       />
       <Route 
         path='/tutor' 
@@ -68,6 +69,9 @@ import TutorDetails from './components/pages/admin/TutorDetails.tsx';
         path='/submit-tutor-proofs/:tutorId' 
         element={<TutorProofs />} 
       />
+
+<Route path="/tutorHome" element={tutorState.isAuthenticated ? <TutorHome /> : <Navigate to="/tutorLogin" />} />
+
 <Route path='/waiting-for-approval' element={<WaitingForApproval/>}/>
 
 <Route path="/admin-login" element={<AdminLogin />} />

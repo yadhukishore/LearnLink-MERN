@@ -6,8 +6,8 @@ import tutorReducer from '../../features/tutor/tutorSlice';
 
 const rootReducer = combineReducers({
   auth: authReducer,
-  admin:adminReducer,
-  tutor:tutorReducer,
+  admin: adminReducer,
+  tutor: tutorReducer,
 });
 
 const store = configureStore({
