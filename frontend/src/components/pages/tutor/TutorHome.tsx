@@ -7,6 +7,7 @@ import { useTokenExpiration } from '../../../hooks/useTokenExpiration';
 import { checkTutorAuthStatus } from '../../../features/tutor/tutorSlice';
 import TutorHeader from './TutorHeader';
 import { motion } from 'framer-motion';
+import TutorCourseList from '../../helpers/TutorCourseList';
 
 const TutorHome = () => {
   const dispatch = useDispatch();
@@ -82,8 +83,8 @@ const TutorHome = () => {
               ))}
             </div>
           </div>
-          
-          <motion.div 
+      {/* Tutor Course part */}
+      <motion.div 
             className="mb-12"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -94,26 +95,20 @@ const TutorHome = () => {
                 Your Courses
               </span>
             </h3>
-            <div className="bg-gray-800 p-8 rounded-lg shadow-lg text-center">
-              <motion.img 
-                src="/empty-courses.svg" 
-                alt="No courses" 
-                className="w-48 h-48 mx-auto mb-6"
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                transition={{ type: "spring", stiffness: 260, damping: 20 }}
-              />
-              <p className="text-gray-300 mb-6 text-lg">You haven't added any courses yet. Start creating your first course!</p>
-              <motion.button
-                onClick={() => navigate('/tutor/create-course')}
-                className="bg-gradient-to-r from-blue-500 to-purple-600 text-white font-bold py-3 px-6 rounded-full shadow-lg hover:shadow-xl transition duration-300 transform hover:-translate-y-1"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                Create Your First Course
-              </motion.button>
-            </div>
+            <TutorCourseList />
           </motion.div>
+
+          {/* Add Course Button */}
+          <div className="text-center mt-8">
+            <motion.button
+              onClick={() => navigate('/tutorCreateCourse')}
+              className="bg-gradient-to-r from-blue-500 to-purple-600 text-white font-bold py-3 px-6 rounded-full shadow-lg hover:shadow-xl transition duration-300 transform hover:-translate-y-1"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              Create New Course
+            </motion.button>
+          </div>
         </div>
       </main>
       {/* Footer part */}

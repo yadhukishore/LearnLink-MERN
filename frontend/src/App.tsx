@@ -24,6 +24,8 @@ import TutorDetails from './components/pages/admin/TutorDetails.tsx';
 import TutorHome from './components/pages/tutor/TutorHome.tsx';
 // import { checkAdminAuthStatus } from './features/admin/adminSlice.ts';
 import { checkTutorAuthStatus } from './features/tutor/tutorSlice';
+import TutorCreateCourse from './components/pages/tutor/TutorCreateCourse.tsx';
+import TutorCourseDetail from './components/pages/tutor/TutorCourseDetail.tsx';
 
   const AppRoutes = () => {
     const isAuthenticated = useAuth();
@@ -71,14 +73,15 @@ import { checkTutorAuthStatus } from './features/tutor/tutorSlice';
       />
 
 <Route path="/tutorHome" element={tutorState.isAuthenticated ? <TutorHome /> : <Navigate to="/tutorLogin" />} />
-
+<Route path="/tutorCreateCourse" element={tutorState.isAuthenticated ? <TutorCreateCourse /> : <Navigate to="/tutorLogin" />} />
+<Route path="/tutorCourseDetail/:id" element={<TutorCourseDetail />} />
 <Route path='/waiting-for-approval' element={<WaitingForApproval/>}/>
 
 <Route path="/admin-login" element={<AdminLogin />} />
 <Route path="/adminDashboard" element={<AdminDashboard />} />
 <Route path="/adminStudentsList" element={<AdminStudentList/>}/>
 <Route path="/adminApprove-tutor" element={<ApproveTutor/>}/>
-<Route path='/tutor-details/:tutorId' element={<TutorDetails/>}/>
+<Route path='/tutorCourseDetail/:courseId' element={<TutorCourseDetail/>}/>
   </Routes>
     );
   };

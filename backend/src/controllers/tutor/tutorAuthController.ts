@@ -7,13 +7,20 @@ import { cloudinary } from '../../config/fileUploads';
 export const tutorRegister = async (req: Request, res: Response) => {
     try {
         console.log("Tutor is trying to register!!!");
+        console.log("Bodey:-",req.body);
+        
         const { name, email, password } = req.body;
+        
+          if (!name || !email || !password) {
+            console.log("All fields required");
+            
+            return res.status(400).json({ message: 'All fields are required' });
+        }
     
         let tutor = await Tutor.findOne({ email });
         if (tutor) {
-          return res.status(400).json({ message: 'Tutor already exists' });
+            return res.status(400).json({ message: 'Tutor with this email already exists' });
         }
-    
         const hashedPassword = await bcrypt.hash(password, 12);
     
         tutor = new Tutor({

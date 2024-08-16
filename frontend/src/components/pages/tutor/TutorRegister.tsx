@@ -3,6 +3,8 @@ import axios from 'axios';
 import { Link, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 interface TutorData {
   name: string;
@@ -26,26 +28,37 @@ const TutorRegister: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+      // Check if all fields are filled
+    if (!tutorData.name || !tutorData.email || !tutorData.password) {
+      toast.error('All fields are required');
+      return;
+    }
     try {
       const response = await axios.post('http://localhost:8000/api/tutor/tutorRegister', tutorData);
       if (response.status === 201) {
         const tutorId = response.data.tutorId;
-        // Store the tutorId in local storage
         localStorage.setItem('tutorId', tutorId);
-        // Navigate to the proof submission page with tutorId in the URL
         navigate(`/submit-tutor-proofs/${tutorId}`);
       } else {
         console.error('Registration failed:', response.data.message);
       }
     } catch (error) {
+      if (axios.isAxiosError(error) && error.response) {
+        if (error.response.status === 400 && error.response.data.message === 'Tutor with this email already exists') {
+          toast.error('A tutor with this email already exists');
+        } else {
+          toast.error(error.response.data.message || 'Registration failed');
+        }
+      } else {
+        toast.error('An unexpected error occurred');
+      }
       console.error('Registration failed:', error);
-      // Handle registration error (e.g., show error message to user)
     }
   };
 
   return (
     <div className="min-h-screen flex flex-col md:flex-row bg-gradient-to-br from-purple-600 via-indigo-700 to-blue-800">
-      {/* Left side with logo */}
+       <ToastContainer position="top-right" autoClose={5000} />
       <div className="md:w-1/2 flex flex-col justify-center items-center p-8">
         <img src="/PinkHat.png" alt="Logo" className="w-100 h-64 mb-8 rounded-xl" />
         <h1 className="text-4xl font-bold text-white text-center mb-4">

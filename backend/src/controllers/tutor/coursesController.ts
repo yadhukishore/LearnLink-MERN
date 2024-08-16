@@ -1,0 +1,244 @@
+//coursesController.ts
+import { Request, Response } from 'express';
+import Course, { ICourse } from '../../models/Course';
+import { cloudinary } from '../../config/fileUploads'; 
+import { UploadApiResponse } from 'cloudinary';
+import CourseCategory from '../../models/CourseCategory';
+
+interface MulterRequest extends Request {
+  files?: {
+    thumbnailFile?: Express.Multer.File[];
+    videos?: Express.Multer.File[];
+  };
+}
+
+interface MongoError extends Error {
+  code?: number;
+  keyPattern?: { [key: string]: any };
+}
+
+
+export const createCourse = async (req: Request, res: Response): Promise<void> => {
+  const multerReq = req as MulterRequest;
+  try {
+    console.log("Entered createCourses");
+    console.log("Body:", multerReq.body);
+    console.log("Files:", multerReq.files);
+
+    let {
+      name,
+      description,
+      price,
+      estimatedPrice,
+      tags,
+      level,
+      demoUrl,
+      category,
+      benefits,
+      prerequisites,
+      tutorId,
+    } = multerReq.body;
+
+    const courseId = generateUniqueCourseId();
+    console.log("CourseId:-", courseId);
+
+    // Upload thumbnail to Cloudinary
+    let thumbnailUpload: UploadApiResponse | undefined;
+    if (multerReq.files?.thumbnailFile && multerReq.files.thumbnailFile[0]) {
+      thumbnailUpload = await cloudinary.uploader.upload(multerReq.files.thumbnailFile[0].path, {
+        folder: 'course_thumbnails',
+      });
+    }
+
+    // Upload videos to Cloudinary
+    const videoUploads: UploadApiResponse[] = [];
+    if (multerReq.files?.videos) {
+      for (const video of multerReq.files.videos) {
+        const videoUpload = await cloudinary.uploader.upload(video.path, {
+          folder: 'course_videos',
+          resource_type: 'video',
+        });
+        videoUploads.push(videoUpload);
+      }
+    }
+
+    const courseData = {
+      courseId,
+      name,
+      description,
+      price: Number(price),
+      estimatedPrice: Number(estimatedPrice),
+      tags,
+      level,
+      demoUrl,
+      category,
+      benefits: typeof benefits === 'string' ? JSON.parse(benefits) : benefits,
+      prerequisites: typeof prerequisites === 'string' ? JSON.parse(prerequisites) : prerequisites,
+      tutorId,
+      thumbnail: thumbnailUpload
+        ? {
+            public_id: thumbnailUpload.public_id,
+            url: thumbnailUpload.secure_url,
+          }
+        : undefined,
+      videos: videoUploads.map((upload, index) => ({
+        file: `video-${index + 1}`,
+        title: `Video ${index + 1}`,
+        description: `Description for Video ${index + 1}`,
+        videoUrl: upload.secure_url,
+        videoThumbnail: {
+          public_id: upload.public_id,
+          url: upload.secure_url,
+        },
+      })),
+      ratings: 0,
+      purchased: 0,
+      isDelete: false,
+    };
+
+    const newCourse: ICourse = new Course(courseData);
+    await newCourse.save();
+
+    res.status(201).json({
+      success: true,
+      course: newCourse,
+      message: "Course created successfully",
+    });
+  } catch (error) {
+    console.error("Error in createCourse:", error);
+    const mongoError = error as MongoError;
+    if (mongoError.code === 11000 && mongoError.keyPattern && mongoError.keyPattern.courseId) {
+      // Handle duplicate courseId
+      console.log("Duplicate courseId, generating a new one and retrying...");
+      return createCourse(req, res); // Retry with new courseId
+    }
+    res.status(400).json({
+      success: false,
+      message: mongoError.message,
+    });
+  }
+}
+
+function generateUniqueCourseId(): string {
+  return `course${Date.now()}${Math.random().toString(36).substr(2, 9)}`;
+}
+
+// Get all courses
+export const getCourses = async (req: Request, res: Response) => {
+  try {
+    const tutorId = req.params.tutorId;
+    if (!tutorId) {
+      return res.status(400).json({ success: false, message: 'Tutor ID is required' });
+    }
+    const courses: ICourse[] = await Course.find({ tutorId: tutorId, isDelete: false });
+
+    res.status(200).json({
+      success: true,
+      courses,
+    });
+  } catch (error) {
+    res.status(500).json({ 
+      success: false,
+      message: (error as Error).message,
+    });
+  }
+};
+
+// Get a single course by ID
+export const getCourseById = async (req: Request, res: Response) => {
+  try {
+      const courseId = req.params.courseId;
+      console.log('Fetching course with ID:', courseId);
+
+      const course: ICourse | null = await Course.findOne({ _id: courseId, isDelete: false });
+
+      if (!course) {
+        console.log('Course not found');
+          return res.status(404).json({
+              success: false,
+              message: "Course not found",
+          });
+      }
+      console.log('Course found:', course);
+
+
+      res.status(200).json({
+          success: true,
+          course: {
+              _id: course._id,
+              name: course.name,
+              description: course.description,
+              thumbnail: course.thumbnail,
+              price: course.price,
+              estimatedPrice:course.estimatedPrice,
+              level: course.level,
+              videos: course.videos.map(video => ({
+                  title: video.title,
+                  description: video.description,
+                  videoUrl: video.videoUrl
+              })),
+              // i will add nother fields if needed
+          },
+      });
+  } catch (error) {
+    console.error('Error in getCourseById:', error);
+      res.status(500).json({ 
+          success: false,
+          message: (error as Error).message,
+      });
+  }
+};
+
+// Update a course
+export const updateCourse = async (req: Request, res: Response) => {
+    try {
+        let course: ICourse | null = await Course.findOne({ _id: req.params.id, isDelete: false });
+
+        if (!course) {
+            return res.status(404).json({
+                success: false,
+                message: "Course not found",
+            });
+        }
+
+        course = await Course.findByIdAndUpdate(req.params.id, req.body, { new: true });
+
+        res.status(200).json({
+            success: true,
+            course,
+            message: "Course updated successfully",
+        });
+    } catch (error) {
+        res.status(400).json({ 
+            success: false,
+            message: (error as Error).message,
+        });
+    }
+};
+
+// Delete a course (soft delete)
+export const deleteCourse = async (req: Request, res: Response) => {
+    try {
+        const course: ICourse | null = await Course.findOne({ _id: req.params.id, isDelete: false });
+
+        if (!course) {
+            return res.status(404).json({
+                success: false,
+                message: "Course not found",
+            });
+        }
+
+        course.isDelete = true;
+        await course.save();
+
+        res.status(200).json({
+            success: true,
+            message: "Course deleted successfully",
+        });
+    } catch (error) {
+        res.status(500).json({ 
+            success: false,
+            message: (error as Error).message,
+        });
+    }
+};
