@@ -26,6 +26,9 @@ import TutorHome from './components/pages/tutor/TutorHome.tsx';
 import { checkTutorAuthStatus } from './features/tutor/tutorSlice';
 import TutorCreateCourse from './components/pages/tutor/TutorCreateCourse.tsx';
 import TutorCourseDetail from './components/pages/tutor/TutorCourseDetail.tsx';
+import UserCourseList from './components/pages/user/UserCourseList.tsx';
+import UserCourseDetail from './components/pages/user/UserCourseDetail.tsx';
+import ApplyFinancialAid from './components/pages/user/FinancialAidApply.tsx';
 
   const AppRoutes = () => {
     const isAuthenticated = useAuth();
@@ -55,6 +58,9 @@ import TutorCourseDetail from './components/pages/tutor/TutorCourseDetail.tsx';
         <Route path='/verify-otp-password' element={<VerifyOtpPassword/>} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password" element={<ResetPassword />} />
+          <Route path="/courses" element={<UserCourseList/>} />
+          <Route path="/courses/:courseId" element={<UserCourseDetail />} />
+          <Route path="/apply-financial-aid/:courseId" element={<ApplyFinancialAid />} />
           <Route 
         path='/tutorRegister' 
         element={tutorState.isAuthenticated ? <Navigate to="/tutor" /> : <TutorRegister />} 

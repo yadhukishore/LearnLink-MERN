@@ -1,4 +1,4 @@
-//coursesController.ts
+//tutor/coursesController.ts
 import { Request, Response } from 'express';
 import Course, { ICourse } from '../../models/Course';
 import { cloudinary } from '../../config/fileUploads'; 

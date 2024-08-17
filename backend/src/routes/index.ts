@@ -3,6 +3,7 @@ import express from 'express';
 import authRoutes from './authRoutes';
 import adminRoutes from'./adminRoutes';
 import tutorRoutes from './tutorRoutes';
+import userCourseRoutes from './userCourseRoutes';
 
 const router = express.Router();
 
@@ -12,5 +13,6 @@ router.use('/admin', (req, res, next) => {
     next();
   }, adminRoutes);
 
+router.use('/tutor',tutorRoutes);
+router.use('/user', userCourseRoutes);
 export default router;
-router.use('/tutor',tutorRoutes)

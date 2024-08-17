@@ -2,12 +2,13 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
-import { logout } from '../../../features/auth/authSlice'; // Adjust the path as needed
+import { logout } from '../../../features/auth/authSlice'; 
+import { RootState } from '../../store/store';
 
 const Header = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dispatch = useDispatch();
-  const user = useSelector((state) => state.auth.user);
+  const user = useSelector((state:RootState) => state.auth.user);
 
   const handleLogout = () => {
     dispatch(logout());
@@ -24,6 +25,11 @@ const Header = () => {
         />
         <span className="ml-2 text-lg sm:text-xl md:text-2xl font-bold text-white">LearnLink</span>
       </div>
+        {/* Navigation Links */}
+        <nav className="hidden md:flex space-x-4">
+        <Link to="/" className="text-white hover:text-gray-300 transition duration-300">Home</Link>
+        <Link to="/courses" className="text-white hover:text-gray-300 transition duration-300">Courses</Link>
+      </nav>
 
       {/* Username and Dropdown */}
       {user && (
