@@ -5,6 +5,9 @@ import { Link } from 'react-router-dom';
 import axios from 'axios';
 import { motion } from 'framer-motion';
 import Header from './HeaderUser';
+import CurrentLearningCourses from './CurrentLearningCourses';
+import { useSelector } from 'react-redux';
+import { RootState } from '../../store/store';
 
 interface Course {
   _id: string;
@@ -19,15 +22,28 @@ interface Course {
   category:string;
 }
 
+interface CurrentCourse extends Course {
+  progress: number;
+}
+
 const UserCourseList: React.FC = () => {
+  const user = useSelector((state: RootState) => state.auth.user);
   const [courses, setCourses] = useState<Course[]>([]);
+  const [currentCourses, setCurrentCourses] = useState<CurrentCourse[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchCourses = async () => {
       try {
-        const response = await axios.get('http://localhost:8000/api/user/courses');
-        setCourses(response.data.courses);
+        const [allCoursesResponse, currentCoursesResponse] = await Promise.all([
+          axios.get('http://localhost:8000/api/user/courses'),
+          axios.get(`http://localhost:8000/api/user/current-courses?userId=${user?.id}`)
+        ]);
+        console.log('All Courses:', allCoursesResponse.data.courses);
+        console.log('Current Courses:', currentCoursesResponse.data.currentCourses);
+
+        setCourses(allCoursesResponse.data.courses);
+        setCurrentCourses(currentCoursesResponse.data.currentCourses);
         setLoading(false);
       } catch (error) {
         console.error('Error fetching courses:', error);
@@ -35,8 +51,10 @@ const UserCourseList: React.FC = () => {
       }
     };
 
-    fetchCourses();
-  }, []);
+    if (user?.id) {
+      fetchCourses();
+    }
+  }, [user]);
 
   if (loading) {
     return (
@@ -50,6 +68,7 @@ const UserCourseList: React.FC = () => {
     <div className="min-h-screen bg-[#071A2B] text-white">
       <Header />
       <main className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+        <CurrentLearningCourses courses={currentCourses} />
         <h1 className="text-4xl font-bold mb-8 text-center">
           <span className="bg-clip-text text-transparent bg-gradient-to-r from-pink-500 to-yellow-500">
             Explore Our Courses

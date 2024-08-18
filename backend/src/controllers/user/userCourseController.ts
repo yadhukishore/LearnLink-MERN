@@ -49,10 +49,8 @@ export const getCourseDetails = async (req: Request, res: Response) => {
       { $project: { videoCount: { $size: "$videos" } } }
     ]);
 
-    // Fetch tutor name
     const tutor = await Tutor.findById(course.tutorId).select('name').lean();
 
-    // Check if the user has an approved financial aid for this course
     const financialAid = await FinancialAid.findOne({
       userId,
       courseId,
@@ -94,7 +92,7 @@ export const applyForFinancialAid = async (req: Request, res: Response) => {
       const { userId } = req.body;
       const { reason, description, academicEmail, careerGoals } = req.body;
   
-      // Validate the course exists
+
       const course = await Course.findById(courseId);
       if (!course) {
         return res.status(404).json({
@@ -103,7 +101,6 @@ export const applyForFinancialAid = async (req: Request, res: Response) => {
         });
       }
   
-      // Check if the user has already applied for financial aid for this course
       const existingApplication = await FinancialAid.findOne({ userId, courseId });
       if (existingApplication) {
         return res.status(400).json({
@@ -112,7 +109,6 @@ export const applyForFinancialAid = async (req: Request, res: Response) => {
         });
       }
   
-      // Create a new financial aid application
       const financialAidApplication = new FinancialAid({
         userId,
         courseId,
@@ -144,8 +140,7 @@ export const applyForFinancialAid = async (req: Request, res: Response) => {
     try {
       const courseId = req.params.courseId;
       const userId = req.query.userId as string;
-  
-      // Check if the user has approved financial aid for this course
+
       const financialAid = await FinancialAid.findOne({
         userId,
         courseId,
@@ -160,7 +155,6 @@ export const applyForFinancialAid = async (req: Request, res: Response) => {
         });
       }
   
-      // Fetch course videos
       const course = await Course.findById(courseId).select('videos');
       if (!course) {
         return res.status(404).json({
@@ -181,3 +175,31 @@ export const applyForFinancialAid = async (req: Request, res: Response) => {
       });
     }
   };
+
+  export const getCurrentCourses = async (req: Request, res: Response) => {
+    try {
+      const userId = req.query.userId as string; 
+      // console.log("getCurrentCourses>", req.query);
+      
+      const approvedCourses = await FinancialAid.find({ userId, status: 'approved' })
+        .populate('courseId', 'name description thumbnail price estimatedPrice level category')
+        .lean();
+  
+      const currentCourses = approvedCourses.map(aid => ({
+        ...aid.courseId,
+        // progress: 0 
+      }));
+      console.log("currentCourses", currentCourses);
+  
+      res.status(200).json({
+        success: true,
+        currentCourses,
+      });
+    } catch (error) {
+      res.status(500).json({ 
+        success: false,
+        message: (error as Error).message,
+      });
+    }
+  };
+  
