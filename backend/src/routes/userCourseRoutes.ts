@@ -1,11 +1,13 @@
 // src/routes/userCourseRoutes.ts
 
 import express from 'express';
-import { getAllCourses,getCourseDetails } from '../controllers/user/userCourseController'; 
+import { applyForFinancialAid, getAllCourses,getCourseDetails, getCourseVideos } from '../controllers/user/userCourseController'; 
 
 const router = express.Router();
 
 router.get('/courses', getAllCourses);
 router.get('/courses/:courseId', getCourseDetails);
+router.post('/apply-financial-aid/:courseId', applyForFinancialAid);
+router.get('/course-videos/:courseId', getCourseVideos);
 
 export default router;

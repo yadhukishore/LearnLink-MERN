@@ -29,6 +29,9 @@ import TutorCourseDetail from './components/pages/tutor/TutorCourseDetail.tsx';
 import UserCourseList from './components/pages/user/UserCourseList.tsx';
 import UserCourseDetail from './components/pages/user/UserCourseDetail.tsx';
 import ApplyFinancialAid from './components/pages/user/FinancialAidApply.tsx';
+import FinancialAidApplications from './components/pages/admin/FinancialAidApplications.tsx';
+import FinancialAidApplicationDetails from './components/pages/admin/FinancialAidDetail.tsx';
+import CourseVideos from './components/pages/user/CourseVideos.tsx';
 
   const AppRoutes = () => {
     const isAuthenticated = useAuth();
@@ -51,16 +54,31 @@ import ApplyFinancialAid from './components/pages/user/FinancialAidApply.tsx';
           path="/verify-otp" 
           element={isRegistered ? <Navigate to="/login" /> : <VerifyOtp />} 
         />
-        <Route 
-          path="/feeds" 
-          element={isAuthenticated ? <FeedsPageUser /> : <Navigate to="/login" />} 
-        />
-        <Route path='/verify-otp-password' element={<VerifyOtpPassword/>} />
-          <Route path="/forgot-password" element={<ForgotPassword />} />
-          <Route path="/reset-password" element={<ResetPassword />} />
-          <Route path="/courses" element={<UserCourseList/>} />
-          <Route path="/courses/:courseId" element={<UserCourseDetail />} />
-          <Route path="/apply-financial-aid/:courseId" element={<ApplyFinancialAid />} />
+         <Route 
+        path="/feeds" 
+        element={isAuthenticated ? <FeedsPageUser /> : <Navigate to="/login" />} 
+      />
+      <Route path='/verify-otp-password' element={<VerifyOtpPassword/>} />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
+      <Route path="/reset-password" element={<ResetPassword />} />
+      <Route 
+        path="/courses" 
+        element={isAuthenticated ? <UserCourseList /> : <Navigate to="/login" />} 
+      />
+      <Route 
+        path="/courses/:courseId" 
+        element={isAuthenticated ? <UserCourseDetail /> : <Navigate to="/login" />} 
+      />
+      <Route 
+        path="/apply-financial-aid/:courseId" 
+        element={<ApplyFinancialAid />} 
+      />
+
+      <Route 
+        path="/course-videos/:courseId" 
+        element={isAuthenticated ? <CourseVideos /> : <Navigate to="/login" />} 
+      />
+
           <Route 
         path='/tutorRegister' 
         element={tutorState.isAuthenticated ? <Navigate to="/tutor" /> : <TutorRegister />} 
@@ -87,7 +105,10 @@ import ApplyFinancialAid from './components/pages/user/FinancialAidApply.tsx';
 <Route path="/adminDashboard" element={<AdminDashboard />} />
 <Route path="/adminStudentsList" element={<AdminStudentList/>}/>
 <Route path="/adminApprove-tutor" element={<ApproveTutor/>}/>
+<Route path='/tutor-details/:tutorId' element={<TutorDetails/>}/>
 <Route path='/tutorCourseDetail/:courseId' element={<TutorCourseDetail/>}/>
+<Route path="/adminFinancial-aids" element={<FinancialAidApplications/>} />
+<Route path="/application/:id" element={<FinancialAidApplicationDetails />} />
   </Routes>
     );
   };

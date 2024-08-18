@@ -3,6 +3,10 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import Header from './HeaderUser';
 import axios from 'axios';
+import Swal from 'sweetalert2';
+import withReactContent from 'sweetalert2-react-content';
+import { useSelector } from 'react-redux';
+import { RootState } from '../../store/store';
 
 interface CourseDetail {
   _id: string;
@@ -22,10 +26,13 @@ const ApplyFinancialAid: React.FC = () => {
   const [careerGoals, setCareerGoals] = useState('');
   const [isSubmitEnabled, setIsSubmitEnabled] = useState(false);
 
+  const user = useSelector((state: RootState) => state.auth.user);
+  const MySwal = withReactContent(Swal);
+
   useEffect(() => {
     const fetchCourseDetails = async () => {
       try {
-        const response = await axios.get(`http://localhost:8000/api/user/courses/${courseId}`);
+        const response = await axios.get(`http://localhost:8000/api/user/courses/apply-financial-aid/${courseId}`);
         setCourse(response.data.course);
       } catch (error) {
         console.error('Error fetching course details:', error);
@@ -44,10 +51,43 @@ const ApplyFinancialAid: React.FC = () => {
     setIsSubmitEnabled(isReasonValid && isDescriptionValid && isCareerGoalsValid);
   }, [reason, description, careerGoals]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log({ reason, description, academicEmail, careerGoals });
-  };
+    const userId = user?.id;
+
+    const confirmation = await MySwal.fire({
+        title: 'Are you sure?',
+        text: 'Do you want to submit the Financial Aid application?',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonText: 'Yes, submit it!',
+        cancelButtonText: 'No, cancel!',
+        reverseButtons: true,
+    });
+
+    if (confirmation.isConfirmed) {
+        try {
+            const response = await axios.post(`http://localhost:8000/api/user/apply-financial-aid/${courseId}`, {
+                userId, // Make sure this is passed
+                reason,
+                description,
+                academicEmail,
+                careerGoals,
+            });
+
+            MySwal.fire('Success!', 'Your application has been submitted.', 'success');
+            navigate('/courses'); 
+        } catch (error: any) {
+            if (error.response && error.response.status === 400) {
+                MySwal.fire('Info', error.response.data.message, 'info'); // Show existing application message
+            } else {
+                MySwal.fire('Error!', 'Something went wrong. Please try again later.', 'error');
+            }
+            console.error('Error submitting application:', error);
+        }
+    }
+};
+
 
   const wordCount = (text: string) => {
     const trimmedText = text.trim();

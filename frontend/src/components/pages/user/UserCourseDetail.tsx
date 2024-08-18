@@ -24,6 +24,7 @@ interface CourseDetail {
   prerequisites: Array<{ title: string; _id: string }>;
   videoCount: number;
   tutorName: string;
+  hasApprovedFinancialAid: boolean;
 }
 
 const UserCourseDetail: React.FC = () => {
@@ -32,11 +33,14 @@ const UserCourseDetail: React.FC = () => {
   const { courseId } = useParams<{ courseId: string }>();
   const navigate = useNavigate();
   const user = useSelector((state: RootState) => state.auth.user);
+  console.log("USERR>",user)
 
   useEffect(() => {
     const fetchCourseDetails = async () => {
       try {
-        const response = await axios.get(`http://localhost:8000/api/user/courses/${courseId}`);
+        const response = await axios.get(`http://localhost:8000/api/user/courses/${courseId}`, {
+          params: { userId: user?.id } // Send userId as a query parameter
+        });
         setCourse(response.data.course);
         console.log("Full response:", response.data);
         console.log("Course data:", response.data.course);
@@ -71,6 +75,10 @@ const UserCourseDetail: React.FC = () => {
     const videoIdMatch = url.match(/[?&]v=([^&]+)/) || url.match(/(?:youtu\.be\/|\/v\/|\/e\/|watch\?v=|&v=|\/embed\/|\/videos\/|embed\/|youtu\.be\/|\/shorts\/|^https:\/\/www\.youtube\.com\/embed\/|^https:\/\/www\.youtube\.com\/watch\?v=)([^#&?]*).*/);
     return videoIdMatch ? `https://www.youtube.com/embed/${videoIdMatch[1]}` : url;
   };
+  const handleGoToCourse = () => {
+    navigate(`/course-videos/${course._id}`); 
+  };
+
 
   const videoEmbedUrl = getYouTubeEmbedUrl(course.demoUrl);
   const handleFinancialAid = () => {
@@ -153,16 +161,27 @@ const UserCourseDetail: React.FC = () => {
           </div>
 
           <div className="mt-8 flex space-x-4">
-  <button className="bg-gradient-to-r from-blue-500 to-purple-500 text-white px-8 py-4 rounded-lg shadow-lg transform hover:scale-105 transition duration-300 ease-in-out">
-    Enroll Now
-  </button>
-  <button
-    onClick={handleFinancialAid}
-    className="bg-green-500 text-white px-5 py-2 rounded-lg hover:bg-gradient-to-r from-green-600 to-blue-800 transition duration-300 "
-  >
-    Apply for Financial Aid
-  </button>
-</div>
+        {course.hasApprovedFinancialAid ? (
+          <button
+            onClick={handleGoToCourse}
+            className="bg-gradient-to-r from-green-500 to-blue-500 text-white px-8 py-4 rounded-lg shadow-lg transform hover:scale-105 transition duration-300 ease-in-out"
+          >
+            Go to Course
+          </button>
+        ) : (
+          <>
+            <button className="bg-gradient-to-r from-blue-500 to-purple-500 text-white px-8 py-4 rounded-lg shadow-lg transform hover:scale-105 transition duration-300 ease-in-out">
+              Enroll Now
+            </button>
+            <button
+              onClick={handleFinancialAid}
+              className="bg-green-500 text-white px-5 py-2 rounded-lg hover:bg-gradient-to-r from-green-600 to-blue-800 transition duration-300"
+            >
+              Apply for Financial Aid
+            </button>
+          </>
+        )}
+      </div>
 
         </motion.div>
       </main>
