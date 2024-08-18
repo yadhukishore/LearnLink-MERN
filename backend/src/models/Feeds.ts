@@ -3,14 +3,23 @@ import mongoose, { Document, Schema } from 'mongoose';
 export interface IFeed extends Document {
   user: mongoose.Types.ObjectId;
   content: string;
-  image?: string;
+  files: { url: string; fileType: string }[];
   createdAt: Date;
+  updatedAt?: Date;
 }
 
-const feedSchema = new Schema({
-  user: { type: Schema.Types.ObjectId, ref: 'User', required: true },
-  content: { type: String, required: true },
-  image: { type: String },
-}, { timestamps: true });
+const feedSchema = new Schema(
+  {
+    user: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+    content: { type: String, required: false }, // Not required now as either content or files can be empty
+    files: [
+      {
+        url: { type: String, required: true },
+        fileType: { type: String, required: true },
+      },
+    ],
+  },
+  { timestamps: true }
+);
 
 export default mongoose.model<IFeed>('Feed', feedSchema);
