@@ -120,7 +120,7 @@ const TutorEditCourse: React.FC = () => {
             (document.getElementById('swal-input1') as HTMLInputElement).value,
             (document.getElementById('swal-input2') as HTMLInputElement).value,
             (document.getElementById('swal-input3') as HTMLInputElement).files?.[0]
-          ]
+          ];
         }
       });
   
@@ -130,6 +130,18 @@ const TutorEditCourse: React.FC = () => {
           Swal.fire('Error', 'Please fill all fields', 'error');
           return;
         }
+  
+        // Show loading spinner or progress bar
+        Swal.fire({
+          title: 'Uploading Video...',
+          html: `<div id="progressBar" style="width: 100%; background-color: #ddd;">
+                   <div id="progress" style="width: 0%; height: 30px; background-color: #4CAF50;"></div>
+                 </div>`,
+          allowOutsideClick: false,
+          didOpen: () => {
+            Swal.showLoading();
+          },
+        });
   
         const formData = new FormData();
         formData.append('title', title);
@@ -144,9 +156,20 @@ const TutorEditCourse: React.FC = () => {
               'Content-Type': 'multipart/form-data',
               Authorization: `Bearer ${token}`,
             },
+            onUploadProgress: (progressEvent) => {
+              const percentCompleted = Math.round(
+                (progressEvent.loaded * 100) / progressEvent.total
+              );
+              const progressBar = document.getElementById('progress');
+              if (progressBar) {
+                progressBar.style.width = `${percentCompleted}%`;
+              }
+            },
           }
         );
+  
         setCourse(response.data.course);
+  
         Swal.fire({
           icon: 'success',
           title: 'Added!',
@@ -161,6 +184,7 @@ const TutorEditCourse: React.FC = () => {
       });
     }
   };
+  
 
   const handleDeleteVideo = async (videoId: string) => {
     try {
