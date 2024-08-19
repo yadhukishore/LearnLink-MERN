@@ -2,6 +2,9 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import Swal from 'sweetalert2';
+import withReactContent from 'sweetalert2-react-content';
+
+const MySwal = withReactContent(Swal)
 
 interface CoursePreviewProps {
   courseData: {
@@ -24,18 +27,28 @@ const CoursePreview: React.FC<CoursePreviewProps> = ({ courseData, onConfirmSubm
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async () => {
-    const result = await Swal.fire({
+    const result = await MySwal.fire({
       title: 'Are you sure?',
       text: "You're about to submit your course. This action cannot be undone.",
       icon: 'warning',
       showCancelButton: true,
       confirmButtonColor: '#3085d6',
       cancelButtonColor: '#d33',
-      confirmButtonText: 'Yes, submit it!'
+      confirmButtonText: 'Yes, submit it!',
+      preConfirm: () => {
+        setIsSubmitting(true);
+        MySwal.fire({
+          title: 'Uploading...',
+          html: 'Please wait while your course is being uploaded.',
+          allowOutsideClick: false,
+          didOpen: () => {
+            Swal.showLoading();
+          }
+        });
+      }
     });
 
     if (result.isConfirmed) {
-      setIsSubmitting(true);
       try {
         await onConfirmSubmit();
         Swal.fire('Success', 'Course submitted successfully!', 'success');
