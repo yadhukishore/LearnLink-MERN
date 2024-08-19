@@ -15,6 +15,34 @@ export const getUsers = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
+export const toggleUserBlockStatus = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { userId } = req.params;
+    console.log("Toggling user status for userId:", userId);
+    
+    const user = await User.findById(userId);
+    console.log("User found:", user);
+    
+    if (!user) {
+      console.log("User not found");
+      res.status(404).json({ error: 'User not found' });
+      return;
+    }
+    
+    user.isBlocked = !user.isBlocked;
+    console.log("New isBlocked status:", user.isBlocked);
+    
+    await user.save();
+    console.log("User saved successfully");
+    
+    res.json({ message: 'User status updated successfully', isBlocked: user.isBlocked });
+  } catch (err) {
+    console.error("Error in toggleUserBlockStatus:", err);
+    res.status(500).json({ error: 'Server error', details: err });
+  }
+};
+
+
 export const getTutorDetails = async (req: Request, res: Response) => {
   try {
     const { tutorId } = req.params;
