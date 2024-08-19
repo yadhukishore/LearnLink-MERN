@@ -32,6 +32,7 @@ import ApplyFinancialAid from './components/pages/user/FinancialAidApply.tsx';
 import FinancialAidApplications from './components/pages/admin/FinancialAidApplications.tsx';
 import FinancialAidApplicationDetails from './components/pages/admin/FinancialAidDetail.tsx';
 import CourseVideos from './components/pages/user/CourseVideos.tsx';
+import TutorEditCourse from './components/pages/tutor/TutorEditCourse.tsx';
 
   const AppRoutes = () => {
     const isAuthenticated = useAuth();
@@ -99,6 +100,7 @@ import CourseVideos from './components/pages/user/CourseVideos.tsx';
 <Route path="/tutorHome" element={tutorState.isAuthenticated ? <TutorHome /> : <Navigate to="/tutorLogin" />} />
 <Route path="/tutorCreateCourse" element={tutorState.isAuthenticated ? <TutorCreateCourse /> : <Navigate to="/tutorLogin" />} />
 <Route path="/tutorCourseDetail/:id" element={<TutorCourseDetail />} />
+<Route path="/tutorEditCourse/:id" element={<TutorEditCourse />} />
 <Route path='/waiting-for-approval' element={<WaitingForApproval/>}/>
 
 <Route path="/admin-login" element={<AdminLogin />} />

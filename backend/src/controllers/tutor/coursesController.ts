@@ -4,6 +4,7 @@ import Course, { ICourse } from '../../models/Course';
 import { cloudinary } from '../../config/fileUploads'; 
 import { UploadApiResponse } from 'cloudinary';
 import CourseCategory from '../../models/CourseCategory';
+import mongoose from 'mongoose';
 
 interface MulterRequest extends Request {
   files?: {
@@ -189,32 +190,32 @@ export const getCourseById = async (req: Request, res: Response) => {
   }
 };
 
-// Update a course
-export const updateCourse = async (req: Request, res: Response) => {
-    try {
-        let course: ICourse | null = await Course.findOne({ _id: req.params.id, isDelete: false });
+// // Update a course
+// export const updateCourse = async (req: Request, res: Response) => {
+//     try {
+//         let course: ICourse | null = await Course.findOne({ _id: req.params.id, isDelete: false });
 
-        if (!course) {
-            return res.status(404).json({
-                success: false,
-                message: "Course not found",
-            });
-        }
+//         if (!course) {
+//             return res.status(404).json({
+//                 success: false,
+//                 message: "Course not found",
+//             });
+//         }
 
-        course = await Course.findByIdAndUpdate(req.params.id, req.body, { new: true });
+//         course = await Course.findByIdAndUpdate(req.params.id, req.body, { new: true });
 
-        res.status(200).json({
-            success: true,
-            course,
-            message: "Course updated successfully",
-        });
-    } catch (error) {
-        res.status(400).json({ 
-            success: false,
-            message: (error as Error).message,
-        });
-    }
-};
+//         res.status(200).json({
+//             success: true,
+//             course,
+//             message: "Course updated successfully",
+//         });
+//     } catch (error) {
+//         res.status(400).json({ 
+//             success: false,
+//             message: (error as Error).message,
+//         });
+//     }
+// };
 
 // Delete a course (soft delete)
 export const deleteCourse = async (req: Request, res: Response) => {
@@ -241,4 +242,117 @@ export const deleteCourse = async (req: Request, res: Response) => {
             message: (error as Error).message,
         });
     }
+};
+
+export const updateCourse = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const updates = req.body;
+
+    const course = await Course.findByIdAndUpdate(id, updates, { new: true });
+
+    if (!course) {
+      return res.status(404).json({ message: 'Course not found' });
+    }
+
+    res.status(200).json({ message: 'Course updated successfully', course });
+  } catch (error) {
+    res.status(500).json({ message: 'Error updating course', error });
+  }
+};
+
+export const updateCourseVideo = async (req: Request, res: Response) => {
+  try {
+    const { id, videoId } = req.params;
+    const updates = req.body;
+
+    const course = await Course.findById(id);
+
+    if (!course) {
+      return res.status(404).json({ message: 'Course not found' });
+    }
+
+    const videoIndex = course.videos.findIndex((video) => video.id.toString() === videoId);
+
+    if (videoIndex === -1) {
+      return res.status(404).json({ message: 'Video not found' });
+    }
+
+    Object.assign(course.videos[videoIndex], updates);
+
+    await course.save();
+
+    res.status(200).json({ message: 'Course video updated successfully', course });
+  } catch (error) {
+    res.status(500).json({ message: 'Error updating course video', error });
+  }
+};
+export const addCourseVideo = async (req: Request, res: Response) => {
+  const multerReq = req as MulterRequest;
+  try {
+    const { id } = req.params;
+    const { title, description } = req.body;
+    const file = multerReq.file;
+
+    if (!file || !title || !description) {
+      return res.status(400).json({ message: 'Missing required fields' });
+    }
+
+    const course = await Course.findById(id);
+
+    if (!course) {
+      return res.status(404).json({ message: 'Course not found' });
+    }
+
+    const videoUpload: UploadApiResponse = await cloudinary.uploader.upload(file.path, {
+      folder: 'course_videos',
+      resource_type: 'video',
+    });
+
+    const newVideo = {
+      file: `video-${course.videos.length + 1}`,
+      title: title,
+      description: description,
+      videoUrl: videoUpload.secure_url,
+      videoThumbnail: {
+        public_id: videoUpload.public_id,
+        url: videoUpload.secure_url,
+      },
+    };
+
+    course.videos.push(newVideo as any);
+    await course.save();
+
+    res.status(200).json({ message: 'Video added successfully', course });
+  } catch (error) {
+    console.error('Error in addCourseVideo:', error);
+    res.status(500).json({ message: 'Error adding video', error: (error as Error).message });
+  }
+};
+export const deleteCourseVideo = async (req: Request, res: Response) => {
+  try {
+    const { id, videoId } = req.params;
+
+    const course = await Course.findById(id);
+
+    if (!course) {
+      return res.status(404).json({ message: 'Course not found' });
+    }
+
+    const videoIndex = course.videos.findIndex((video) => video.id.toString() === videoId);
+
+    if (videoIndex === -1) {
+      return res.status(404).json({ message: 'Video not found' });
+    }
+
+    // Delete video from Cloudinary
+    await cloudinary.uploader.destroy(course.videos[videoIndex].videoThumbnail.public_id, { resource_type: 'video' });
+
+    course.videos.splice(videoIndex, 1);
+    await course.save();
+
+    res.status(200).json({ message: 'Video deleted successfully', course });
+  } catch (error) {
+    res.status(500).json({ message: 'Error deleting video', error });
+  }
 };

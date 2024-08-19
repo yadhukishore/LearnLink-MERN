@@ -3,7 +3,7 @@ import express from 'express';
 import multer from 'multer';
 import { tutorLogin, tutorRegister, tutorSubmitingProofs } from '../controllers/tutor/tutorAuthController';
 import { approveTutor } from '../controllers/admin/adminController';
-import { createCourse, getCourseById, getCourses } from '../controllers/tutor/coursesController';
+import { addCourseVideo, createCourse, getCourseById, getCourses, updateCourse, updateCourseVideo } from '../controllers/tutor/coursesController';
 
 
 const router = express.Router();
@@ -20,5 +20,7 @@ router.post('/tutorCreateCourse', upload.fields([
 ]), createCourse);
 router.get('/getCourses/:tutorId', getCourses);
 router.get('/tutorCourseDetail/:courseId', getCourseById);
-
+router.patch('/updateCourse/:id', updateCourse);
+router.patch('/updateCourseVideo/:id/:videoId', updateCourseVideo);
+router.post('/addCourseVideo/:id', upload.single('video'), addCourseVideo);
 export default router;
