@@ -35,6 +35,7 @@ import CourseVideos from './components/pages/user/CourseVideos.tsx';
 import TutorEditCourse from './components/pages/tutor/TutorEditCourse.tsx';
 import CoursesList from './components/pages/admin/AdminCourseList.tsx';
 import CourseDetails from './components/pages/admin/CourseDetailsAdmin.tsx';
+import TutorProfile from './components/pages/tutor/TutorProfile.tsx';
 
   const AppRoutes = () => {
     const isAuthenticated = useAuth();
@@ -115,6 +116,7 @@ import CourseDetails from './components/pages/admin/CourseDetailsAdmin.tsx';
 <Route path="/application/:id" element={<FinancialAidApplicationDetails />} />
 <Route path="/adminCoursesList" element={<CoursesList/>}/>
 <Route path='/adminCourseDetails/:courseId' element={<CourseDetails/>} />
+<Route path="/tutorProfile" element={<TutorProfile />} />
   </Routes>
     );
   };
