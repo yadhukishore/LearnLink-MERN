@@ -47,3 +47,24 @@ export const getFeeds = async (req: Request, res: Response) => {
     res.status(500).json({ message: 'Error fetching feeds', error });
   }
 };
+
+
+export const reportFeed = async (req: Request, res: Response) => {
+  try {
+    const { feedId } = req.params;
+    const feed = await Feed.findById(feedId);
+
+    if (!feed) {
+      return res.status(404).json({ message: 'Feed not found' });
+    }
+    console.log(`${feed} is Reported.`)
+
+    feed.isReported = true;
+    await feed.save();
+
+    res.json({ message: 'Feed reported successfully' });
+  } catch (error) {
+    console.error('Error reporting feed:', error);
+    res.status(500).json({ message: 'Error reporting feed' });
+  }
+};

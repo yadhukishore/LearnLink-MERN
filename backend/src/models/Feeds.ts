@@ -6,6 +6,8 @@ export interface IFeed extends Document {
   files: { url: string; fileType: string }[];
   createdAt: Date;
   updatedAt?: Date;
+  isReported: boolean;
+  isDeleted:boolean;
 }
 
 const feedSchema = new Schema(
@@ -18,6 +20,8 @@ const feedSchema = new Schema(
         fileType: { type: String, required: true },
       },
     ],
+    isReported: { type: Boolean, default: false },
+    isDeleted: { type: Boolean, default: false },
   },
   { timestamps: true }
 );
