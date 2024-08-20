@@ -29,6 +29,15 @@ const CreateFeed: React.FC<CreateFeedProps> = ({ onFeedCreated }) => {
       cancelButtonText: 'No, cancel',
     }).then(async (result) => {
       if (result.isConfirmed) {
+        Swal.fire({
+          title: 'Posting...',
+          text: 'Finishing your Post...Please wait.!.',
+          allowOutsideClick: false,
+          didOpen: () => {
+            Swal.showLoading(); 
+          },
+        });
+
         const formData = new FormData();
         formData.append('content', content);
         files.forEach((file) => formData.append('files', file));
