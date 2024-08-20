@@ -133,6 +133,10 @@ export const tutorLogin = async (req: Request, res: Response) => {
       
       return res.status(400).json({ success: false, message: 'Invalid credentials' });
     }
+    if (tutor.isBanned){
+      console.log("Banned Tutor");
+      return res.status(400).json({ success: false, message: 'Banned Tutor,Please Try another Account' });
+    }
     console.log("name:",tutor.name);
     
     const isMatch = await bcrypt.compare(password, tutor.password);

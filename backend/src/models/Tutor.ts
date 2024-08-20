@@ -12,6 +12,7 @@ export interface ITutor extends Document {
   };
   description: string;
   isApprovedByAdmin: boolean;
+  isBanned: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -29,6 +30,7 @@ const TutorSchema: Schema = new Schema(
     },
     description: { type: String },
     isApprovedByAdmin: { type: Boolean, default: false },
+    isBanned: { type: Boolean, default: false },
   },
   {
     timestamps: true,

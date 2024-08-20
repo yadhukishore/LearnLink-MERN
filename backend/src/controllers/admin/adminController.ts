@@ -68,6 +68,7 @@ export const getEnrolledStudents = async (req: Request, res: Response): Promise<
   }
 };
 
+//users ne Report nokit Suspend Chyan (I will do it!)
 export const toggleCourseSuspension = async (req: Request, res: Response): Promise<void> => {
   try {
     const { courseId } = req.params;
@@ -216,5 +217,33 @@ export const updateFinancialAidStatus = async (req: Request, res: Response) => {
     res.json({ message: `Application ${status}`, application });
   } catch (error) {
     res.status(500).json({ message: 'Error updating application status' });
+  }
+};
+
+export const showTutorsList = async (req: Request, res: Response) => {
+  try {
+    const tutors = await Tutor.find({ isApprovedByAdmin: true }).select('name email createdAt');
+    res.json(tutors);
+  } catch (error) {
+    res.status(500).json({ message: 'Error fetching tutors', error });
+  }
+};
+export const toggleTutorBanStatus = async (req: Request, res: Response) => {
+  console.log("TutorBAn Button")
+  try {
+    const { tutorId } = req.params;
+    const tutor = await Tutor.findById(tutorId);
+    console.log("Tutor "+tutor+" Alle")
+
+    if (!tutor) {
+      return res.status(404).json({ message: 'Tutor not found' });
+    }
+
+    tutor.isBanned = !tutor.isBanned;
+    await tutor.save();
+
+    res.json({ message: 'Tutor ban status updated', tutor });
+  } catch (error) {
+    res.status(500).json({ message: 'Error updating tutor ban status', error });
   }
 };

@@ -1,6 +1,6 @@
 import express from 'express';
 import { loginAdmin, registerAdmin } from '../controllers/admin/adminAuthController';
-import { approveTutor,  getAllCoursesForAdmin, getCourseDetailsForAdmin, getEnrolledStudents, getFinancialAidApplications, getFinancialAidDetails, getPendingTutors, getTutorDetails, getUsers, toggleUserBlockStatus, updateFinancialAidStatus } from '../controllers/admin/adminController';
+import { approveTutor,  getAllCoursesForAdmin, getCourseDetailsForAdmin, getEnrolledStudents, getFinancialAidApplications, getFinancialAidDetails, getPendingTutors, getTutorDetails, getUsers, showTutorsList, toggleTutorBanStatus, toggleUserBlockStatus, updateFinancialAidStatus } from '../controllers/admin/adminController';
 
 
 const router =express.Router();
@@ -17,5 +17,7 @@ router.put('/financial-aid-status/:applicationId', updateFinancialAidStatus);
 router.get('/adminCoursesList', getAllCoursesForAdmin);
 router.get('/adminCourseDetails/:courseId', getCourseDetailsForAdmin);
 router.get('/adminEnrolledStudents/:courseId', getEnrolledStudents);
+router.get('/adminTutorsList', showTutorsList);
+router.put('/toggleTutorBanStatus/:tutorId', toggleTutorBanStatus);
 
 export default router;

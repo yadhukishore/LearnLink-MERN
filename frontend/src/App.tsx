@@ -36,6 +36,7 @@ import TutorEditCourse from './components/pages/tutor/TutorEditCourse.tsx';
 import CoursesList from './components/pages/admin/AdminCourseList.tsx';
 import CourseDetails from './components/pages/admin/CourseDetailsAdmin.tsx';
 import TutorProfile from './components/pages/tutor/TutorProfile.tsx';
+import TutorList from './components/pages/admin/TutorsListAdmin.tsx';
 
   const AppRoutes = () => {
     const isAuthenticated = useAuth();
@@ -105,6 +106,7 @@ import TutorProfile from './components/pages/tutor/TutorProfile.tsx';
 <Route path="/tutorCourseDetail/:id" element={<TutorCourseDetail />} />
 <Route path="/tutorEditCourse/:id" element={<TutorEditCourse />} />
 <Route path='/waiting-for-approval' element={<WaitingForApproval/>}/>
+<Route path="/tutorProfile" element={<TutorProfile />} />
 
 <Route path="/admin-login" element={<AdminLogin />} />
 <Route path="/adminDashboard" element={<AdminDashboard />} />
@@ -116,7 +118,7 @@ import TutorProfile from './components/pages/tutor/TutorProfile.tsx';
 <Route path="/application/:id" element={<FinancialAidApplicationDetails />} />
 <Route path="/adminCoursesList" element={<CoursesList/>}/>
 <Route path='/adminCourseDetails/:courseId' element={<CourseDetails/>} />
-<Route path="/tutorProfile" element={<TutorProfile />} />
+<Route path="/adminTutorsList" element={<TutorList />} />
   </Routes>
     );
   };
