@@ -11,7 +11,7 @@ const Sidebar: React.FC = () => {
     { name: 'Books List', path: '/admin/books' },
     { name: 'Order Detail', path: '/admin/orders' },
     { name: 'Students', path: '/adminStudentsList' },
-    { name: 'Courses', path: '/admin/courses' },
+    { name: 'Courses', path: '/adminCoursesList' },
     { name: 'Feed Control', path: '/admin/feed' },
     { name: 'Financial aids', path: '/adminFinancial-aids'},
     { name: 'Approve Tutor', path: '/adminApprove-tutor' },

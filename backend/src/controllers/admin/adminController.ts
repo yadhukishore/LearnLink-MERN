@@ -3,6 +3,7 @@ import User from '../../models/User';
 import Tutor from '../../models/Tutor';
 import { sendTutorApprovalEmail  } from '../../utils/tutorVerificationMail';
 import FinancialAid from '../../models/FinancialAid';
+import Course from '../../models/Course';
 
 export const getUsers = async (req: Request, res: Response): Promise<void> => {
   try {
@@ -10,6 +11,83 @@ export const getUsers = async (req: Request, res: Response): Promise<void> => {
     console.log(users);
     
     res.json(users);
+  } catch (err) {
+    res.status(500).json({ error: 'Server error' });
+  }
+};
+
+
+export const getAllCoursesForAdmin = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const courses = await Course.find()
+      .select('name thumbnail createdAt')
+      .populate('tutorId', 'name');
+    res.json(courses);
+  } catch (err) {
+    console.error('Error fetching courses:', err);
+    res.status(500).json({ error: 'Server error' });
+  }
+};
+
+export const getCourseDetailsForAdmin = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { courseId } = req.params;
+    const course = await Course.findById(courseId).populate('tutorId', 'name');
+    if (!course) {
+      res.status(404).json({ error: 'Course not found' });
+      return;
+    }
+    res.json(course);
+  } catch (err) {
+    res.status(500).json({ error: 'Server error' });
+  }
+};
+export const getEnrolledStudents = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { courseId } = req.params;
+    console.log("Entered getEnrolledStudents for course:", courseId);
+
+    const approvedApplications = await FinancialAid.find({
+      courseId: courseId,
+      status: 'approved'
+    }).select('userId');
+
+    const approvedUserIds = approvedApplications.map(app => app.userId);
+    const enrolledStudents = await User.find({
+      $or: [
+        { enrolledCourses: courseId },
+        { _id: { $in: approvedUserIds } }
+      ]
+    }).select('name email paymentMethod');
+
+    const totalEnrollmentCount = enrolledStudents.length;
+    res.json({ enrolledStudents, totalEnrollmentCount });
+  } catch (err) {
+    console.error('Error fetching enrolled students:', err);
+    res.status(500).json({ error: 'Server error' });
+  }
+};
+
+export const toggleCourseSuspension = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { courseId } = req.params;
+    const course = await Course.findById(courseId);
+    if (!course) {
+      res.status(404).json({ error: 'Course not found' });
+      return;
+    }
+
+    course.isDelete = !course.isDelete;
+    await course.save();
+
+    if (course.isDelete) {
+      const tutor = await Tutor.findById(course.tutorId);
+      if (tutor) {
+        // await sendWarningEmail(tutor.email, course.name);
+      }
+    }
+
+    res.json({ message: 'Course suspension status updated', isDelete: course.isDelete });
   } catch (err) {
     res.status(500).json({ error: 'Server error' });
   }

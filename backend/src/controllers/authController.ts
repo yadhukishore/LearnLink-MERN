@@ -133,7 +133,10 @@ export const login = async (req: Request, res: Response) => {
       console.log("User not found");
       return res.status(400).json({ message: 'Invalid credentials' });
     }
-
+    if (user.isBlocked) {
+      console.log("User is blocked");
+      return res.status(403).json({ message: 'This User is Blocked!!!' });
+    }
     console.log('User found:', { id: user._id, email: user.email });
     console.log('Stored hashed password:', user.password);
     const isMatch = await user.comparePassword(password);
