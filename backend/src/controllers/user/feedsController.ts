@@ -8,7 +8,6 @@ export const createFeed = async (req: Request, res: Response) => {
     const { content, userId } = req.body;
     const files = req.files as Express.Multer.File[];
 
-    // Upload files to Cloudinary
     const uploadPromises = files.map(file => 
       cloudinary.uploader.upload(file.path, {
         folder: 'feeds',
@@ -17,8 +16,6 @@ export const createFeed = async (req: Request, res: Response) => {
     );
 
     const uploadResults = await Promise.all(uploadPromises);
-
-    // Prepare file data for saving
     const fileData = uploadResults.map(result => ({
       url: result.secure_url,
       fileType: result.resource_type === 'image' ? 'image' : 'file'
@@ -41,10 +38,11 @@ export const createFeed = async (req: Request, res: Response) => {
 
 export const getFeeds = async (req: Request, res: Response) => {
   try {
-    const feeds = await Feed.find().sort({ createdAt: -1 }).populate('user', 'name');
-    res.status(200).json(feeds);
+    const feeds = await Feed.find({ isDeleted: false }).sort({ createdAt: -1 }).populate('user', 'name');
+    res.json(feeds);
   } catch (error) {
-    res.status(500).json({ message: 'Error fetching feeds', error });
+    console.error('Error fetching feeds:', error);
+    res.status(500).json({ message: 'Error fetching feeds' });
   }
 };
 
@@ -66,5 +64,24 @@ export const reportFeed = async (req: Request, res: Response) => {
   } catch (error) {
     console.error('Error reporting feed:', error);
     res.status(500).json({ message: 'Error reporting feed' });
+  }
+};
+
+export const DeleteFeed = async (req: Request, res: Response) => {
+  try {
+    const { feedId } = req.params;
+    const feed = await Feed.findById(feedId);
+
+    if (!feed) {
+      return res.status(404).json({ message: 'Feed not found' });
+    }
+
+    feed.isDeleted = true;
+    await feed.save();
+
+    res.json({ message: 'Feed Deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting feed:', error);
+    res.status(500).json({ message: 'Error deleting feed' });
   }
 };

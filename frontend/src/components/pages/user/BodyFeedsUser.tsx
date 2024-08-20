@@ -39,29 +39,27 @@ const BodyFeedsUser: React.FC = () => {
   const [feeds, setFeeds] = useState<Feed[]>([]);
   const [loading, setLoading] = useState(true);
   const userId = useSelector((state: RootState) => state.auth.user?.id);
-
-  // State to manage the visibility of dropdowns
   const [dropdownOpen, setDropdownOpen] = useState<string | null>(null);
 
-  useEffect(() => {
-    const fetchFeeds = async () => {
-      try {
-        const response = await axios.get<Feed[]>('http://localhost:8000/api/user/feeds');
-        setFeeds(response.data);
-        setLoading(false);
-      } catch (error) {
-        console.error('Error fetching feeds:', error);
-        setLoading(false);
-      }
-    };
+  const fetchFeeds = async () => {
+    try {
+      const response = await axios.get<Feed[]>('http://localhost:8000/api/user/feeds');
+      setFeeds(response.data);
+      setLoading(false);
+    } catch (error) {
+      console.error('Error fetching feeds:', error);
+      setLoading(false);
+    }
+  };
 
-    fetchFeeds();
+  useEffect(() => {
+    fetchFeeds(); 
   }, []);
 
-  
   const toggleDropdown = (id: string) => {
     setDropdownOpen(dropdownOpen === id ? null : id);
   };
+
   const handleReport = async (feedId: string) => {
     const result = await Swal.fire({
       title: 'Are you sure?',
@@ -93,6 +91,37 @@ const BodyFeedsUser: React.FC = () => {
     }
   };
 
+  const handleDelete = async (feedId: string) => {
+    const result = await Swal.fire({
+      title: 'Are you sure?',
+      text: 'Do you want to Delete this feed?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, Remove it!',
+      cancelButtonText: 'No, cancel!',
+    });
+
+    if (result.isConfirmed) {
+      try {
+        await axios.post(`http://localhost:8000/api/user/userFeedDelete/${feedId}`);
+        Swal.fire({
+          title: 'Deleted!',
+          text: 'The feed has been Deleted successfully.',
+          icon: 'success',
+          confirmButtonText: 'OK',
+        });
+        fetchFeeds();
+      } catch (error) {
+        console.error('Error Deleting feed:', error);
+        Swal.fire({
+          title: 'Error!',
+          text: 'There was an error Deleting the feed.',
+          icon: 'error',
+          confirmButtonText: 'OK',
+        });
+      }
+    }
+  };
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -158,9 +187,7 @@ const BodyFeedsUser: React.FC = () => {
                       </button>
                       <button
                         className="block w-full text-left p-2 hover:bg-gray-200"
-                        onClick={() => {
-                          /* handle delete */
-                        }}
+                        onClick={() => handleDelete(feed._id)}
                       >
                         Delete
                       </button>
@@ -168,9 +195,7 @@ const BodyFeedsUser: React.FC = () => {
                   ) : (
                     <button
                       className="block w-full text-left p-2 hover:bg-gray-200"
-                      onClick={() => {
-                        handleReport(feed._id)
-                      }}
+                      onClick={() => handleReport(feed._id)}
                     >
                       Report
                     </button>
@@ -200,26 +225,20 @@ const BodyFeedsUser: React.FC = () => {
                 </div>
               ))}
               <div className="mt-6 flex justify-between items-center">
-                <button className="flex items-center text-red-500 hover:text-red-600 transition-colors duration-300">
-                  <FaHeart className="mr-2" /> Like
+                <button className="flex items-center text-red-500 hover:text-red-700">
+                  <FaHeart className="mr-1" /> Like
                 </button>
-                <button className="flex items-center text-blue-500 hover:text-blue-600 transition-colors duration-300">
-                  <FaComment className="mr-2" /> Comment
+                <button className="flex items-center text-blue-500 hover:text-blue-700">
+                  <FaComment className="mr-1" /> Comment
                 </button>
-                <button className="flex items-center text-green-500 hover:text-green-600 transition-colors duration-300">
-                  <FaShare className="mr-2" /> Share
+                <button className="flex items-center text-green-500 hover:text-green-700">
+                  <FaShare className="mr-1" /> Share
                 </button>
               </div>
             </motion.div>
           ))
         ) : (
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="text-white text-center text-xl"
-          >
-            No feeds available. Be the first to post!
-          </motion.p>
+          <p>No feeds available</p>
         )}
       </div>
     </div>
