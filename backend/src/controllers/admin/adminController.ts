@@ -272,7 +272,6 @@ export const getAdminFeeds = async (req: Request, res: Response) => {
 };
 
 
-// Remove a post (set isDeleted to true)
 export const adminRemovePost = async (req: Request, res: Response) => {
   try {
     const { feedId } = req.params;
