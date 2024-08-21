@@ -4,6 +4,7 @@ import Tutor from '../../models/Tutor';
 import { sendTutorApprovalEmail  } from '../../utils/tutorVerificationMail';
 import FinancialAid from '../../models/FinancialAid';
 import Course from '../../models/Course';
+import Feeds from '../../models/Feeds';
 
 export const getUsers = async (req: Request, res: Response): Promise<void> => {
   try {
@@ -245,5 +246,51 @@ export const toggleTutorBanStatus = async (req: Request, res: Response) => {
     res.json({ message: 'Tutor ban status updated', tutor });
   } catch (error) {
     res.status(500).json({ message: 'Error updating tutor ban status', error });
+  }
+};
+
+/* To get all the non deleted feeds on Admin side as 2 section reported and non reported! 
+*/
+export const getAdminFeeds = async (req: Request, res: Response) => {
+  try {
+    console.log("Get some Feeds to control")
+    const feeds = await Feeds.find({ isDeleted: false })
+      .populate('user', 'name')
+      .sort({ createdAt: -1 });
+
+    const reportedFeeds = feeds.filter(feed => feed.isReported);
+    const normalFeeds = feeds.filter(feed => !feed.isReported);
+
+    res.status(200).json({
+      reportedFeeds,
+      normalFeeds
+    });
+  } catch (error) {
+    console.error('Error fetching feeds:', error);
+    res.status(500).json({ message: 'Error fetching feeds', error });
+  }
+};
+
+
+// Remove a post (set isDeleted to true)
+export const adminRemovePost = async (req: Request, res: Response) => {
+  try {
+    const { feedId } = req.params;
+    console.log(`Remove ${feedId} Post`)
+
+    const updatedFeed = await Feeds.findByIdAndUpdate(
+      feedId,
+      { isDeleted: true },
+      { new: true }
+    );
+
+    if (!updatedFeed) {
+      return res.status(404).json({ message: 'Feed not found' });
+    }
+
+    res.status(200).json({ message: 'Feed removed successfully', feed: updatedFeed });
+  } catch (error) {
+    console.error('Error removing feed:', error);
+    res.status(500).json({ message: 'Error removing feed', error });
   }
 };

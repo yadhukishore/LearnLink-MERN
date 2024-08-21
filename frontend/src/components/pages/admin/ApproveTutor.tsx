@@ -40,7 +40,7 @@ const ApproveTutor: React.FC = () => {
   };
 
   if (!isAuthenticated) {
-    return null; // or a loading spinner
+    return null; 
   }
 
   return (

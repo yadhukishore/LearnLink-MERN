@@ -13,7 +13,7 @@ export interface IFeed extends Document {
 const feedSchema = new Schema(
   {
     user: { type: Schema.Types.ObjectId, ref: 'User', required: true },
-    content: { type: String, required: false }, // Not required now as either content or files can be empty
+    content: { type: String, required: false }, 
     files: [
       {
         url: { type: String, required: true },

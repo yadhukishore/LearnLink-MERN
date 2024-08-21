@@ -62,7 +62,7 @@ const UsersList: React.FC = () => {
           `User has been ${currentStatus ? 'unblocked' : 'blocked'}.`,
           'success'
         );
-        fetchUsers(); // Refresh the user list
+        fetchUsers(); 
       }
     } catch (error: any) {
       Swal.fire(

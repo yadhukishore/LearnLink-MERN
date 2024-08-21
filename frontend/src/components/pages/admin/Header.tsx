@@ -17,7 +17,7 @@ const Header: React.FC = () => {
     '/admin/orders': 'Order Detail',
     '/adminStudentsList': 'Students',
     '/adminCoursesList': 'Courses',
-    '/admin/feed': 'Feed Control',
+    '/adminFeedControl': 'Feed Control',
     '/adminFinancial-aids': 'Financial Aids',
     '/adminApprove-tutor': 'Approve New Tutors',
     '/adminTutorsList': 'Tutors',
@@ -40,7 +40,7 @@ const Header: React.FC = () => {
         <div className="relative">
           <button
             onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-            className="flex items-center text-gray-700 hover:text-gray-900 focus:outline-none"
+            className="flex items-center text-gray-700 hover:text-gray-900 focus:outline-none hover:bg-gray-200 rounded-lg p-1"
           >
               <span className="mr-2">{admin?.username || 'Admin'}</span>
             <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
