@@ -39,6 +39,9 @@ import TutorProfile from './components/pages/tutor/TutorProfile.tsx';
 import TutorList from './components/pages/admin/TutorsListAdmin.tsx';
 import FeedControl from './components/pages/admin/FeedsControlAdmin.tsx';
 import AdminCategory from './components/pages/admin/CategoryAdmin.tsx';
+import FinancialAidApplicationList from './components/pages/tutor/FinacialAidListTutor.tsx';
+import FinancialAidListTutor from './components/pages/tutor/FinacialAidListTutor.tsx';
+import FinancialAidDetailsTutor from './components/pages/tutor/FinacialAidDetailsTutor.tsx';
 
   const AppRoutes = () => {
     const isAuthenticated = useAuth();
@@ -109,6 +112,8 @@ import AdminCategory from './components/pages/admin/CategoryAdmin.tsx';
 <Route path="/tutorEditCourse/:id" element={<TutorEditCourse />} />
 <Route path='/waiting-for-approval' element={<WaitingForApproval/>}/>
 <Route path="/tutorProfile" element={<TutorProfile />} />
+<Route path="/tutorFinacial-aids" element={<FinancialAidListTutor/>}/>
+<Route path='/FinacialapplyDetail/:id' element={<FinancialAidDetailsTutor/>} />
 
 <Route path="/admin-login" element={<AdminLogin />} />
 <Route path="/adminDashboard" element={<AdminDashboard />} />

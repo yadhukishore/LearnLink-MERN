@@ -44,6 +44,13 @@ const TutorHeader = () => {
               >
                Tutor Profile
               </Link>
+              <Link
+                to="/tutorFinacial-aids"
+                className="block px-4 py-2 text-sm text-black hover:bg-white"
+                onClick={() => setIsDropdownOpen(false)}
+              >
+              Finacial-Aid Requests
+              </Link>
               <button
                 onClick={() => {
                   handleLogout();
