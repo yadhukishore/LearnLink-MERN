@@ -3,7 +3,7 @@ import express from 'express';
 import multer from 'multer';
 import { tutorLogin, tutorRegister, tutorSubmitingProofs } from '../controllers/tutor/tutorAuthController';
 import { approveTutor } from '../controllers/admin/adminController';
-import { addCourseVideo, createCourse, getCourseById, getCourses, updateCourse, updateCourseVideo } from '../controllers/tutor/coursesController';
+import { addCourseVideo, createCourse, getAllCategoriesForTutor, getCourseById, getCourses, updateCourse, updateCourseVideo } from '../controllers/tutor/coursesController';
 import { getTutorProfile, updateTutorProfile } from '../controllers/tutor/tutorPersonal';
 import { authenticateTutor } from '../middlewares/tutorAuth';
 
@@ -27,4 +27,5 @@ router.patch('/updateCourseVideo/:id/:videoId', updateCourseVideo);
 router.post('/addCourseVideo/:id', upload.single('video'), addCourseVideo);
 router.get('/tutorProfile', authenticateTutor, getTutorProfile);
 router.patch('/updateProfile', authenticateTutor, updateTutorProfile);
+router.get('/getAllCategoriesForTutor', getAllCategoriesForTutor);
 export default router;

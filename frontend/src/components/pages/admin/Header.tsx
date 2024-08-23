@@ -17,6 +17,7 @@ const Header: React.FC = () => {
     '/admin/orders': 'Order Detail',
     '/adminStudentsList': 'Students',
     '/adminCoursesList': 'Courses',
+    '/adminCoursesCategory': 'Course Category',
     '/adminFeedControl': 'Feed Control',
     '/adminFinancial-aids': 'Financial Aids',
     '/adminApprove-tutor': 'Approve New Tutors',

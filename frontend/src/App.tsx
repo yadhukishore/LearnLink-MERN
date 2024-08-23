@@ -38,6 +38,7 @@ import CourseDetails from './components/pages/admin/CourseDetailsAdmin.tsx';
 import TutorProfile from './components/pages/tutor/TutorProfile.tsx';
 import TutorList from './components/pages/admin/TutorsListAdmin.tsx';
 import FeedControl from './components/pages/admin/FeedsControlAdmin.tsx';
+import AdminCategory from './components/pages/admin/CategoryAdmin.tsx';
 
   const AppRoutes = () => {
     const isAuthenticated = useAuth();
@@ -121,6 +122,7 @@ import FeedControl from './components/pages/admin/FeedsControlAdmin.tsx';
 <Route path='/adminCourseDetails/:courseId' element={<CourseDetails/>} />
 <Route path="/adminTutorsList" element={<TutorList />} />
 <Route path="/adminFeedControl" element={<FeedControl />} />
+<Route path="/adminCoursesCategory" element={<AdminCategory />}/>
   </Routes>
     );
   };

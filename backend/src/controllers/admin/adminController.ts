@@ -5,6 +5,7 @@ import { sendTutorApprovalEmail  } from '../../utils/tutorVerificationMail';
 import FinancialAid from '../../models/FinancialAid';
 import Course from '../../models/Course';
 import Feeds from '../../models/Feeds';
+import CourseCategory from '../../models/CourseCategory';
 
 export const getUsers = async (req: Request, res: Response): Promise<void> => {
   try {
@@ -291,5 +292,89 @@ export const adminRemovePost = async (req: Request, res: Response) => {
   } catch (error) {
     console.error('Error removing feed:', error);
     res.status(500).json({ message: 'Error removing feed', error });
+  }
+};
+
+export const getAllCategories = async (req: Request, res: Response) => {
+  try {
+    // Get categories from CourseCategory model
+    const categoriesFromModel = await CourseCategory.find().sort({ createdAt: -1 });
+
+    // Get unique categories from Course model
+    const coursesWithCategories = await Course.distinct('category');
+
+    // Combine categories
+    const allCategories = [
+      ...categoriesFromModel.map(cat => ({ _id: cat._id, name: cat.name })),
+      ...coursesWithCategories.map(category => ({ name: category }))
+    ];
+
+    // Deduplicate categories
+    const uniqueCategories = Array.from(new Set(allCategories.map(c => c.name)))
+      .map(name => {
+        return allCategories.find(c => c.name === name) || { name };
+      });
+
+    // Get course count for each category
+    const categoriesWithCount = await Promise.all(
+      uniqueCategories.map(async (category) => {
+        const courseCount = await Course.countDocuments({ category: category.name });
+
+        // Handle case where _id might not exist
+        return {
+          _id: (category as any)._id || null,  // Type assertion and fallback to null
+          name: category.name,
+          courseCount
+        };
+      })
+    );
+
+    res.json(categoriesWithCount);
+  } catch (error) {
+    console.error('Error fetching categories:', error);
+    res.status(500).json({ message: 'Error fetching categories' });
+  }
+};
+
+
+export const addCategory = async (req: Request, res: Response) => {
+  try {
+    const { name } = req.body;
+    const newCategory = new CourseCategory({ name });
+    await newCategory.save();
+    res.status(201).json(newCategory);
+  } catch (error) {
+    console.error('Error adding category:', error);
+    res.status(500).json({ message: 'Error adding category' });
+  }
+};
+
+export const updateCategory = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const { name } = req.body;
+    console.log("Entered in to ",name)
+    const updatedCategory = await CourseCategory.findByIdAndUpdate(id, { name }, { new: true });
+    if (!updatedCategory) {
+      return res.status(404).json({ message: 'Category not found' });
+    }
+    res.json(updatedCategory);
+  } catch (error) {
+    console.error('Error updating category:', error);
+    res.status(500).json({ message: 'Error updating category' });
+  }
+};
+
+export const deleteCategory = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const deletedCategory = await CourseCategory.findByIdAndDelete(id);
+    if (!deletedCategory) {
+      return res.status(404).json({ message: 'Category not found' });
+    }
+    res.json({ message: 'Category deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting category:', error);
+    res.status(500).json({ message: 'Error deleting category' });
   }
 };

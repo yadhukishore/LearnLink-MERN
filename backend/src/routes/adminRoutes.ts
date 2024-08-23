@@ -1,6 +1,6 @@
 import express from 'express';
 import { loginAdmin, registerAdmin } from '../controllers/admin/adminAuthController';
-import { adminRemovePost, approveTutor,  getAdminFeeds,  getAllCoursesForAdmin, getCourseDetailsForAdmin, getEnrolledStudents, getFinancialAidApplications, getFinancialAidDetails, getPendingTutors, getTutorDetails, getUsers, showTutorsList, toggleTutorBanStatus, toggleUserBlockStatus, updateFinancialAidStatus } from '../controllers/admin/adminController';
+import { addCategory, adminRemovePost, approveTutor,  deleteCategory,  getAdminFeeds,  getAllCategories,  getAllCoursesForAdmin, getCourseDetailsForAdmin, getEnrolledStudents, getFinancialAidApplications, getFinancialAidDetails, getPendingTutors, getTutorDetails, getUsers, showTutorsList, toggleTutorBanStatus, toggleUserBlockStatus, updateCategory, updateFinancialAidStatus } from '../controllers/admin/adminController';
 
 
 const router =express.Router();
@@ -20,6 +20,10 @@ router.get('/adminEnrolledStudents/:courseId', getEnrolledStudents);
 router.get('/adminTutorsList', showTutorsList);
 router.put('/toggleTutorBanStatus/:tutorId', toggleTutorBanStatus);
 router.get('/adminFeedControl',getAdminFeeds);
-router.post('/AdminRemoveFeed/:feedId',adminRemovePost)
+router.post('/AdminRemoveFeed/:feedId',adminRemovePost);
+router.get('/adminCoursesCategory',getAllCategories);
+router.post('/adminCoursesCategory',addCategory);
+router.put('/adminEditCoursesCategory/:id', updateCategory);
+router.delete('/adminCoursesCategory/:id', deleteCategory);
 
 export default router;
