@@ -2,8 +2,17 @@
 
 import { Request, Response } from 'express';
 import Course,{ ICourse } from '../../models/Course';
+import Razorpay from 'razorpay';
+import crypto from 'crypto';
 import Tutor from '../../models/Tutor'; 
 import FinancialAid from '../../models/FinancialAid';
+import Enrollment from '../../models/Enrollment';
+
+const razorpay = new Razorpay({
+  key_id: process.env.RAZORPAY_KEY_ID || '',
+  key_secret: process.env.RAZORPAY_KEY_SECRET || '',
+});
+
 
 export const getAllCourses = async (req: Request, res: Response) => {
   try {
@@ -23,16 +32,10 @@ export const getAllCourses = async (req: Request, res: Response) => {
 };
 
 
-
 export const getCourseDetails = async (req: Request, res: Response) => {
   try {
-    console.log("Entered to Personal courses");
-    
     const courseId = req.params.courseId;
     const userId = req.query.userId as string;
-    console.log("userID----------",userId);
-    
-    console.log(courseId);
     
     const course: ICourse | null = await Course.findOne({ _id: courseId, isDelete: false })
       .select('name description thumbnail price estimatedPrice level category tags demoUrl benefits prerequisites tutorId')
@@ -44,6 +47,7 @@ export const getCourseDetails = async (req: Request, res: Response) => {
         message: "Course not found",
       });
     }
+
     const videoCount = await Course.aggregate([
       { $match: { _id: course._id } },
       { $project: { videoCount: { $size: "$videos" } } }
@@ -57,24 +61,26 @@ export const getCourseDetails = async (req: Request, res: Response) => {
       status: 'approved'
     });
 
-    const hasApprovedFinancialAid = !!financialAid;
+    const enrollment = await Enrollment.findOne({
+      userId,
+      courseId,
+      status: 'paid'
+    });
+
+    const hasAccess = !!financialAid || !!enrollment;
 
     const courseData = {
       ...course,
       videoCount: videoCount[0].videoCount,
       tutorName: tutor ? tutor.name : 'Unknown Tutor',
-      hasApprovedFinancialAid
+      hasAccess
     };
-
-    console.log("courseData>>", courseData);
 
     res.status(200).json({
       success: true,
       course: courseData,
     });
-    console.log("Successfully sent CourseData")
   } catch (error) {
-    console.log("Failed to send CourseData")
     res.status(500).json({ 
       success: false,
       message: (error as Error).message,
@@ -140,14 +146,25 @@ export const applyForFinancialAid = async (req: Request, res: Response) => {
     try {
       const courseId = req.params.courseId;
       const userId = req.query.userId as string;
-
+  
+      // Check for approved financial aid
       const financialAid = await FinancialAid.findOne({
         userId,
         courseId,
         status: 'approved'
       });
   
-      if (!financialAid) {
+      // Check for paid enrollment
+      const enrollment = await Enrollment.findOne({
+        userId,
+        courseId,
+        status: 'paid'
+      });
+  
+      // Grant access if either financial aid is approved or enrollment is paid
+      const hasAccess = !!financialAid || !!enrollment;
+  
+      if (!hasAccess) {
         return res.status(403).json({
           success: false,
           hasAccess: false,
@@ -202,4 +219,123 @@ export const applyForFinancialAid = async (req: Request, res: Response) => {
       });
     }
   };
-  
+
+
+  export const getCheckoutCourseDetails = async (req: Request, res: Response) => {
+  try {
+    const courseId = req.params.courseId;
+    const userId = req.query.userId as string;
+
+    const course: ICourse | null = await Course.findOne({ _id: courseId, isDelete: false })
+      .select('name description thumbnail price tutorId')
+      .lean();
+
+    if (!course) {
+      return res.status(404).json({
+        success: false,
+        message: "Course not found",
+      });
+    }
+
+    const tutor = await Tutor.findById(course.tutorId).select('name').lean();
+
+    const courseData = {
+      ...course,
+      tutorName: tutor ? tutor.name : 'Unknown Tutor',
+    };
+
+    res.status(200).json({
+      success: true,
+      course: courseData,
+    });
+  } catch (error) {
+    res.status(500).json({ 
+      success: false,
+      message: (error as Error).message,
+    });
+  }
+};
+
+/**
+ * RazorPay
+ */
+
+export const createOrder = async (req: Request, res: Response) => {
+  try {
+    const { courseId, userId } = req.body;
+    console.log(`On createOrder ${courseId} , ${userId}.`);
+    console.log(`Body:- ${req.body}`);
+
+    const course = await Course.findById(courseId);
+    if (!course) {
+      return res.status(404).json({ success: false, message: 'Course not found' });
+    }
+
+    const options = {
+      amount: course.price * 100, // Razorpay expects amount in paise
+      currency: 'INR',
+      receipt: `receipt_${new Date().getTime()}`,
+    };
+
+    const order = await razorpay.orders.create(options);
+    console.log("Order: ",order)
+
+    res.status(200).json({
+      success: true,
+      id: order.id,
+      amount: order.amount,
+      currency: order.currency,
+    });
+  } catch (error) {
+    console.error('Error creating order:', error);
+    res.status(500).json({ success: false, message: 'Error creating order' });
+  }
+};
+
+export const verifyPayment = async (req: Request, res: Response) => {
+  try {
+    const {
+      razorpay_order_id,
+      razorpay_payment_id,
+      razorpay_signature,
+      courseId,
+      userId,
+      amount,
+      currency,
+      status
+    } = req.body;
+    console.log("Verify payment: ", req.body);
+
+    const shasum = crypto.createHmac('sha256', process.env.RAZORPAY_KEY_SECRET || '');
+    shasum.update(`${razorpay_order_id}|${razorpay_payment_id}`);
+    const digest = shasum.digest('hex');
+
+    if (digest !== razorpay_signature) {
+      return res.status(400).json({ success: false, message: 'Transaction not legit!' });
+    }
+
+    const course = await Course.findById(courseId);
+    if (!course) {
+      return res.status(404).json({ success: false, message: 'Course not found' });
+    }
+    const enrollment = new Enrollment({
+      userId,
+      courseId,
+      razorpay_order_id,
+      razorpay_payment_id,
+      razorpay_signature,
+      amount: amount || course.price * 100, // Use the amount from request or calculate from course price
+      currency: currency || 'INR',
+      status: status || 'paid',
+      created_at: new Date()
+    });
+    console.log("Enrollment: ", enrollment);
+    await enrollment.save();
+    await Course.findByIdAndUpdate(courseId, { $inc: { purchased: 1 } });
+
+    res.status(200).json({ success: true, message: 'Payment verified and enrollment successful' });
+  } catch (error) {
+    console.error('Error verifying payment:', error);
+    res.status(500).json({ success: false, message: 'Error verifying payment' });
+  }
+};

@@ -42,6 +42,7 @@ import AdminCategory from './components/pages/admin/CategoryAdmin.tsx';
 import FinancialAidApplicationList from './components/pages/tutor/FinacialAidListTutor.tsx';
 import FinancialAidListTutor from './components/pages/tutor/FinacialAidListTutor.tsx';
 import FinancialAidDetailsTutor from './components/pages/tutor/FinacialAidDetailsTutor.tsx';
+import CheckoutCourse from './components/pages/user/CheckoutCourse.tsx';
 
   const AppRoutes = () => {
     const isAuthenticated = useAuth();
@@ -83,6 +84,7 @@ import FinancialAidDetailsTutor from './components/pages/tutor/FinacialAidDetail
         path="/apply-financial-aid/:courseId" 
         element={<ApplyFinancialAid />} 
       />
+      <Route path="/checkoutUserCourse/:courseId" element={<CheckoutCourse />} />
 
       <Route 
         path="/course-videos/:courseId" 

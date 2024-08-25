@@ -25,6 +25,7 @@ interface CourseDetail {
   videoCount: number;
   tutorName: string;
   hasApprovedFinancialAid: boolean;
+  hasAccess: boolean;
 }
 
 const UserCourseDetail: React.FC = () => {
@@ -85,6 +86,11 @@ const UserCourseDetail: React.FC = () => {
     const courseID = course._id
     navigate(`/apply-financial-aid/${courseID}`);
   };
+
+  const handleEnrollNow = () => {
+    navigate(`/checkoutUserCourse/${course._id}`);
+  };
+
 
   return (
     <div className="min-h-screen bg-[#071A2B] text-white">
@@ -159,9 +165,8 @@ const UserCourseDetail: React.FC = () => {
               )}
             </div>
           </div>
-
           <div className="mt-8 flex space-x-4">
-        {course.hasApprovedFinancialAid ? (
+        {course.hasAccess ? (
           <button
             onClick={handleGoToCourse}
             className="bg-gradient-to-r from-green-500 to-blue-500 text-white px-8 py-4 rounded-lg shadow-lg transform hover:scale-105 transition duration-300 ease-in-out"
@@ -170,7 +175,10 @@ const UserCourseDetail: React.FC = () => {
           </button>
         ) : (
           <>
-            <button className="bg-gradient-to-r from-blue-500 to-purple-500 text-white px-8 py-4 rounded-lg shadow-lg transform hover:scale-105 transition duration-300 ease-in-out">
+            <button 
+              onClick={handleEnrollNow}
+              className="bg-gradient-to-r from-blue-500 to-purple-500 text-white px-8 py-4 rounded-lg shadow-lg transform hover:scale-105 transition duration-300 ease-in-out"
+            >
               Enroll Now
             </button>
             <button
