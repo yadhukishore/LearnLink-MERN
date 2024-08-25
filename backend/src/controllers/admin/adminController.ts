@@ -6,6 +6,7 @@ import FinancialAid from '../../models/FinancialAid';
 import Course from '../../models/Course';
 import Feeds from '../../models/Feeds';
 import CourseCategory from '../../models/CourseCategory';
+import Enrollment from '../../models/Enrollment';
 
 export const getUsers = async (req: Request, res: Response): Promise<void> => {
   try {
@@ -47,23 +48,30 @@ export const getCourseDetailsForAdmin = async (req: Request, res: Response): Pro
 export const getEnrolledStudents = async (req: Request, res: Response): Promise<void> => {
   try {
     const { courseId } = req.params;
-    console.log("Entered getEnrolledStudents for course:", courseId);
 
     const approvedApplications = await FinancialAid.find({
       courseId: courseId,
       status: 'approved'
-    }).select('userId');
+    }).populate('userId', 'name email');
+    
+    const financialAidStudents = approvedApplications.map(app => app.userId);
 
-    const approvedUserIds = approvedApplications.map(app => app.userId);
-    const enrolledStudents = await User.find({
-      $or: [
-        { enrolledCourses: courseId },
-        { _id: { $in: approvedUserIds } }
-      ]
-    }).select('name email paymentMethod');
+    const paidEnrollments = await Enrollment.find({
+      courseId: courseId,
+      status: 'paid'
+    }).populate('userId', 'name email');
 
-    const totalEnrollmentCount = enrolledStudents.length;
-    res.json({ enrolledStudents, totalEnrollmentCount });
+    const paidStudents = paidEnrollments.map(enrollment => enrollment.userId);
+
+    const financialAidApprovedCount = financialAidStudents.length;
+    const paidCount = paidStudents.length;
+
+    res.json({
+      financialAidApprovedCount,
+      paidCount,
+      paidStudents,
+      financialAidStudents,
+    });
   } catch (err) {
     console.error('Error fetching enrolled students:', err);
     res.status(500).json({ error: 'Server error' });

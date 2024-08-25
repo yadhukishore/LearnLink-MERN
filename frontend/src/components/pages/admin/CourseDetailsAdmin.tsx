@@ -7,7 +7,7 @@ import { useSelector } from 'react-redux';
 import { RootState } from '../../store/store';
 import Sidebar from './Sidebar';
 import Header from './Header';
-import { FaBook, FaCalendarAlt, FaUserTie, FaUsers, FaDollarSign, FaStar } from 'react-icons/fa';
+import { FaBook, FaCalendarAlt, FaUserTie, FaUsers, FaDollarSign, FaStar, FaGraduationCap } from 'react-icons/fa';
 
 interface CourseDetails {
   _id: string;
@@ -32,11 +32,27 @@ interface EnrolledStudent {
   email: string;
 }
 
+interface EnrollmentData {
+  enrolledStudents: EnrolledStudent[];
+  totalEnrollmentCount: number;
+  financialAidApprovedCount: number;
+  paidCount: number;
+  paidStudents: EnrolledStudent[];
+  financialAidStudents: EnrolledStudent[];
+}
+
 const CourseDetails: React.FC = () => {
   const [course, setCourse] = useState<CourseDetails | null>(null);
-  const [enrolledStudents, setEnrolledStudents] = useState<EnrolledStudent[]>([]);
-  const [totalEnrollmentCount, setTotalEnrollmentCount] = useState<number>(0);
+  const [enrollmentData, setEnrollmentData] = useState<EnrollmentData>({
+    enrolledStudents: [],
+    totalEnrollmentCount: 0,
+    financialAidApprovedCount: 0,
+    paidCount: 0,
+    paidStudents: [],
+    financialAidStudents: [],
+  });
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const { courseId } = useParams<{ courseId: string }>();
   const navigate = useNavigate();
   const isAuthenticated = useSelector((state: RootState) => state.admin.isAuthenticated);
@@ -55,6 +71,7 @@ const CourseDetails: React.FC = () => {
       const response = await axios.get(`http://localhost:8000/api/admin/adminCourseDetails/${courseId}`);
       setCourse(response.data);
     } catch (error) {
+      setError('Failed to fetch course details. Please try again.');
       console.error('Error fetching course details:', error);
     } finally {
       setIsLoading(false);
@@ -64,9 +81,20 @@ const CourseDetails: React.FC = () => {
   const fetchEnrolledStudents = async () => {
     try {
       const response = await axios.get(`http://localhost:8000/api/admin/adminEnrolledStudents/${courseId}`);
-      setEnrolledStudents(response.data.enrolledStudents);
-      setTotalEnrollmentCount(response.data.totalEnrollmentCount);
+      const paidCount = response.data.paidCount;
+      const financialAidCount = response.data.financialAidApprovedCount;
+      const totalEnrollment = paidCount + financialAidCount;
+  
+      setEnrollmentData({
+        enrolledStudents: response.data.enrolledStudents,
+        totalEnrollmentCount: totalEnrollment,
+        financialAidApprovedCount: financialAidCount,
+        paidCount: paidCount,
+        paidStudents: response.data.paidStudents,
+        financialAidStudents: response.data.financialAidStudents,
+      });
     } catch (error) {
+      setError('Failed to fetch enrolled students. Please try again.');
       console.error('Error fetching enrolled students:', error);
     }
   };
@@ -76,12 +104,22 @@ const CourseDetails: React.FC = () => {
       await axios.put(`http://localhost:8000/api/admin/adminToggleCourseSuspension/${courseId}`);
       fetchCourseDetails();
     } catch (error) {
+      setError('Failed to toggle course suspension. Please try again.');
       console.error('Error toggling course suspension:', error);
     }
   };
 
-  if (!isAuthenticated || isLoading) {
-    return null; // Later i add a loading spinner
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        Loading...
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    console.log("Not Authenticated!!!")
+    return null; 
   }
 
   return (
@@ -90,6 +128,11 @@ const CourseDetails: React.FC = () => {
       <div className="flex flex-col flex-1">
         <Header />
         <main className="flex-1 overflow-y-auto p-6">
+          {error && (
+            <div className="mb-4 p-4 text-red-700 bg-red-100 rounded">
+              {error}
+            </div>
+          )}
           {course && (
             <div className="bg-white shadow-lg rounded-lg overflow-hidden">
               <img
@@ -114,7 +157,15 @@ const CourseDetails: React.FC = () => {
                   </div>
                   <div className="flex items-center text-gray-600">
                     <FaUsers className="mr-2" />
-                    <p>Total Enrollment: {totalEnrollmentCount}</p>
+                    <p>Total Enrollment: {enrollmentData.totalEnrollmentCount}</p>
+                  </div>
+                  <div className="flex items-center text-gray-600">
+                    <FaGraduationCap className="mr-2" />
+                    <p>Financial Aid Approved: {enrollmentData.financialAidApprovedCount}</p>
+                  </div>
+                  <div className="flex items-center text-gray-600">
+                    <FaDollarSign className="mr-2" />
+                    <p>Paid Enrollments: {enrollmentData.paidCount}</p>
                   </div>
                   <div className="flex items-center text-gray-600">
                     <FaStar className="mr-2" />
@@ -139,8 +190,10 @@ const CourseDetails: React.FC = () => {
               </div>
             </div>
           )}
+
+          {/* Paid Enrolled Students */}
           <div className="mt-8">
-            <h2 className="text-2xl font-bold mb-4 text-gray-800">Enrolled Students</h2>
+            <h2 className="text-2xl font-bold mb-4 text-gray-800">Paid Enrolled Students</h2>
             <div className="bg-white shadow-lg rounded-lg overflow-hidden">
               <table className="w-full">
                 <thead className="bg-gray-100">
@@ -154,7 +207,7 @@ const CourseDetails: React.FC = () => {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">
-                  {enrolledStudents.map((student) => (
+                  {enrollmentData.paidStudents.map((student) => (
                     <tr key={student._id}>
                       <td className="px-6 py-4 whitespace-nowrap">{student.name}</td>
                       <td className="px-6 py-4 whitespace-nowrap">{student.email}</td>
@@ -162,6 +215,39 @@ const CourseDetails: React.FC = () => {
                   ))}
                 </tbody>
               </table>
+              {enrollmentData.paidStudents.length === 0 && (
+                <p className="text-center py-4 text-gray-500">No paid students enrolled yet.</p>
+              )}
+            </div>
+          </div>
+
+          {/* Financial Aid Students */}
+          <div className="mt-8">
+            <h2 className="text-2xl font-bold mb-4 text-gray-800">Financial Aid Students</h2>
+            <div className="bg-white shadow-lg rounded-lg overflow-hidden">
+              <table className="w-full">
+                <thead className="bg-gray-100">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Name
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Email
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-200">
+                  {enrollmentData.financialAidStudents.map((student) => (
+                    <tr key={student._id}>
+                      <td className="px-6 py-4 whitespace-nowrap">{student.name}</td>
+                      <td className="px-6 py-4 whitespace-nowrap">{student.email}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              {enrollmentData.financialAidStudents.length === 0 && (
+                <p className="text-center py-4 text-gray-500">No financial aid students enrolled yet.</p>
+              )}
             </div>
           </div>
         </main>
