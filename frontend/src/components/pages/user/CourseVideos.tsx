@@ -2,9 +2,11 @@ import React, { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { useSelector } from 'react-redux';
+import Swal from 'sweetalert2';
 import { RootState } from '../../store/store';
 import Header from './HeaderUser';
-import { FaPlay, FaLock } from 'react-icons/fa';
+import { FaPlay, FaLock, FaCalendarAlt } from 'react-icons/fa';
+import AvailableTimes from './AvailableTimes';
 
 interface Video {
   _id: string;
@@ -17,10 +19,18 @@ interface Video {
   };
 }
 
+interface AvailableTime {
+  _id: string;
+  startTime: string;
+  endTime: string;
+}
+
 const CourseVideos: React.FC = () => {
   const [videos, setVideos] = useState<Video[]>([]);
   const [currentVideo, setCurrentVideo] = useState<Video | null>(null);
   const [loading, setLoading] = useState(true);
+  const [availableTimes, setAvailableTimes] = useState<AvailableTime[]>([]);
+  
   const { courseId } = useParams<{ courseId: string }>();
   const navigate = useNavigate();
   const user = useSelector((state: RootState) => state.auth.user);
@@ -46,7 +56,17 @@ const CourseVideos: React.FC = () => {
       }
     };
 
+    const fetchAvailableTimes = async () => {
+      try {
+        const response = await axios.get(`http://localhost:8000/api/user/available-times/${courseId}`);
+        setAvailableTimes(response.data.availableTimes);
+      } catch (error) {
+        console.error('Error fetching available times:', error);
+      }
+    };
+
     fetchCourseVideos();
+    fetchAvailableTimes();
 
     const handleVisibilityChange = () => {
       if (document.hidden) {
@@ -60,7 +80,11 @@ const CourseVideos: React.FC = () => {
       const forbiddenKeys = ['PrintScreen', 'p', 'P', 's', 'S', 'F12', 'F11'];
       if (forbiddenKeys.includes(event.key) || (event.ctrlKey && event.key === 'p')) {
         event.preventDefault();
-        alert("Screenshots and printing are not allowed.");
+        Swal.fire({
+          icon: 'warning',
+          title: 'Action Not Allowed',
+          text: 'Screenshots and printing are not allowed.',
+        });
       }
     };
 
@@ -81,6 +105,30 @@ const CourseVideos: React.FC = () => {
 
   const handleVideoSelect = (video: Video) => {
     setCurrentVideo(video);
+  };
+
+  const handleScheduleCall = async (timeId: string) => {
+    try {
+      await axios.post(`http://localhost:8000/api/user/schedule-call/${courseId}`, {
+        userId: user?.id,
+        timeId: timeId
+      });
+      Swal.fire({
+        icon: 'success',
+        title: 'Call Scheduled!',
+        text: 'Your call has been scheduled successfully.',
+      });
+      // Refresh available times
+      const response = await axios.get(`http://localhost:8000/api/user/available-times/${courseId}`);
+      setAvailableTimes(response.data.availableTimes);
+    } catch (error) {
+      console.error('Error scheduling call:', error);
+      Swal.fire({
+        icon: 'error',
+        title: 'Oops...',
+        text: 'Failed to schedule call. Please try again.',
+      });
+    }
   };
 
   if (loading) {
@@ -119,8 +167,8 @@ const CourseVideos: React.FC = () => {
             )}
           </div>
 
-          {/* Video List */}
-          <div className="lg:w-1/4">
+          {/* Video List and Available Times */}
+          <div className="lg:w-1/4 space-y-6">
             <div className="bg-gray-800 rounded-lg shadow-lg p-4">
               <h3 className="text-xl font-bold mb-4">Course Content</h3>
               <ul className="space-y-2">
@@ -142,16 +190,15 @@ const CourseVideos: React.FC = () => {
                       </div>
                       <div>
                         <p className="font-semibold">{`${index + 1}. ${video.title}`}</p>
-                        <p className="text-sm text-gray-400">
-                          {/* You can add video duration here if available */}
-                          {/* {video.duration} */}
-                        </p>
                       </div>
                     </div>
                   </li>
                 ))}
               </ul>
             </div>
+
+            {/* Available Times */}
+            <AvailableTimes courseId={courseId} userId={user?.id} />
           </div>
         </div>
       </main>

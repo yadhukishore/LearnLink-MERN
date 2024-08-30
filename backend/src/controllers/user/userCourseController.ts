@@ -7,6 +7,9 @@ import crypto from 'crypto';
 import Tutor from '../../models/Tutor'; 
 import FinancialAid from '../../models/FinancialAid';
 import Enrollment from '../../models/Enrollment';
+// import ScheduledCall from '../../models/ScheduledCall';
+import ScheduledTime from '../../models/ScheduledTime';
+import User from '../../models/User';
 
 const razorpay = new Razorpay({
   key_id: process.env.RAZORPAY_KEY_ID || '',
@@ -337,5 +340,94 @@ export const verifyPayment = async (req: Request, res: Response) => {
   } catch (error) {
     console.error('Error verifying payment:', error);
     res.status(500).json({ success: false, message: 'Error verifying payment' });
+  }
+};
+
+export const getAvailableTimes = async (req: Request, res: Response) => {
+  try {
+    const { courseId } = req.params;
+    const now = new Date();
+    const availableTimes = await ScheduledTime.find({
+      courseId,
+      endTime: { $gt: now }
+    }).sort({ startTime: 1 });
+    res.status(200).json({ success: true, availableTimes });
+  } catch (error) {
+    console.error('Error fetching available times:', error);
+    res.status(500).json({ success: false, message: 'Failed to fetch available times' });
+  }
+};
+export const scheduleCall = async (req: Request, res: Response) => {
+  try {
+    const { userId, timeId } = req.body;
+    const { courseId } = req.params;
+
+    const scheduledTime = await ScheduledTime.findById(timeId);
+    if (!scheduledTime) {
+      return res.status(404).json({ success: false, message: 'Scheduled time not found' });
+    }
+
+    if (new Date(scheduledTime.endTime) <= new Date()) {
+      return res.status(400).json({ success: false, message: 'This time slot has expired' });
+    }
+
+    if (scheduledTime.bookedUsers.includes(userId)) {
+      return res.status(400).json({ success: false, message: 'You have already booked this time slot' });
+    }
+
+    scheduledTime.bookedUsers.push(userId);
+    scheduledTime.isBooked = scheduledTime.bookedUsers.length > 0;
+    await scheduledTime.save();
+
+    res.status(200).json({ success: true, message: 'Call scheduled successfully' });
+  } catch (error) {
+    console.error('Error scheduling call:', error);
+    res.status(500).json({ success: false, message: 'Failed to schedule call' });
+  }
+};
+
+export const unscheduleCall = async (req: Request, res: Response) => {
+  try {
+    const { userId, timeId } = req.body;
+    const { courseId } = req.params;
+
+    const scheduledTime = await ScheduledTime.findById(timeId);
+    if (!scheduledTime) {
+      return res.status(404).json({ success: false, message: 'Scheduled time not found' });
+    }
+
+    const userIndex = scheduledTime.bookedUsers.indexOf(userId);
+    if (userIndex === -1) {
+      return res.status(400).json({ success: false, message: 'You have not booked this time slot' });
+    }
+
+    scheduledTime.bookedUsers.splice(userIndex, 1);
+    scheduledTime.isBooked = scheduledTime.bookedUsers.length > 0;
+    await scheduledTime.save();
+
+    res.status(200).json({ success: true, message: 'Call unscheduled successfully' });
+  } catch (error) {
+    console.error('Error unscheduling call:', error);
+    res.status(500).json({ success: false, message: 'Failed to unschedule call' });
+  }
+};
+
+
+export const getBookedUserDetails = async (req: Request, res: Response) => {
+  try {
+    const { timeId } = req.params;
+    const scheduledTime = await ScheduledTime.findById(timeId).populate({
+      path: 'bookedUsers',
+      select: 'name email'
+    });
+    
+    if (!scheduledTime || scheduledTime.bookedUsers.length === 0) {
+      return res.status(404).json({ message: 'Scheduled time not found or no booked users' });
+    }
+
+    res.json({ bookedUsers: scheduledTime.bookedUsers });
+  } catch (error) {
+    console.error('Error fetching booked user details:', error);
+    res.status(500).json({ message: 'Server error' });
   }
 };

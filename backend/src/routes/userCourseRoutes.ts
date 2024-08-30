@@ -1,7 +1,7 @@
 // src/routes/userCourseRoutes.ts
 
 import express from 'express';
-import { applyForFinancialAid, createOrder, getAllCourses,getCheckoutCourseDetails,getCourseDetails, getCourseVideos, getCurrentCourses, verifyPayment } from '../controllers/user/userCourseController'; 
+import { applyForFinancialAid, createOrder, getAllCourses,getAvailableTimes,getCheckoutCourseDetails,getCourseDetails, getCourseVideos, getCurrentCourses, scheduleCall, unscheduleCall, verifyPayment } from '../controllers/user/userCourseController'; 
 
 const router = express.Router();
 
@@ -13,5 +13,8 @@ router.get('/current-courses', getCurrentCourses);
 router.get('/checkoutUserCourse/:courseId', getCheckoutCourseDetails);
 router.post('/create-order', createOrder);
 router.post('/verify', verifyPayment);
+router.get('/available-times/:courseId', getAvailableTimes);
+router.post('/schedule-call/:courseId', scheduleCall);
+router.post('/unschedule-call/:courseId', unscheduleCall);
 
 export default router;

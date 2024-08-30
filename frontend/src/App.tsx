@@ -43,6 +43,8 @@ import FinancialAidApplicationList from './components/pages/tutor/FinacialAidLis
 import FinancialAidListTutor from './components/pages/tutor/FinacialAidListTutor.tsx';
 import FinancialAidDetailsTutor from './components/pages/tutor/FinacialAidDetailsTutor.tsx';
 import CheckoutCourse from './components/pages/user/CheckoutCourse.tsx';
+import ScheduledCalls from './components/pages/tutor/ScheduledCalls.tsx';
+import CallUserList from './components/pages/tutor/CallUserList.tsx';
 
   const AppRoutes = () => {
     const isAuthenticated = useAuth();
@@ -116,6 +118,8 @@ import CheckoutCourse from './components/pages/user/CheckoutCourse.tsx';
 <Route path="/tutorProfile" element={<TutorProfile />} />
 <Route path="/tutorFinacial-aids" element={<FinancialAidListTutor/>}/>
 <Route path='/FinacialapplyDetail/:id' element={<FinancialAidDetailsTutor/>} />
+<Route path='/scheduled-calls/:tutorId' element={<ScheduledCalls/>} />
+<Route path="/callUserList/:timeId" element={<CallUserList />} />
 
 <Route path="/admin-login" element={<AdminLogin />} />
 <Route path="/adminDashboard" element={<AdminDashboard />} />

@@ -4,9 +4,10 @@ import multer from 'multer';
 import { tutorLogin, tutorRegister, tutorSubmitingProofs } from '../controllers/tutor/tutorAuthController';
 import { approveTutor } from '../controllers/admin/adminController';
 import { addCourseVideo, createCourse, getAllCategoriesForTutor, getCourseById, getCourses, updateCourse, updateCourseVideo } from '../controllers/tutor/coursesController';
-import { getTutorProfile, updateTutorProfile } from '../controllers/tutor/tutorPersonal';
+import { createAvailableTime, deleteAvailableTime, getAllAvailableTimes, getNonExpiredAvailableTimes, getTutorProfile, takeTheCourses, updateTutorProfile } from '../controllers/tutor/tutorPersonal';
 import { authenticateTutor } from '../middlewares/tutorAuth';
 import { getFinancialAidApplicationsForTutor, getFinancialAidDetailsForTutor, updateFinancialAidStatusForTutor } from '../controllers/tutor/tuttorFinacialAid';
+import { getBookedUserDetails } from '../controllers/user/userCourseController';
 
 
 const router = express.Router();
@@ -32,4 +33,11 @@ router.get('/getAllCategoriesForTutor', getAllCategoriesForTutor);
 router.get('/tutorFinacial-aids',getFinancialAidApplicationsForTutor);
 router.get('/FinacialapplyDetail/:applicationId',getFinancialAidDetailsForTutor);
 router.put('/financial-aid-status/:applicationId',updateFinancialAidStatusForTutor);
+router.post('/create-available-time', createAvailableTime);
+router.get('/available-times/:tutorId/:courseId', getAllAvailableTimes);
+router.delete('/delete-available-time/:timeId', deleteAvailableTime);
+router.get('/takeTheCourses/:tutorId', takeTheCourses); 
+router.get('/non-expired-available-times/:tutorId', getNonExpiredAvailableTimes);
+router.get('/booked-user-details/:timeId', getBookedUserDetails);
+
 export default router;

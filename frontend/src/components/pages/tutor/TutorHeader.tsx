@@ -37,19 +37,26 @@ const TutorHeader = () => {
           </button>
           {isDropdownOpen && (
             <div className="absolute right-0 mt-2 w-48 bg-gray-200 rounded-md shadow-lg py-1 z-10">
-                <Link
+              <Link
                 to="/tutorProfile"
                 className="block px-4 py-2 text-sm text-black hover:bg-white"
                 onClick={() => setIsDropdownOpen(false)}
               >
-               Tutor Profile
+                Tutor Profile
               </Link>
               <Link
                 to="/tutorFinacial-aids"
                 className="block px-4 py-2 text-sm text-black hover:bg-white"
                 onClick={() => setIsDropdownOpen(false)}
               >
-              Finacial-Aid Requests
+                Financial-Aid Requests
+              </Link>
+              <Link
+                to={`/scheduled-calls/${tutor.id}`}  // New Link for Scheduled Calls
+                className="block px-4 py-2 text-sm text-black hover:bg-white"
+                onClick={() => setIsDropdownOpen(false)}
+              >
+                Scheduled Calls
               </Link>
               <button
                 onClick={() => {
