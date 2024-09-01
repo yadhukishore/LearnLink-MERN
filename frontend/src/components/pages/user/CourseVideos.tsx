@@ -7,6 +7,7 @@ import { RootState } from '../../store/store';
 import Header from './HeaderUser';
 import { FaPlay, FaLock, FaCalendarAlt } from 'react-icons/fa';
 import AvailableTimes from './AvailableTimes';
+import AcceptCallButton from './AcceptCallButton';
 
 interface Video {
   _id: string;
@@ -143,6 +144,7 @@ const CourseVideos: React.FC = () => {
     <div className="min-h-screen bg-[#071A2B] text-white">
       <Header />
       <main className="container mx-auto py-8 px-4">
+      <AcceptCallButton userId={user?.id} courseId={courseId!} />
         <div className="flex flex-col lg:flex-row gap-8">
           {/* Video Player */}
           <div className="lg:w-3/4">

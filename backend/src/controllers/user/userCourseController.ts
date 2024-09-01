@@ -9,7 +9,8 @@ import FinancialAid from '../../models/FinancialAid';
 import Enrollment from '../../models/Enrollment';
 // import ScheduledCall from '../../models/ScheduledCall';
 import ScheduledTime from '../../models/ScheduledTime';
-import User from '../../models/User';
+import User, { IUser } from '../../models/User';
+import CallLinks from '../../models/CallLinks';
 
 const razorpay = new Razorpay({
   key_id: process.env.RAZORPAY_KEY_ID || '',
@@ -416,18 +417,105 @@ export const unscheduleCall = async (req: Request, res: Response) => {
 export const getBookedUserDetails = async (req: Request, res: Response) => {
   try {
     const { timeId } = req.params;
-    const scheduledTime = await ScheduledTime.findById(timeId).populate({
-      path: 'bookedUsers',
-      select: 'name email'
-    });
+    const scheduledTime = await ScheduledTime.findById(timeId)
+      .populate<{ bookedUsers: IUser[] }>({
+        path: 'bookedUsers',
+        select: 'name email'
+      })
+      .populate<{ courseId: ICourse }>({
+        path: 'courseId',
+        select: 'name'
+      });
     
     if (!scheduledTime || scheduledTime.bookedUsers.length === 0) {
       return res.status(404).json({ message: 'Scheduled time not found or no booked users' });
     }
 
-    res.json({ bookedUsers: scheduledTime.bookedUsers });
+    const bookedUsers = scheduledTime.bookedUsers.map((user) => ({
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+      courseName: (scheduledTime.courseId as ICourse).name,
+      courseId: scheduledTime.courseId._id
+    }));
+
+    res.json({ 
+      bookedUsers,
+      courseName: (scheduledTime.courseId as ICourse).name
+    });
   } catch (error) {
     console.error('Error fetching booked user details:', error);
     res.status(500).json({ message: 'Server error' });
+  }
+};
+
+export const sendCallLink = async (req: Request, res: Response) => {
+  try {
+    const { userId, tutorId, courseId, callLink } = req.body;
+    const newCallLink = new CallLinks({
+      userId,
+      tutorId,
+      courseId,
+      callLink,
+      isEnd: false,
+    });
+    console.log("newCallLink:-\n",newCallLink);
+    await newCallLink.save();
+    console.log("Saved to DB:)")
+
+    res.status(200).json({ success: true, message: 'Call link saved successfully' });
+  } catch (error) {
+    console.error('Error saving call link:', error);
+    res.status(500).json({ success: false, message: 'Failed to save call link' });
+  }
+};
+export const checkCallLink = async (req: Request, res: Response) => {
+  try {
+    const { userId, courseId } = req.params;
+    console.log(`Checking for videocall...by ${userId} on ${courseId}`);
+
+    const callLink = await CallLinks.findOne({
+      userId,
+      courseId,
+      isEnd: false, 
+    }).sort({ createdAt: -1 });
+
+    if (callLink) {
+      console.log("CallLink found:", callLink);
+      res.status(200).json({ callLink: callLink.callLink });
+    } else {
+      console.log("No link found for user:", userId, "and course:", courseId);
+      res.status(404).json({ message: 'No active call link found' });
+    }
+  } catch (error) {
+    console.error('Error checking call link:', error);
+    res.status(500).json({ message: 'Error checking call link' });
+  }
+};
+
+
+export const endCall = async (req: Request, res: Response) => {
+  try {
+    const { roomId } = req.params;
+    console.log("RoomId:", roomId);
+
+    const fullCallLink = `/room/${roomId}`;
+
+    const updatedCallLink = await CallLinks.findOneAndUpdate(
+      { callLink: fullCallLink, isEnd: false },
+      { isEnd: true },
+      { new: true }
+    );
+
+    if (!updatedCallLink) {
+      console.error('Active call link not found for roomId:', roomId);
+      return res.status(404).json({ message: 'Active call link not found' });
+    }
+
+    console.log("Call ended successfully:", updatedCallLink);
+    res.status(200).json({ message: 'Call ended successfully', callLink: updatedCallLink });
+  } catch (error) {
+    console.error('Error ending call:', error);
+    res.status(500).json({ message: 'Error ending call' });
   }
 };

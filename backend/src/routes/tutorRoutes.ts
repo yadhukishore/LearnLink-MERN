@@ -7,7 +7,7 @@ import { addCourseVideo, createCourse, getAllCategoriesForTutor, getCourseById, 
 import { createAvailableTime, deleteAvailableTime, getAllAvailableTimes, getNonExpiredAvailableTimes, getTutorProfile, takeTheCourses, updateTutorProfile } from '../controllers/tutor/tutorPersonal';
 import { authenticateTutor } from '../middlewares/tutorAuth';
 import { getFinancialAidApplicationsForTutor, getFinancialAidDetailsForTutor, updateFinancialAidStatusForTutor } from '../controllers/tutor/tuttorFinacialAid';
-import { getBookedUserDetails } from '../controllers/user/userCourseController';
+import { getBookedUserDetails, sendCallLink } from '../controllers/user/userCourseController';
 
 
 const router = express.Router();
@@ -39,5 +39,6 @@ router.delete('/delete-available-time/:timeId', deleteAvailableTime);
 router.get('/takeTheCourses/:tutorId', takeTheCourses); 
 router.get('/non-expired-available-times/:tutorId', getNonExpiredAvailableTimes);
 router.get('/booked-user-details/:timeId', getBookedUserDetails);
+router.post('/send-call-link', sendCallLink);
 
 export default router;

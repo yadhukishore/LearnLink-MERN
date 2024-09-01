@@ -4,7 +4,8 @@ import authRoutes from './authRoutes';
 import adminRoutes from'./adminRoutes';
 import tutorRoutes from './tutorRoutes';
 import userCourseRoutes from './userCourseRoutes';
-import userFeedRoutes from './userFeedRoutes'
+import userFeedRoutes from './userFeedRoutes';
+import callRoutes from './callRoutes';
 
 const router = express.Router();
 
@@ -17,4 +18,5 @@ router.use('/admin', (req, res, next) => {
 router.use('/tutor',tutorRoutes);
 router.use('/user', userCourseRoutes);
 router.use('/user',userFeedRoutes);
+router.use('/call',callRoutes);
 export default router;
