@@ -46,6 +46,7 @@ import CheckoutCourse from './components/pages/user/CheckoutCourse.tsx';
 import ScheduledCalls from './components/pages/tutor/ScheduledCalls.tsx';
 import CallUserList from './components/pages/tutor/CallUserList.tsx';
 import RoomPage from './components/pages/RoomPage.tsx';
+import TutorWallet from './components/pages/tutor/WalletTutor.tsx';
 
   const AppRoutes = () => {
     const isAuthenticated = useAuth();
@@ -122,6 +123,7 @@ import RoomPage from './components/pages/RoomPage.tsx';
 <Route path='/scheduled-calls/:tutorId' element={<ScheduledCalls/>} />
 <Route path="/callUserList/:timeId" element={<CallUserList />} />
 <Route path="/room/:roomId" element={<RoomPage />} />
+<Route path="/tutorWallet" element={< TutorWallet />} />
 
 <Route path="/admin-login" element={<AdminLogin />} />
 <Route path="/adminDashboard" element={<AdminDashboard />} />

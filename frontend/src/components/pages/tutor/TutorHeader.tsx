@@ -52,11 +52,18 @@ const TutorHeader = () => {
                 Financial-Aid Requests
               </Link>
               <Link
-                to={`/scheduled-calls/${tutor.id}`}  // New Link for Scheduled Calls
+                to={`/scheduled-calls/${tutor.id}`} 
                 className="block px-4 py-2 text-sm text-black hover:bg-white"
                 onClick={() => setIsDropdownOpen(false)}
               >
                 Scheduled Calls
+              </Link>
+              <Link
+                to={`/tutorWallet`}  
+                className="block px-4 py-2 text-sm text-black hover:bg-white"
+                onClick={() => setIsDropdownOpen(false)}
+              >
+               Wallet
               </Link>
               <button
                 onClick={() => {

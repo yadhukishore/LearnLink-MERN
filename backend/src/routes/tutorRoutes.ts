@@ -4,7 +4,7 @@ import multer from 'multer';
 import { tutorLogin, tutorRegister, tutorSubmitingProofs } from '../controllers/tutor/tutorAuthController';
 import { approveTutor } from '../controllers/admin/adminController';
 import { addCourseVideo, createCourse, getAllCategoriesForTutor, getCourseById, getCourses, updateCourse, updateCourseVideo } from '../controllers/tutor/coursesController';
-import { createAvailableTime, deleteAvailableTime, getAllAvailableTimes, getNonExpiredAvailableTimes, getTutorProfile, takeTheCourses, updateTutorProfile } from '../controllers/tutor/tutorPersonal';
+import { createAvailableTime, deleteAvailableTime, getAllAvailableTimes, getNonExpiredAvailableTimes, getTutorProfile, getTutorWalletDetails, takeTheCourses, updateTutorProfile } from '../controllers/tutor/tutorPersonal';
 import { authenticateTutor } from '../middlewares/tutorAuth';
 import { getFinancialAidApplicationsForTutor, getFinancialAidDetailsForTutor, updateFinancialAidStatusForTutor } from '../controllers/tutor/tuttorFinacialAid';
 import { getBookedUserDetails, sendCallLink } from '../controllers/user/userCourseController';
@@ -40,5 +40,6 @@ router.get('/takeTheCourses/:tutorId', takeTheCourses);
 router.get('/non-expired-available-times/:tutorId', getNonExpiredAvailableTimes);
 router.get('/booked-user-details/:timeId', getBookedUserDetails);
 router.post('/send-call-link', sendCallLink);
+router.get('/tutorWallet',getTutorWalletDetails);
 
 export default router;

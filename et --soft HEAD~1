@@ -1,0 +1,203 @@
+[33mcommit fb994026dfcc31b9ff162fea073c892bd44f5a34[m[33m ([m[1;36mHEAD -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m)[m
+Author: Yadhukrishna <yadhukishore37@gmail.com>
+Date:   Mon Sep 2 11:33:09 2024 +0530
+
+    Proper error message on category unique validation
+
+[33mcommit 294bf9e186aa73f774330b38fd2ab7ac45b1a770[m
+Author: Yadhukrishna <yadhukishore37@gmail.com>
+Date:   Mon Sep 2 00:52:41 2024 +0530
+
+    CallLinks models to add newly created calls and a ZegoCloud RoomPage to make video calls by tutor who can connect the user when user Clicks on the Accept Button
+
+[33mcommit f50b9493efe66b44d614cac47e4bac4b426fc355[m
+Author: Yadhukrishna <yadhukishore37@gmail.com>
+Date:   Fri Aug 30 13:05:56 2024 +0530
+
+    Time Scheduling by tutor and listing that on userSide where user can book that and the tutor can see the list of users booked the slot
+
+[33mcommit 91aac31eb397db1cac33336150ba825ec1f2cfa6[m
+Author: Yadhukrishna <yadhukishore37@gmail.com>
+Date:   Sun Aug 25 20:39:05 2024 +0530
+
+    Admin Side Razorpay enrollment listing
+
+[33mcommit 7997a6a7831e469db6bccd6d0178592ba4480f1a[m
+Author: Yadhukrishna <yadhukishore37@gmail.com>
+Date:   Sun Aug 25 15:16:19 2024 +0530
+
+    User Side Online Payment(Razorpay) and Course Enrollment
+
+[33mcommit 46476f8ba00228158238fed3de0ec06f569b52e0[m
+Author: Yadhukrishna <yadhukishore37@gmail.com>
+Date:   Sat Aug 24 00:37:24 2024 +0530
+
+    Simply added Finacial-Aid Approvals on Tutor Side
+
+[33mcommit e47f601c98bc7f49ab02500099d1103446e1904e[m
+Author: Yadhukrishna <yadhukishore37@gmail.com>
+Date:   Fri Aug 23 20:56:04 2024 +0530
+
+    Category creation/listing on admin side and those where available for tutor on creating course
+
+[33mcommit f5556d5c6a8894338a878db5138491db7b156a88[m
+Author: Yadhukrishna <yadhukishore37@gmail.com>
+Date:   Wed Aug 21 14:20:27 2024 +0530
+
+    Test Commit
+
+[33mcommit 1d168d751beaa90fc36b71c1967187d9557ca2e5[m
+Author: Yadhukrishna <yadhukishore37@gmail.com>
+Date:   Wed Aug 21 14:16:02 2024 +0530
+
+    Feeds Reporting functionality and Admin Side Feeds Management
+
+[33mcommit 8c1aafc9f7ace18fdf7981a478c6ecf3b9073b01[m
+Author: Yadhukrishna <yadhukishore37@gmail.com>
+Date:   Wed Aug 21 01:30:44 2024 +0530
+
+    Feeds Soft Deletions
+
+[33mcommit 37298b19c5f8bced08a566794c69e7ba87e430d7[m
+Author: Yadhukrishna <yadhukishore37@gmail.com>
+Date:   Wed Aug 21 00:56:09 2024 +0530
+
+    Feeds Reportings
+
+[33mcommit bb2e5cdf32d84246a27a41645861e89b3de730f1[m
+Author: Yadhukrishna <yadhukishore37@gmail.com>
+Date:   Tue Aug 20 23:35:52 2024 +0530
+
+    Feeds Loading Spinner
+
+[33mcommit d7dd04da3cfef14f0c1cd2d02a8ade7ceb3e63f4[m
+Author: Yadhukrishna <yadhukishore37@gmail.com>
+Date:   Tue Aug 20 23:14:41 2024 +0530
+
+    Tutor Listing and Bannings
+
+[33mcommit e0e05526b0f1a5431a530a8b4ecb84850168dbc7[m
+Author: Yadhukrishna <yadhukishore37@gmail.com>
+Date:   Tue Aug 20 16:59:28 2024 +0530
+
+    Tutor Profile Frontend,backend and a TutorAuth middleware
+
+[33mcommit dac154a92ffdca82565dabae88c934146f39c7e2[m
+Author: Yadhukrishna <yadhukishore37@gmail.com>
+Date:   Tue Aug 20 13:18:19 2024 +0530
+
+    Admin Side Course Listing and its Details With No.of users Enrolled in Each courses
+
+[33mcommit db0988ed1eb7f29c015ce1d543455225b9d7771e[m
+Author: Yadhukrishna <yadhukishore37@gmail.com>
+Date:   Mon Aug 19 22:03:43 2024 +0530
+
+    Admin Can Block/Unblock  Users
+
+[33mcommit 82310832ca5eae4935556b5eb16c50e6ce2f1af2[m
+Author: Yadhukrishna <yadhukishore37@gmail.com>
+Date:   Mon Aug 19 17:34:39 2024 +0530
+
+    When Uploading New Course It shows Please wait its loading in UI
+
+[33mcommit 4dbba8ed591f355d208cfbcc0e6ad27177393ed3[m
+Author: Yadhukrishna <yadhukishore37@gmail.com>
+Date:   Mon Aug 19 17:09:14 2024 +0530
+
+    When Editing video of the Course(Adding a new Video) ProgressBar is Added
+
+[33mcommit 3589d0b6a01419ea3af91ca798f013168c05bcbc[m
+Author: Yadhukrishna <yadhukishore37@gmail.com>
+Date:   Mon Aug 19 16:56:01 2024 +0530
+
+    Edit Course Setup With Add Videos in edit part
+
+[33mcommit fdd7875dcaee7746d78ee1276273a6784b51eda4[m
+Author: Yadhukrishna <yadhukishore37@gmail.com>
+Date:   Mon Aug 19 01:21:25 2024 +0530
+
+    User Side Feeds post and renderings
+
+[33mcommit d9fab54205d87097f6a65bef9b9976056681f9b7[m
+Author: Yadhukrishna <yadhukishore37@gmail.com>
+Date:   Sun Aug 18 23:26:38 2024 +0530
+
+    Finacial-Aid Purchased Courses Listing
+
+[33mcommit 1c939a7628c80a147c2b4a59c38080d57a3189f6[m
+Author: Yadhukrishna <yadhukishore37@gmail.com>
+Date:   Sun Aug 18 19:50:11 2024 +0530
+
+    Finacial-Aid Approval by Admin, Rendering the Course on user Side
+
+[33mcommit 6411d0ba94814101952b568ffc90215c643ba114[m
+Author: Yadhukrishna <yadhukishore37@gmail.com>
+Date:   Sat Aug 17 20:03:32 2024 +0530
+
+    Course Rendering on userSide and apply finacialAid frontend
+
+[33mcommit d3b15222b2c4c91fdbebebb34bc1e39eedeca229[m
+Author: Yadhukrishna <yadhukishore37@gmail.com>
+Date:   Sat Aug 17 00:57:11 2024 +0530
+
+    Tutor Course Part
+
+[33mcommit c1ef05d496b54f12e3a589062f7522fbc128d4b7[m
+Author: Yadhukrishna <yadhukishore37@gmail.com>
+Date:   Fri Aug 9 23:52:14 2024 +0530
+
+    authentication and tutor home  page
+
+[33mcommit 19b3996f4b96b1d4059778888ae452104afb7d5b[m
+Author: Yadhukrishna <yadhukishore37@gmail.com>
+Date:   Mon Aug 5 01:06:15 2024 +0530
+
+    setup admin approval
+
+[33mcommit 31a6c2f13b12edfea9dcada200f03de863f114df[m
+Author: Yadhukrishna <yadhukishore37@gmail.com>
+Date:   Fri Aug 2 00:26:05 2024 +0530
+
+    tutor side front end setup and landing page front end setup also admin side basic setup
+
+[33mcommit e2a15b43f5fd845a35083d5917ac97a6da1f64e5[m
+Author: Yadhukrishna <yadhukishore37@gmail.com>
+Date:   Sun Jul 28 20:55:33 2024 +0530
+
+    Designed feeds page with Shimmers,and Tutor Modal
+
+[33mcommit c2d2a1c04fdd4fc5ea621ca70abb7025bd26e7f9[m
+Author: Yadhukrishna <yadhukishore37@gmail.com>
+Date:   Sun Jul 28 17:30:41 2024 +0530
+
+    Set up Google Auth
+
+[33mcommit c04f48ef677a1b7f0f64370576203e2b9aaa9edd[m
+Author: Yadhukrishna <yadhukishore37@gmail.com>
+Date:   Sat Jul 27 22:38:54 2024 +0530
+
+    AuthCleanup
+
+[33mcommit 6e749f699da5bd59ca0e76f5d7ef2cba92a300a2[m
+Author: Yadhukrishna <yadhukishore37@gmail.com>
+Date:   Sat Jul 27 22:32:25 2024 +0530
+
+    Done user auth
+
+[33mcommit 580d06fd6eec726c995c48e092c828ae9cbb52c4[m
+Author: Yadhukrishna <yadhukishore37@gmail.com>
+Date:   Fri Jul 26 00:31:06 2024 +0530
+
+    Backend connect
+
+[33mcommit e53292afc0467149fd88baa09ded4963fb568494[m
+Author: Yadhukrishna <yadhukishore37@gmail.com>
+Date:   Wed Jul 24 23:01:02 2024 +0530
+
+    Basic Landing Page Setup
+
+[33mcommit e8c150c0e5d8f1d90f6e71870d7f2b40b358e9a8[m
+Author: Yadhukrishna <yadhukishore37@gmail.com>
+Date:   Wed Jul 24 14:55:00 2024 +0530
+
+    first commit

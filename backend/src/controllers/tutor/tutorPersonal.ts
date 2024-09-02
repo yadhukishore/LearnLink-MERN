@@ -3,6 +3,7 @@ import Tutor , {ITutor} from '../../models/Tutor';
 // import ScheduledCall from '../../models/ScheduledCall';
 import ScheduledTime from '../../models/ScheduledTime';
 import Course from '../../models/Course';
+import Enrollment from '../../models/Enrollment';
 
 declare global {
     namespace Express {
@@ -10,6 +11,10 @@ declare global {
         user?: ITutor;
       }
     }
+  }
+
+  interface CustomRequest extends Request{
+    tutor?:{_id:string};
   }
 
   export const getTutorProfile = async (req: Request, res: Response) => {
@@ -111,4 +116,46 @@ declare global {
     } catch (error) {
         res.status(500).json({ message: 'Error fetching available times', error });
     }
+};
+
+//Tutor Wallet things...
+
+export const getTutorWalletDetails = async (req: CustomRequest, res: Response) => {
+  try {
+    const tutorId = req.headers['tutor-id'];
+    if (!tutorId) {
+      console.log("No Tutor");
+      return res.status(400).json({ message: 'No Tutor ID provided' });
+    }
+    if (!tutorId) {
+      console.log("No Tutor");
+      return res.status(401).json({ message: 'Unauthorized' });
+    }
+
+    // Get the total amount earned by the tutor
+    const totalEarnings = await Enrollment.aggregate([
+      { $match: { courseId: { $in: await Course.find({ tutorId }).distinct('_id') } } },
+      { $group: { _id: null, totalAmount: { $sum: '$amount' } } },
+    ]);
+
+    const totalAmount = totalEarnings.length > 0 ? totalEarnings[0].totalAmount : 0;
+
+    // Get the courses and their paid enrollments for the tutor
+    const courses = await Course.find({ tutorId }).select('name');
+    console.log("courses",courses);
+    const coursesWithEnrollments = await Promise.all(
+      courses.map(async (course) => ({
+        name: course.name,
+        paidEnrollments: await Enrollment.countDocuments({ courseId: course._id, status: 'paid' }),
+      }))
+    );
+
+    res.json({
+      totalAmount,
+      courses: coursesWithEnrollments,
+    });
+  } catch (error) {
+    console.error('Error getting tutor wallet details:', error);
+    res.status(500).json({ message: 'Error getting tutor wallet details' });
+  }
 };
