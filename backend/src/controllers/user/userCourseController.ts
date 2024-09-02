@@ -205,11 +205,21 @@ export const applyForFinancialAid = async (req: Request, res: Response) => {
       const approvedCourses = await FinancialAid.find({ userId, status: 'approved' })
         .populate('courseId', 'name description thumbnail price estimatedPrice level category')
         .lean();
+
+      const paidCourses = await Enrollment.find({userId,status:'paid'})
+        .populate('courseId', 'name description thumbnail price estimatedPrice level category')
+        .lean();
   
-      const currentCourses = approvedCourses.map(aid => ({
-        ...aid.courseId,
-        // progress: 0 
-      }));
+        const currentCourses = [
+          ...approvedCourses.map((aid) => ({
+            ...aid.courseId,
+            progress: 0,
+          })),
+          ...paidCourses.map((enroll) => ({
+            ...enroll.courseId,
+            progress: 0, 
+          })),
+        ];
       console.log("currentCourses", currentCourses);
   
       res.status(200).json({
