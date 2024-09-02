@@ -305,32 +305,26 @@ export const adminRemovePost = async (req: Request, res: Response) => {
 
 export const getAllCategories = async (req: Request, res: Response) => {
   try {
-    // Get categories from CourseCategory model
     const categoriesFromModel = await CourseCategory.find().sort({ createdAt: -1 });
 
-    // Get unique categories from Course model
     const coursesWithCategories = await Course.distinct('category');
 
-    // Combine categories
     const allCategories = [
       ...categoriesFromModel.map(cat => ({ _id: cat._id, name: cat.name })),
       ...coursesWithCategories.map(category => ({ name: category }))
     ];
 
-    // Deduplicate categories
     const uniqueCategories = Array.from(new Set(allCategories.map(c => c.name)))
       .map(name => {
         return allCategories.find(c => c.name === name) || { name };
       });
 
-    // Get course count for each category
     const categoriesWithCount = await Promise.all(
       uniqueCategories.map(async (category) => {
         const courseCount = await Course.countDocuments({ category: category.name });
 
-        // Handle case where _id might not exist
         return {
-          _id: (category as any)._id || null,  // Type assertion and fallback to null
+          _id: (category as any)._id || null,  
           name: category.name,
           courseCount
         };
@@ -348,6 +342,12 @@ export const getAllCategories = async (req: Request, res: Response) => {
 export const addCategory = async (req: Request, res: Response) => {
   try {
     const { name } = req.body;
+
+    const existingCategory = await CourseCategory.findOne({ name: { $regex: new RegExp(`^${name}$`, 'i') } });
+    if (existingCategory) {
+      console.log("A category with this name already exists");
+      return res.status(400).json({ message: 'A category with this name already exists' });
+    }
     const newCategory = new CourseCategory({ name });
     await newCategory.save();
     res.status(201).json(newCategory);
@@ -361,7 +361,18 @@ export const updateCategory = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const { name } = req.body;
-    console.log("Entered in to ",name)
+    console.log("Entered in to ",name);
+
+    const existingCategory = await CourseCategory.findOne({
+      _id: { $ne: id },
+      name: { $regex: new RegExp(`^${name}$`, 'i') }
+    });
+    if (existingCategory) {
+      console.log("Editing category name already exists")
+      return res.status(400).json({ message: 'Editing category name already exists' });
+    }
+
+
     const updatedCategory = await CourseCategory.findByIdAndUpdate(id, { name }, { new: true });
     if (!updatedCategory) {
       return res.status(404).json({ message: 'Category not found' });

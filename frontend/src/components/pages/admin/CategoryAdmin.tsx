@@ -55,8 +55,13 @@ const AdminCategory: React.FC = () => {
       setNewCategoryName('');
       setIsAddingCategory(false);
       fetchCategories();
+      Swal.fire('Success', 'Category added successfully', 'success');
     } catch (error) {
-      console.error('Error adding category:', error);
+      if (axios.isAxiosError(error) && error.response) {
+        Swal.fire('Error', error.response.data.message || 'Error adding category', 'error');
+      } else {
+        Swal.fire('Error', 'An unexpected error occurred', 'error');
+      }
     }
   };
 
@@ -75,13 +80,21 @@ const AdminCategory: React.FC = () => {
               return response.data;
             })
             .catch(error => {
-              Swal.showValidationMessage(`Request failed: ${error}`);
+              if (axios.isAxiosError(error) && error.response) {
+                Swal.showValidationMessage(error.response.data.message || 'Error updating category');
+              } else {
+                Swal.showValidationMessage('An unexpected error occurred');
+              }
             });
         } else if (newName === currentName) {
           Swal.showValidationMessage('New name must be different from the current name');
         } else {
           Swal.showValidationMessage('Category name cannot be empty');
         }
+      }
+    }).then((result) => {
+      if (result.isConfirmed) {
+        Swal.fire('Success', 'Category updated successfully', 'success');
       }
     });
   };
@@ -109,7 +122,7 @@ const AdminCategory: React.FC = () => {
   };
 
   if (!isAuthenticated) {
-    return null; // Later you can add a loading spinner
+    return null; // Later add a loading spinner
   }
 
   return (
