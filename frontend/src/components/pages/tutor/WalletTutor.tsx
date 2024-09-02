@@ -71,7 +71,10 @@ const TutorWallet = () => {
                 transition={{ duration: 0.6 }}
               >
                 <h2 className="text-2xl font-semibold">Total Amount Earned</h2>
-                <p className="text-5xl font-bold text-green-400 mt-2 animate-pulse">₹{totalAmount.toFixed(2)}</p>
+                <p className="text-5xl font-bold text-green-400 mt-2 animate-pulse">
+  ₹{totalAmount.toFixed(2)}
+</p>
+
               </motion.div>
 
               <motion.h2

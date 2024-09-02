@@ -132,21 +132,18 @@ export const getTutorWalletDetails = async (req: CustomRequest, res: Response) =
       return res.status(401).json({ message: 'Unauthorized' });
     }
 
-    // Get the total amount earned by the tutor
     const totalEarnings = await Enrollment.aggregate([
       { $match: { courseId: { $in: await Course.find({ tutorId }).distinct('_id') } } },
       { $group: { _id: null, totalAmount: { $sum: '$amount' } } },
     ]);
 
     const totalAmount = totalEarnings.length > 0 ? totalEarnings[0].totalAmount : 0;
-
-    // Get the courses and their paid enrollments for the tutor
-    const courses = await Course.find({ tutorId }).select('name');
-    console.log("courses",courses);
+    const courses = await Course.find({ tutorId }).select('name price');
     const coursesWithEnrollments = await Promise.all(
       courses.map(async (course) => ({
         name: course.name,
         paidEnrollments: await Enrollment.countDocuments({ courseId: course._id, status: 'paid' }),
+        earnings: course.price * await Enrollment.countDocuments({ courseId: course._id, status: 'paid' }) // New: Calculate earnings for each course
       }))
     );
 

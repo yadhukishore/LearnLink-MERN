@@ -359,19 +359,16 @@ export const deleteCourseVideo = async (req: Request, res: Response) => {
 
 export const getAllCategoriesForTutor = async (req: Request, res: Response) => {
   try {
-    // Get categories from CourseCategory model
     const categoriesFromModel = await CourseCategory.find().sort({ createdAt: -1 });
 
-    // Get unique categories from Course model
     const coursesWithCategories = await Course.distinct('category');
 
-    // Combine categories
+
     const allCategories = [
       ...categoriesFromModel.map(cat => ({ _id: cat._id, name: cat.name })),
       ...coursesWithCategories.map(category => ({ name: category }))
     ];
 
-    // Deduplicate categories
     const uniqueCategories = Array.from(new Set(allCategories.map(c => c.name)))
       .map(name => {
         return allCategories.find(c => c.name === name) || { name };

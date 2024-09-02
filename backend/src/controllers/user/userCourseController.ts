@@ -328,7 +328,7 @@ export const verifyPayment = async (req: Request, res: Response) => {
       razorpay_order_id,
       razorpay_payment_id,
       razorpay_signature,
-      amount: amount || course.price * 100, // Use the amount from request or calculate from course price
+      amount: (amount || course.price * 100) / 100, // Convert paise to rupees back
       currency: currency || 'INR',
       status: status || 'paid',
       created_at: new Date()
