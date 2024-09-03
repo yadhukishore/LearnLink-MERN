@@ -10,11 +10,41 @@ import Enrollment from '../../models/Enrollment';
 
 export const getUsers = async (req: Request, res: Response): Promise<void> => {
   try {
-    const users = await User.find().select('-password'); 
+    const page = parseInt(req.query.page as string, 10) || 1;
+    const limit = parseInt(req.query.limit as string, 10)|| 10;
+    const skip = (page-1)*limit;
+    const [users,totalUsers]=await Promise.all([
+      User.aggregate([
+        {
+          $project: {
+            name: 1,
+            email: 1,
+            googleId: 1,
+            isBlocked: 1,
+            createdAt: 1,
+            updatedAt: 1
+          }
+        },
+        {
+          $sort: { createdAt: -1 } 
+        },
+        {
+          $skip:skip
+        },
+        {
+          $limit:limit
+        },
+    ]),
+    User.countDocuments({}),//Гит
+  ]);
     console.log(users);
-    
-    res.json(users);
+    res.json({
+      users,
+      totalPages:Math.ceil(totalUsers/limit),
+      currentPage:page,
+    });
   } catch (err) {
+    console.error('Error in getUsers:', err);
     res.status(500).json({ error: 'Server error' });
   }
 };
