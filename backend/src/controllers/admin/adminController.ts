@@ -52,10 +52,25 @@ export const getUsers = async (req: Request, res: Response): Promise<void> => {
 
 export const getAllCoursesForAdmin = async (req: Request, res: Response): Promise<void> => {
   try {
-    const courses = await Course.find()
-      .select('name thumbnail createdAt')
-      .populate('tutorId', 'name');
-    res.json(courses);
+    const page = parseInt(req.query.page as string, 10) || 1; 
+    const limit = parseInt(req.query.limit as string, 10) || 6; 
+    const skip = (page - 1) * limit;
+
+    const [courses, totalCourses] = await Promise.all([
+      Course.find()
+        .select('name thumbnail createdAt')
+        .populate('tutorId', 'name')
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit),
+      Course.countDocuments(),
+    ]);
+
+    res.json({
+      courses,
+      totalPages: Math.ceil(totalCourses / limit),
+      currentPage: page,
+    });
   } catch (err) {
     console.error('Error fetching courses:', err);
     res.status(500).json({ error: 'Server error' });

@@ -8,6 +8,7 @@ import { RootState } from '../../store/store';
 import Sidebar from './Sidebar';
 import Header from './Header';
 import { FaBook, FaCalendarAlt, FaUserTie } from 'react-icons/fa';
+import { Pagination } from 'flowbite-react';
 
 interface Course {
   _id: string;
@@ -24,6 +25,9 @@ interface Course {
 const CoursesList: React.FC = () => {
   const [courses, setCourses] = useState<Course[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [totalPages, setTotalPages] = useState<number>(1);
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const isAuthenticated = useSelector((state: RootState) => state.admin.isAuthenticated);
@@ -36,17 +40,21 @@ const CoursesList: React.FC = () => {
     if (!isAuthenticated) {
       navigate('/admin-login');
     } else {
-      fetchCourses();
+      fetchCourses(currentPage);
     }
-  }, [isAuthenticated, navigate]);
+  }, [isAuthenticated, navigate, currentPage]);
 
-  const fetchCourses = async () => {
+  const fetchCourses = async (page: number) => {
     setIsLoading(true);
     try {
-      const response = await axios.get('http://localhost:8000/api/admin/adminCoursesList');
-      setCourses(response.data);
+      const response = await axios.get('http://localhost:8000/api/admin/adminCoursesList', {
+        params: { page, limit: 6 }, 
+      });
+      setCourses(response.data.courses);
+      setTotalPages(response.data.totalPages);
     } catch (error) {
       console.error('Error fetching courses:', error);
+      setError('Error fetching courses');
     } finally {
       setIsLoading(false);
     }
@@ -56,11 +64,15 @@ const CoursesList: React.FC = () => {
     navigate(`/adminCourseDetails/${courseId}`);
   };
 
+  const onPageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
   if (!isAuthenticated) {
     return null; // Later i will add a loading spinner
   }
 
-  return (
+   return (
     <div className="flex h-screen bg-gray-100">
       <Sidebar />
       <div className="flex flex-col flex-1">
@@ -71,37 +83,49 @@ const CoursesList: React.FC = () => {
             <div className="flex justify-center items-center h-64">
               <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-purple-500"></div>
             </div>
+          ) : error ? (
+            <div className="text-red-500 text-center">{error}</div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {courses.map((course) => (
-                <div
-                  key={course._id}
-                  className="bg-white shadow-lg rounded-lg overflow-hidden cursor-pointer transform transition duration-300 hover:scale-105"
-                  onClick={() => handleCourseClick(course._id)}
-                >
-                  <img
-                    src={course.thumbnail.url}
-                    alt={course.name}
-                    className="w-full h-48 object-cover"
-                  />
-                  <div className="p-4">
-                    <h2 className="text-xl font-semibold text-gray-800 mb-2">{course.name}</h2>
-                    <div className="flex items-center text-gray-600 mb-2">
-                      <FaCalendarAlt className="mr-2" />
-                      <p>Created: {new Date(course.createdAt).toLocaleDateString()}</p>
+            <>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {courses.map((course) => (
+                  <div
+                    key={course._id}
+                    className="bg-white shadow-lg rounded-lg overflow-hidden cursor-pointer transform transition duration-300 hover:scale-105"
+                    onClick={() => handleCourseClick(course._id)}
+                  >
+                    <img
+                      src={course.thumbnail.url}
+                      alt={course.name}
+                      className="w-full h-48 object-cover"
+                    />
+                    <div className="p-4">
+                      <h2 className="text-xl font-semibold text-gray-800 mb-2">{course.name}</h2>
+                      <div className="flex items-center text-gray-600 mb-2">
+                        <FaCalendarAlt className="mr-2" />
+                        <p>Created: {new Date(course.createdAt).toLocaleDateString()}</p>
+                      </div>
+                      <div className="flex items-center text-gray-600">
+                        <FaUserTie className="mr-2" />
+                        <p>Tutor: {course.tutorId.name}</p>
+                      </div>
                     </div>
-                    <div className="flex items-center text-gray-600">
-                      <FaUserTie className="mr-2" />
-                      <p>Tutor: {course.tutorId.name}</p>
+                    <div className="bg-purple-500 text-white py-2 px-4 flex items-center justify-center">
+                      <FaBook className="mr-2" />
+                      <span>View Details</span>
                     </div>
                   </div>
-                  <div className="bg-purple-500 text-white py-2 px-4 flex items-center justify-center">
-                    <FaBook className="mr-2" />
-                    <span>View Details</span>
-                  </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+              {/* Pagination Component */}
+              <div className="flex justify-center mt-8">
+                <Pagination
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  onPageChange={onPageChange}
+                />
+              </div>
+            </>
           )}
         </main>
       </div>
