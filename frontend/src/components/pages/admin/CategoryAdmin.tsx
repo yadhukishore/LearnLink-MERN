@@ -9,11 +9,12 @@ import Sidebar from './Sidebar';
 import Header from './Header';
 import { FaFolder, FaPlus, FaEdit, FaTrash } from 'react-icons/fa';
 import Swal from 'sweetalert2';
+import { Pagination } from 'flowbite-react'; 
 
 interface Category {
   _id: string;
   name: string;
-  courseCount: number; // Added courseCount to display the number of courses in each category
+  courseCount: number;
 }
 
 const AdminCategory: React.FC = () => {
@@ -21,6 +22,8 @@ const AdminCategory: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [newCategoryName, setNewCategoryName] = useState('');
   const [isAddingCategory, setIsAddingCategory] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const isAuthenticated = useSelector((state: RootState) => state.admin.isAuthenticated);
@@ -33,15 +36,18 @@ const AdminCategory: React.FC = () => {
     if (!isAuthenticated) {
       navigate('/admin-login');
     } else {
-      fetchCategories();
+      fetchCategories(currentPage); 
     }
-  }, [isAuthenticated, navigate]);
+  }, [isAuthenticated, navigate, currentPage]);
 
-  const fetchCategories = async () => {
+  const fetchCategories = async (page: number) => {
     setIsLoading(true);
     try {
-      const response = await axios.get('http://localhost:8000/api/admin/adminCoursesCategory');
-      setCategories(response.data);
+      const response = await axios.get('http://localhost:8000/api/admin/adminCoursesCategory', {
+        params: { page, limit: 6 } 
+      });
+      setCategories(response.data.categories);
+      setTotalPages(response.data.totalPages);
     } catch (error) {
       console.error('Error fetching categories:', error);
     } finally {
@@ -54,7 +60,7 @@ const AdminCategory: React.FC = () => {
       await axios.post('http://localhost:8000/api/admin/adminCoursesCategory', { name: newCategoryName });
       setNewCategoryName('');
       setIsAddingCategory(false);
-      fetchCategories();
+      fetchCategories(currentPage); 
       Swal.fire('Success', 'Category added successfully', 'success');
     } catch (error) {
       if (axios.isAxiosError(error) && error.response) {
@@ -76,7 +82,7 @@ const AdminCategory: React.FC = () => {
         if (newName && newName !== currentName) {
           return axios.put(`http://localhost:8000/api/admin/adminEditCoursesCategory/${categoryId}`, { name: newName })
             .then(response => {
-              fetchCategories();
+              fetchCategories(currentPage); 
               return response.data;
             })
             .catch(error => {
@@ -111,7 +117,7 @@ const AdminCategory: React.FC = () => {
       if (result.isConfirmed) {
         axios.delete(`http://localhost:8000/api/admin/adminCoursesCategory/${categoryId}`)
           .then(() => {
-            fetchCategories();
+            fetchCategories(currentPage);
             Swal.fire('Deleted!', 'The category has been deleted.', 'success');
           })
           .catch(error => {
@@ -119,6 +125,10 @@ const AdminCategory: React.FC = () => {
           });
       }
     });
+  };
+
+  const onPageChange = (page: number) => {
+    setCurrentPage(page);
   };
 
   if (!isAuthenticated) {
@@ -160,7 +170,7 @@ const AdminCategory: React.FC = () => {
             </div>
           )}
 
-{isLoading ? (
+          {isLoading ? (
             <div className="flex justify-center items-center h-64">
               <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-purple-500"></div>
             </div>
@@ -198,6 +208,15 @@ const AdminCategory: React.FC = () => {
               ))}
             </div>
           )}
+
+          {/* Pagination Component */}
+          <div className="flex justify-center mt-8">
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={onPageChange}
+            />
+          </div>
         </main>
       </div>
     </div>

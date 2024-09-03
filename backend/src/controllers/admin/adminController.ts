@@ -305,33 +305,73 @@ export const adminRemovePost = async (req: Request, res: Response) => {
 
 export const getAllCategories = async (req: Request, res: Response) => {
   try {
-    const categoriesFromModel = await CourseCategory.find().sort({ createdAt: -1 });
+    const page = parseInt(req.query.page as string, 10) || 1;
+    const limit = parseInt(req.query.limit as string, 10) || 6;
+    const skip = (page - 1) * limit;
 
-    const coursesWithCategories = await Course.distinct('category');
+    const [categoriesAggregation, totalCategories] = await Promise.all([
+      CourseCategory.aggregate([
+        {
+          $sort: { createdAt: -1 }
+        },
+        {
+          $project: {
+            _id: 1,
+            name: 1
+          }
+        },
+        {
+          $skip: skip
+        },
+        {
+          $limit: limit
+        }
+      ]),
+      CourseCategory.countDocuments({})
+    ]);
+
+    const courseCategoriesAggregation = await Course.aggregate([
+      {
+        $group: {
+          _id: '$category',
+          count: { $sum: 1 }
+        }
+      },
+      {
+        $project: {
+          name: '$_id',
+          courseCount: '$count',
+          _id: 0
+        }
+      }
+    ]);
 
     const allCategories = [
-      ...categoriesFromModel.map(cat => ({ _id: cat._id, name: cat.name })),
-      ...coursesWithCategories.map(category => ({ name: category }))
+      ...categoriesAggregation,
+      ...courseCategoriesAggregation.filter(cat => !categoriesAggregation.some(c => c.name === cat.name))
     ];
 
-    const uniqueCategories = Array.from(new Set(allCategories.map(c => c.name)))
-      .map(name => {
-        return allCategories.find(c => c.name === name) || { name };
-      });
-
     const categoriesWithCount = await Promise.all(
-      uniqueCategories.map(async (category) => {
-        const courseCount = await Course.countDocuments({ category: category.name });
-
-        return {
-          _id: (category as any)._id || null,  
-          name: category.name,
-          courseCount
-        };
+      allCategories.map(async (category) => {
+        if (category.courseCount === undefined) {
+          const courseCount = await Course.countDocuments({ category: category.name });
+          return {
+            _id: category._id || null,
+            name: category.name,
+            courseCount
+          };
+        }
+        return category;
       })
     );
 
-    res.json(categoriesWithCount);
+    const totalPages = Math.ceil(totalCategories / limit);
+
+    res.json({
+      categories: categoriesWithCount,
+      totalPages,
+      currentPage: page
+    });
   } catch (error) {
     console.error('Error fetching categories:', error);
     res.status(500).json({ message: 'Error fetching categories' });
