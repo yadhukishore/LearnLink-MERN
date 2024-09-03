@@ -9,7 +9,7 @@ import Header from './Header';
 import { FaUser, FaCalendarAlt, FaExclamationTriangle, FaTrash, FaImage } from 'react-icons/fa';
 import Swal from 'sweetalert2';
 import withReactContent from 'sweetalert2-react-content';
-
+import { Pagination } from 'flowbite-react';
 
 interface Feed {
   _id: string;
@@ -28,6 +28,10 @@ const FeedControl: React.FC = () => {
   const [normalFeeds, setNormalFeeds] = useState<Feed[]>([]);
   const [reportedFeeds, setReportedFeeds] = useState<Feed[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [reportedPage, setReportedPage] = useState<number>(1);
+  const [normalPage, setNormalPage] = useState<number>(1);
+  const [totalReportedPages, setTotalReportedPages] = useState<number>(1);
+  const [totalNormalPages, setTotalNormalPages] = useState<number>(1);
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const isAuthenticated = useSelector((state: RootState) => state.admin.isAuthenticated);
@@ -40,22 +44,32 @@ const FeedControl: React.FC = () => {
     if (!isAuthenticated) {
       navigate('/admin-login');
     } else {
-      fetchFeeds();
+      fetchFeeds(reportedPage, normalPage);
     }
-  }, [isAuthenticated, navigate]);
+  }, [isAuthenticated, navigate, reportedPage, normalPage]);
 
-  const fetchFeeds = async () => {
+  const fetchFeeds = async (reportedPage: number, normalPage: number) => {
     setIsLoading(true);
     try {
-      const response = await axios.get('http://localhost:8000/api/admin/adminFeedControl');
+      const response = await axios.get('http://localhost:8000/api/admin/adminFeedControl', {
+        params: {
+          reportedPage,
+          normalPage,
+          reportedLimit: 3, 
+          normalLimit: 6,   
+        },
+      });
       setReportedFeeds(response.data.reportedFeeds);
       setNormalFeeds(response.data.normalFeeds);
+      setTotalReportedPages(response.data.totalReportedPages);
+      setTotalNormalPages(response.data.totalNormalPages);
     } catch (error) {
       console.error('Error fetching feeds:', error);
     } finally {
       setIsLoading(false);
     }
   };
+
 
   const MySwal = withReactContent(Swal);
 
@@ -128,7 +142,7 @@ const FeedControl: React.FC = () => {
               </div>
             ) : (
               <div className="h-48 bg-gradient-to-r from-purple-400 to-pink-500 flex items-center justify-center">
-                <p className="text-white text-xl font-semibold">No Image Uploded</p>
+                <p className="text-white text-xl font-semibold">No Image Uploaded</p>
               </div>
             )}
             <div className="p-6">
@@ -170,7 +184,19 @@ const FeedControl: React.FC = () => {
           <h1 className="text-4xl font-bold mb-8 text-gray-500 text-center">Feed Control</h1>
           <div className="max-w-7xl mx-auto">
             {renderFeedSection(reportedFeeds, "Reported Feeds")}
+            <Pagination
+              currentPage={reportedPage}
+              totalPages={totalReportedPages}
+              onPageChange={setReportedPage}
+              className="my-4"
+            />
             {renderFeedSection(normalFeeds, "Normal Feeds")}
+            <Pagination
+              currentPage={normalPage}
+              totalPages={totalNormalPages}
+              onPageChange={setNormalPage}
+              className="my-4"
+            />
           </div>
         </main>
       </div>

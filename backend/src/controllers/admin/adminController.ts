@@ -322,17 +322,45 @@ export const toggleTutorBanStatus = async (req: Request, res: Response) => {
 */
 export const getAdminFeeds = async (req: Request, res: Response) => {
   try {
-    console.log("Get some Feeds to control")
-    const feeds = await Feeds.find({ isDeleted: false })
-      .populate('user', 'name')
-      .sort({ createdAt: -1 });
+    console.log("Get some Feeds to control");
 
-    const reportedFeeds = feeds.filter(feed => feed.isReported);
-    const normalFeeds = feeds.filter(feed => !feed.isReported);
+    // Extract pagination parameters from the request query for reported feeds
+    const reportedPage = parseInt(req.query.reportedPage as string, 10) || 1;
+    const reportedLimit = parseInt(req.query.reportedLimit as string, 10) || 5; // Default 5 per page
+    const reportedSkip = (reportedPage - 1) * reportedLimit;
+
+    // Extract pagination parameters from the request query for normal feeds
+    const normalPage = parseInt(req.query.normalPage as string, 10) || 1;
+    const normalLimit = parseInt(req.query.normalLimit as string, 10) || 5; // Default 5 per page
+    const normalSkip = (normalPage - 1) * normalLimit;
+
+    // Fetch reported feeds
+    const [reportedFeeds, totalReported] = await Promise.all([
+      Feeds.find({ isDeleted: false, isReported: true })
+        .populate('user', 'name')
+        .sort({ createdAt: -1 })
+        .skip(reportedSkip)
+        .limit(reportedLimit),
+      Feeds.countDocuments({ isDeleted: false, isReported: true }),
+    ]);
+
+    // Fetch normal feeds
+    const [normalFeeds, totalNormal] = await Promise.all([
+      Feeds.find({ isDeleted: false, isReported: false })
+        .populate('user', 'name')
+        .sort({ createdAt: -1 })
+        .skip(normalSkip)
+        .limit(normalLimit),
+      Feeds.countDocuments({ isDeleted: false, isReported: false }),
+    ]);
 
     res.status(200).json({
       reportedFeeds,
-      normalFeeds
+      totalReportedPages: Math.ceil(totalReported / reportedLimit),
+      currentReportedPage: reportedPage,
+      normalFeeds,
+      totalNormalPages: Math.ceil(totalNormal / normalLimit),
+      currentNormalPage: normalPage,
     });
   } catch (error) {
     console.error('Error fetching feeds:', error);
