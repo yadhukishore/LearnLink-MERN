@@ -1,16 +1,15 @@
 // src/components/user/UserCourseList.tsx
-
 import React, { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import { motion } from 'framer-motion';
 import Header from './HeaderUser';
 import CurrentLearningCourses from './CurrentLearningCourses';
-import { useSelector,useDispatch } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../../store/store';
-import { addToWishlist,removeFromWishlist,setWishlist } from '../../../features/wishlist/wishlistSlice';
+import { addToWishlist, removeFromWishlist, setWishlist } from '../../../features/wishlist/wishlistSlice';
 import { FaHeart, FaRegHeart } from 'react-icons/fa';
-
+import { Pagination } from 'flowbite-react';
 
 interface Course {
   _id: string;
@@ -20,9 +19,9 @@ interface Course {
     url: string;
   };
   price: number;
-  estimatedPrice:number;
+  estimatedPrice: number;
   level: string;
-  category:string;
+  category: string;
 }
 
 interface CurrentCourse extends Course {
@@ -37,16 +36,20 @@ const UserCourseList: React.FC = () => {
   const [courses, setCourses] = useState<Course[]>([]);
   const [currentCourses, setCurrentCourses] = useState<CurrentCourse[]>([]);
   const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const coursesPerPage = 6; 
 
   useEffect(() => {
     const fetchCourses = async () => {
       try {
         const [allCoursesResponse, currentCoursesResponse] = await Promise.all([
-          axios.get('http://localhost:8000/api/user/courses'),
+          axios.get(`http://localhost:8000/api/user/courses?page=${currentPage}&limit=${coursesPerPage}`),
           axios.get(`http://localhost:8000/api/user/current-courses?userId=${user?.id}`)
         ]);
 
         setCourses(allCoursesResponse.data.courses);
+        setTotalPages(allCoursesResponse.data.totalPages);
         setCurrentCourses(currentCoursesResponse.data.currentCourses);
 
         if (user?.id) {
@@ -64,11 +67,11 @@ const UserCourseList: React.FC = () => {
     if (user?.id) {
       fetchCourses();
     }
-  }, [user, dispatch]);
+  }, [user, dispatch, currentPage]);
 
   const handleWishlistToggle = useCallback(async (course: Course) => {
     const isWishlisted = wishlist.some(item => item._id === course._id);
-  
+
     try {
       const url = isWishlisted ? '/wishlist/remove' : '/wishlist/add';
       await axios.post(`http://localhost:8000/api/user${url}`, {
@@ -80,8 +83,10 @@ const UserCourseList: React.FC = () => {
       console.error('Error updating wishlist:', error);
     }
   }, [wishlist, user, dispatch]);
-  
-  
+
+  const onPageChange = (page: number) => {
+    setCurrentPage(page); 
+  };
 
   if (loading) {
     return (
@@ -149,6 +154,15 @@ const UserCourseList: React.FC = () => {
               </motion.div>
             );
           })}
+        </div>
+
+        {/* Pagination Component */}
+        <div className="flex justify-center mt-8">
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={onPageChange}
+          />
         </div>
       </main>
     </div>

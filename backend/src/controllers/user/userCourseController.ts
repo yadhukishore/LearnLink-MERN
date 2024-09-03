@@ -18,23 +18,53 @@ const razorpay = new Razorpay({
 });
 
 
-export const getAllCourses = async (req: Request, res: Response) => {
+export const getAllCourses = async (req: Request, res: Response): Promise<void> => {
   try {
-    const courses: ICourse[] = await Course.find({ isDelete: false }).select('name description thumbnail price level category estimatedPrice');
-    
-    
+    const page = parseInt(req.query.page as string, 10) || 1;
+    const limit = parseInt(req.query.limit as string, 10) || 10;
+    const skip = (page - 1) * limit;
+
+    const coursesAggregation = [
+      {
+        $match: { isDelete: false } 
+      },
+      {
+        $project: {
+          name: 1,
+          description: 1,
+          thumbnail: 1,
+          price: 1,
+          level: 1,
+          category: 1,
+          estimatedPrice: 1
+        }
+      },
+      {
+        $skip: skip 
+      },
+      {
+        $limit: limit 
+      }
+    ];
+
+    const [courses, totalCourses] = await Promise.all([
+      Course.aggregate(coursesAggregation).exec(),
+      Course.countDocuments({ isDelete: false }).exec()
+    ]);
+
     res.status(200).json({
       success: true,
       courses,
+      totalPages: Math.ceil(totalCourses / limit),
+      currentPage: page
     });
   } catch (error) {
-    res.status(500).json({ 
+    res.status(500).json({
       success: false,
-      message: (error as Error).message,
+      message: (error as Error).message
     });
   }
 };
-
 
 export const getCourseDetails = async (req: Request, res: Response) => {
   try {
