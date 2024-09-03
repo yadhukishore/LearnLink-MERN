@@ -215,9 +215,36 @@ export const approveTutor = async (req: Request, res: Response) => {
 
 export const getPendingTutors = async (req: Request, res: Response) => {
   try {
-    const tutors = await Tutor.find({ isApprovedByAdmin: false }).select('name email');
-    res.json(tutors);
+    const page = parseInt(req.query.page as string, 10) || 1;
+    const limit = parseInt(req.query.limit as string, 10) || 10; 
+    const skip = (page - 1) * limit;
+
+    const [tutors, totalTutors] = await Promise.all([
+      Tutor.aggregate([
+        {
+          $match: {
+            isApprovedByAdmin: false
+          }
+        },
+        {
+          $project: {
+            name: 1,
+            email: 1
+          }
+        },
+        { $skip: skip },
+        { $limit: limit }
+      ]),
+      Tutor.countDocuments({ isApprovedByAdmin: false }),
+    ]);
+
+    res.json({
+      tutors,
+      totalPages: Math.ceil(totalTutors / limit),
+      currentPage: page,
+    });
   } catch (error) {
+    console.error('Error fetching pending tutors:', error);
     res.status(500).json({ message: 'Error fetching pending tutors' });
   }
 };
@@ -324,17 +351,14 @@ export const getAdminFeeds = async (req: Request, res: Response) => {
   try {
     console.log("Get some Feeds to control");
 
-    // Extract pagination parameters from the request query for reported feeds
     const reportedPage = parseInt(req.query.reportedPage as string, 10) || 1;
-    const reportedLimit = parseInt(req.query.reportedLimit as string, 10) || 5; // Default 5 per page
+    const reportedLimit = parseInt(req.query.reportedLimit as string, 10) || 5; 
     const reportedSkip = (reportedPage - 1) * reportedLimit;
 
-    // Extract pagination parameters from the request query for normal feeds
     const normalPage = parseInt(req.query.normalPage as string, 10) || 1;
-    const normalLimit = parseInt(req.query.normalLimit as string, 10) || 5; // Default 5 per page
+    const normalLimit = parseInt(req.query.normalLimit as string, 10) || 5; 
     const normalSkip = (normalPage - 1) * normalLimit;
 
-    // Fetch reported feeds
     const [reportedFeeds, totalReported] = await Promise.all([
       Feeds.find({ isDeleted: false, isReported: true })
         .populate('user', 'name')
@@ -344,7 +368,6 @@ export const getAdminFeeds = async (req: Request, res: Response) => {
       Feeds.countDocuments({ isDeleted: false, isReported: true }),
     ]);
 
-    // Fetch normal feeds
     const [normalFeeds, totalNormal] = await Promise.all([
       Feeds.find({ isDeleted: false, isReported: false })
         .populate('user', 'name')

@@ -6,9 +6,12 @@ import { checkAdminAuthStatus } from '../../../features/admin/adminSlice';
 import { RootState } from '../../store/store';
 import Sidebar from './Sidebar';
 import Header from './Header';
+import { Pagination } from 'flowbite-react';
 
 const ApproveTutor: React.FC = () => {
   const [tutors, setTutors] = useState([]);
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [totalPages, setTotalPages] = useState<number>(1);
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const isAuthenticated = useSelector((state: RootState) => state.admin.isAuthenticated);
@@ -24,16 +27,23 @@ const ApproveTutor: React.FC = () => {
   }, [isAuthenticated, navigate]);
 
   useEffect(() => {
-    const fetchTutors = async () => {
-      try {
-        const response = await axios.get('http://localhost:8000/api/admin/adminApprove-tutor');
-        setTutors(response.data);
-      } catch (error) {
-        console.error('Error fetching tutors:', error);
-      }
-    };
-    fetchTutors();
-  }, []);
+    fetchTutors(currentPage);
+  }, [currentPage]);
+
+  const fetchTutors = async (page: number) => {
+    try {
+      const response = await axios.get('http://localhost:8000/api/admin/adminApprove-tutor', {
+        params: {
+          page,
+          limit: 6, 
+        },
+      });
+      setTutors(response.data.tutors);
+      setTotalPages(response.data.totalPages);
+    } catch (error) {
+      console.error('Error fetching tutors:', error);
+    }
+  };
 
   const handleViewDetails = (tutorId: string) => {
     navigate(`/tutor-details/${tutorId}`);
@@ -43,6 +53,7 @@ const ApproveTutor: React.FC = () => {
     return null; 
   }
 
+ 
   return (
     <div className="flex h-screen bg-gray-100">
       <Sidebar />
@@ -66,6 +77,12 @@ const ApproveTutor: React.FC = () => {
                 </li>
               ))}
             </ul>
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={setCurrentPage}
+              className="mt-4"
+            />
           </div>
         </main>
       </div>
