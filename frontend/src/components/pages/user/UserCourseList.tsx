@@ -1,13 +1,16 @@
 // src/components/user/UserCourseList.tsx
 
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import { motion } from 'framer-motion';
 import Header from './HeaderUser';
 import CurrentLearningCourses from './CurrentLearningCourses';
-import { useSelector } from 'react-redux';
+import { useSelector,useDispatch } from 'react-redux';
 import { RootState } from '../../store/store';
+import { addToWishlist,removeFromWishlist,setWishlist } from '../../../features/wishlist/wishlistSlice';
+import { FaHeart, FaRegHeart } from 'react-icons/fa';
+
 
 interface Course {
   _id: string;
@@ -28,6 +31,9 @@ interface CurrentCourse extends Course {
 
 const UserCourseList: React.FC = () => {
   const user = useSelector((state: RootState) => state.auth.user);
+  const wishlist = useSelector((state: RootState) => state.wishlist.items);
+  const dispatch = useDispatch();
+
   const [courses, setCourses] = useState<Course[]>([]);
   const [currentCourses, setCurrentCourses] = useState<CurrentCourse[]>([]);
   const [loading, setLoading] = useState(true);
@@ -39,14 +45,18 @@ const UserCourseList: React.FC = () => {
           axios.get('http://localhost:8000/api/user/courses'),
           axios.get(`http://localhost:8000/api/user/current-courses?userId=${user?.id}`)
         ]);
-        console.log('All Courses:', allCoursesResponse.data.courses);
-        console.log('Current Courses:', currentCoursesResponse.data.currentCourses);
 
         setCourses(allCoursesResponse.data.courses);
         setCurrentCourses(currentCoursesResponse.data.currentCourses);
+
+        if (user?.id) {
+          const wishlistResponse = await axios.get(`http://localhost:8000/api/user/wishlist/${user.id}`);
+          dispatch(setWishlist(wishlistResponse.data.wishlist));
+        }
+
         setLoading(false);
       } catch (error) {
-        console.error('Error fetching courses:', error);
+        console.error('Error fetching courses or wishlist:', error);
         setLoading(false);
       }
     };
@@ -54,7 +64,24 @@ const UserCourseList: React.FC = () => {
     if (user?.id) {
       fetchCourses();
     }
-  }, [user]);
+  }, [user, dispatch]);
+
+  const handleWishlistToggle = useCallback(async (course: Course) => {
+    const isWishlisted = wishlist.some(item => item._id === course._id);
+  
+    try {
+      const url = isWishlisted ? '/wishlist/remove' : '/wishlist/add';
+      await axios.post(`http://localhost:8000/api/user${url}`, {
+        userId: user?.id,
+        courseId: course._id,
+      });
+      dispatch(isWishlisted ? removeFromWishlist(course._id) : addToWishlist(course));
+    } catch (error) {
+      console.error('Error updating wishlist:', error);
+    }
+  }, [wishlist, user, dispatch]);
+  
+  
 
   if (loading) {
     return (
@@ -79,6 +106,8 @@ const UserCourseList: React.FC = () => {
             const discount = course.estimatedPrice
               ? Math.round(((course.estimatedPrice - course.price) / course.estimatedPrice) * 100)
               : 0;
+
+            const isWishlisted = wishlist.some(item => item._id === course._id);
 
             return (
               <motion.div
@@ -108,6 +137,13 @@ const UserCourseList: React.FC = () => {
                     >
                       View Details
                     </Link>
+                    <button
+                      onClick={() => handleWishlistToggle(course)}
+                      className="ml-4 text-pink-500 hover:text-pink-600 transition duration-300"
+                      aria-label="Toggle Wishlist"
+                    >
+                      {isWishlisted ? <FaHeart size={24} /> : <FaRegHeart size={24} />}
+                    </button>
                   </div>
                 </div>
               </motion.div>

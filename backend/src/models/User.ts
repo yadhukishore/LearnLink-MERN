@@ -8,6 +8,7 @@ export interface IUser extends Document {
   createdAt?: Date;
   googleId?:string;
   isBlocked?: boolean;
+  wishlist: Schema.Types.ObjectId[];
   comparePassword(candidatePassword: string): Promise<boolean>;
   skipPasswordHashing?: boolean; 
 }
@@ -18,6 +19,7 @@ const userSchema = new Schema({
   password: { type: String, required: true },
   googleId: {type:String},
   isBlocked: { type: Boolean, default: false }, 
+  wishlist: [{ type: Schema.Types.ObjectId, ref: 'Course' }],
 }, { timestamps: true });
 
 

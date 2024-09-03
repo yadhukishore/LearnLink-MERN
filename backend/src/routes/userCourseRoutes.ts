@@ -2,6 +2,7 @@
 
 import express from 'express';
 import { applyForFinancialAid, checkCallLink, createOrder, getAllCourses,getAvailableTimes,getCheckoutCourseDetails,getCourseDetails, getCourseVideos, getCurrentCourses, scheduleCall, unscheduleCall, verifyPayment } from '../controllers/user/userCourseController'; 
+import { addToWishlist, getWishlist, removeFromWishlist } from '../controllers/user/userWishlistController';
 
 const router = express.Router();
 
@@ -17,5 +18,8 @@ router.get('/available-times/:courseId', getAvailableTimes);
 router.post('/schedule-call/:courseId', scheduleCall);
 router.post('/unschedule-call/:courseId', unscheduleCall);
 router.get('/check-call-link/:userId/:courseId', checkCallLink);
+router.post('/wishlist/add', addToWishlist);
+router.post('/wishlist/remove', removeFromWishlist);
+router.get('/wishlist/:userId', getWishlist);
 
 export default router;
