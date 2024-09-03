@@ -319,12 +319,42 @@ export const updateFinancialAidStatus = async (req: Request, res: Response) => {
 
 export const showTutorsList = async (req: Request, res: Response) => {
   try {
-    const tutors = await Tutor.find({ isApprovedByAdmin: true }).select('name email createdAt');
-    res.json(tutors);
+    const page = parseInt(req.query.page as string, 10) || 1;
+    const limit = parseInt(req.query.limit as string, 10) || 10;
+    const skip = (page - 1) * limit;
+
+    const [tutors, totalTutors] = await Promise.all([
+      Tutor.aggregate([
+        {
+          $match: {
+            isApprovedByAdmin: true
+          }
+        },
+        {
+          $project: {
+            name: 1,
+            email: 1,
+            createdAt: 1,
+            isBanned: 1 
+          }
+        },
+        { $skip: skip },
+        { $limit: limit }
+      ]),
+      Tutor.countDocuments({ isApprovedByAdmin: true })
+    ]);
+
+    res.json({
+      tutors,
+      totalPages: Math.ceil(totalTutors / limit),
+      currentPage: page
+    });
   } catch (error) {
+    console.error('Error fetching tutors:', error);
     res.status(500).json({ message: 'Error fetching tutors', error });
   }
 };
+
 export const toggleTutorBanStatus = async (req: Request, res: Response) => {
   console.log("TutorBAn Button")
   try {

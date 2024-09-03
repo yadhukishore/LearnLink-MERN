@@ -4,6 +4,7 @@ import axios from 'axios';
 import Sidebar from './Sidebar';
 import Header from './Header';
 import Swal from 'sweetalert2';
+import { Pagination } from 'flowbite-react'; 
 
 interface Tutor {
   _id: string;
@@ -23,17 +24,26 @@ const formatDate = (dateString: string): string => {
 
 const TutorList: React.FC = () => {
   const [tutors, setTutors] = useState<Tutor[]>([]);
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [totalPages, setTotalPages] = useState<number>(1);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetchTutors();
-  }, []);
+    fetchTutors(currentPage);
+  }, [currentPage]);
 
-  const fetchTutors = async () => {
+  const fetchTutors = async (page: number) => {
+    setLoading(true);
     try {
-      const response = await axios.get('http://localhost:8000/api/admin/adminTutorsList');
-      setTutors(response.data);
+      const response = await axios.get('http://localhost:8000/api/admin/adminTutorsList', {
+        params: {
+          page,
+          limit: 6, 
+        },
+      });
+      setTutors(response.data.tutors);
+      setTotalPages(response.data.totalPages);
       setLoading(false);
     } catch (error: any) {
       setError(error.message);
@@ -107,39 +117,40 @@ const TutorList: React.FC = () => {
                   </tr>
                 </thead>
                 <tbody>
-  {tutors.map((tutor) => {
-    if (!tutor) return null; // Guard against undefined tutor
-
-    return (
-      <tr key={tutor._id}>
-        <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-          <p className="text-gray-900 whitespace-no-wrap">{tutor.name}</p>
-        </td>
-        <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-          <p className="text-gray-900 whitespace-no-wrap">{tutor.email}</p>
-        </td>
-        <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-          <p className="text-gray-900 whitespace-no-wrap">{formatDate(tutor.createdAt)}</p>
-        </td>
-        <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-          <button
-            onClick={() => toggleTutorBanStatus(tutor._id, tutor.isBanned)}
-            className={`px-4 py-2 rounded ${
-              tutor.isBanned
-                ? 'bg-red-500 hover:bg-red-600 text-white'
-                : 'bg-green-500 hover:bg-green-600 text-white'
-            }`}
-          >
-            {tutor.isBanned ? 'Banned' : 'Active'}
-          </button>
-        </td>
-      </tr>
-    );
-  })}
-</tbody>
-
+                  {tutors.map((tutor) => (
+                    <tr key={tutor._id}>
+                      <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                        <p className="text-gray-900 whitespace-no-wrap">{tutor.name}</p>
+                      </td>
+                      <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                        <p className="text-gray-900 whitespace-no-wrap">{tutor.email}</p>
+                      </td>
+                      <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                        <p className="text-gray-900 whitespace-no-wrap">{formatDate(tutor.createdAt)}</p>
+                      </td>
+                      <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                        <button
+                          onClick={() => toggleTutorBanStatus(tutor._id, tutor.isBanned)}
+                          className={`px-4 py-2 rounded ${
+                            tutor.isBanned
+                              ? 'bg-red-500 hover:bg-red-600 text-white'
+                              : 'bg-green-500 hover:bg-green-600 text-white'
+                          }`}
+                        >
+                          {tutor.isBanned ? 'Banned' : 'Active'}
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
               </table>
             </div>
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={setCurrentPage}
+              className="mt-4"
+            />
           </div>
         </main>
       </div>
