@@ -224,13 +224,28 @@ export const getPendingTutors = async (req: Request, res: Response) => {
 
 export const getFinancialAidApplications = async (req: Request, res: Response) => {
   try {
-    const applications = await FinancialAid.find()
-      .populate('userId', 'name email')
-      .populate('courseId', 'name')
-      .select('userId courseId status createdAt');
-    
-    res.json(applications);
+    const page = parseInt(req.query.page as string, 10) || 1; 
+    const limit = parseInt(req.query.limit as string, 10) || 10; 
+    const skip = (page - 1) * limit;
+
+    const [applications, totalApplications] = await Promise.all([
+      FinancialAid.find()
+        .populate('userId', 'name email')
+        .populate('courseId', 'name')
+        .select('userId courseId status createdAt')
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit),
+      FinancialAid.countDocuments(),
+    ]);
+
+    res.json({
+      applications,
+      totalPages: Math.ceil(totalApplications / limit),
+      currentPage: page,
+    });
   } catch (error) {
+    console.error('Error fetching financial aid applications:', error);
     res.status(500).json({ message: 'Error fetching financial aid applications' });
   }
 };

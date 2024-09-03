@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import Header from './Header';
 import Sidebar from './Sidebar';
+import { Pagination } from 'flowbite-react';
 
 interface Application {
   _id: string;
@@ -22,18 +23,30 @@ interface Application {
 
 const FinancialAidApplicationList: React.FC = () => {
   const [applications, setApplications] = useState<Application[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [totalPages, setTotalPages] = useState<number>(1);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    fetchApplications();
-  }, []);
 
-  const fetchApplications = async () => {
+  useEffect(() => {
+    fetchApplications(currentPage);
+  }, [currentPage]);
+
+  const fetchApplications = async (page: number) => {
+    setIsLoading(true);
     try {
-      const response = await axios.get('http://localhost:8000/api/admin/financial-aid-applications');
-      setApplications(response.data);
+      const response = await axios.get('http://localhost:8000/api/admin/financial-aid-applications', {
+        params: { page, limit: 5}, 
+      });
+      setApplications(response.data.applications);
+      setTotalPages(response.data.totalPages);
     } catch (error) {
       console.error('Error fetching applications:', error);
+      setError('Error fetching applications');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -48,6 +61,10 @@ const FinancialAidApplicationList: React.FC = () => {
     }
   };
 
+  const onPageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
   return (
     <div className="flex h-screen bg-gray-100">
       <Sidebar />
@@ -55,7 +72,7 @@ const FinancialAidApplicationList: React.FC = () => {
         <Header />
         <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-200">
           <div className="container mx-auto px-6 py-8">
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
@@ -65,28 +82,46 @@ const FinancialAidApplicationList: React.FC = () => {
                 <h1 className="text-3xl font-bold">Financial Aid Applications</h1>
               </div>
               <div className="p-6">
-                <ul className="space-y-4">
-                  {applications.map((app) => (
-                    <motion.li
-                      key={app._id}
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                      className="cursor-pointer bg-gray-100 hover:bg-gray-200 p-4 rounded-lg shadow-md transition-all duration-200 ease-in-out"
-                      onClick={() => navigate(`/application/${app._id}`)}
-                    >
-                      <div className="flex justify-between items-center">
-                        <div>
-                          <p className="font-semibold text-lg text-gray-800">{app.userId.name}</p>
-                          <p className="text-sm text-gray-600">{app.courseId.name}</p>
-                          <p className="text-xs text-gray-500">Applied on: {new Date(app.createdAt).toLocaleDateString()}</p>
-                        </div>
-                        <div className={`px-3 py-1 rounded-full text-xs font-medium text-white ${getStatusColor(app.status)}`}>
-                          {app.status}
-                        </div>
-                      </div>
-                    </motion.li>
-                  ))}
-                </ul>
+                {isLoading ? (
+                  <div className="flex justify-center items-center h-64">
+                    <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-purple-500"></div>
+                  </div>
+                ) : error ? (
+                  <div className="text-red-500 text-center">{error}</div>
+                ) : (
+                  <>
+                    <ul className="space-y-4">
+                      {applications.map((app) => (
+                        <motion.li
+                          key={app._id}
+                          whileHover={{ scale: 1.02 }}
+                          whileTap={{ scale: 0.98 }}
+                          className="cursor-pointer bg-gray-100 hover:bg-gray-200 p-4 rounded-lg shadow-md transition-all duration-200 ease-in-out"
+                          onClick={() => navigate(`/application/${app._id}`)}
+                        >
+                          <div className="flex justify-between items-center">
+                            <div>
+                              <p className="font-semibold text-lg text-gray-800">{app.userId.name}</p>
+                              <p className="text-sm text-gray-600">{app.courseId.name}</p>
+                              <p className="text-xs text-gray-500">Applied on: {new Date(app.createdAt).toLocaleDateString()}</p>
+                            </div>
+                            <div className={`px-3 py-1 rounded-full text-xs font-medium text-white ${getStatusColor(app.status)}`}>
+                              {app.status}
+                            </div>
+                          </div>
+                        </motion.li>
+                      ))}
+                    </ul>
+                    {/* Pagination Component */}
+                    <div className="flex justify-center mt-8">
+                      <Pagination
+                        currentPage={currentPage}
+                        totalPages={totalPages}
+                        onPageChange={onPageChange}
+                      />
+                    </div>
+                  </>
+                )}
               </div>
             </motion.div>
           </div>
