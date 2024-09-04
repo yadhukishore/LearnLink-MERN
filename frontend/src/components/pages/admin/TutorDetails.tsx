@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import { apiService } from '../../../services/api';
 import { useParams, useNavigate } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import Header from './Header';
@@ -32,15 +32,14 @@ const TutorDetails: React.FC = () => {
   useEffect(() => {
     const fetchTutorDetails = async () => {
       try {
-        const response = await axios.get(`http://localhost:8000/api/admin/tutor-details/${tutorId}`);
-        setTutor(response.data);
+        const response = await apiService.get<Tutor>(`/admin/tutor-details/${tutorId}`);
+        setTutor(response);
       } catch (error) {
         console.error('Error fetching tutor details:', error);
       }
     };
     fetchTutorDetails();
   }, [tutorId]);
-
   const handleApproval = async (approve: boolean) => {
     MySwal.fire({
       title: 'Are you sure?',
@@ -51,7 +50,7 @@ const TutorDetails: React.FC = () => {
       cancelButtonText: 'No, cancel!',
       preConfirm: () => {
         MySwal.showLoading();
-        return axios.post(`http://localhost:8000/api/admin/approve-tutor/${tutorId}`, { approve })
+        return apiService.post(`/admin/approve-tutor/${tutorId}`, { approve })
           .then(() => {
             MySwal.fire(
               'Email Sent!',

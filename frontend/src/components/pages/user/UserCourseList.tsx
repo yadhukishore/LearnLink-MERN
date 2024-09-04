@@ -1,7 +1,7 @@
 // src/components/user/UserCourseList.tsx
 import React, { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import axios from 'axios';
+import { apiService } from '../../../services/api';
 import { motion } from 'framer-motion';
 import Header from './HeaderUser';
 import CurrentLearningCourses from './CurrentLearningCourses';
@@ -28,6 +28,19 @@ interface CurrentCourse extends Course {
   progress: number;
 }
 
+interface CoursesResponse {
+  courses: Course[];
+  totalPages: number;
+}
+
+interface CurrentCoursesResponse {
+  currentCourses: CurrentCourse[];
+}
+
+interface WishlistResponse {
+  wishlist: Course[];
+}
+
 const UserCourseList: React.FC = () => {
   const user = useSelector((state: RootState) => state.auth.user);
   const wishlist = useSelector((state: RootState) => state.wishlist.items);
@@ -44,17 +57,21 @@ const UserCourseList: React.FC = () => {
     const fetchCourses = async () => {
       try {
         const [allCoursesResponse, currentCoursesResponse] = await Promise.all([
-          axios.get(`http://localhost:8000/api/user/courses?page=${currentPage}&limit=${coursesPerPage}`),
-          axios.get(`http://localhost:8000/api/user/current-courses?userId=${user?.id}`)
+          apiService.get<CoursesResponse>(`/user/courses`, {
+            params: { page: currentPage, limit: coursesPerPage },
+          }),
+          apiService.get<CurrentCoursesResponse>(`/user/current-courses`, {
+            params: { userId: user?.id },
+          }),
         ]);
 
-        setCourses(allCoursesResponse.data.courses);
-        setTotalPages(allCoursesResponse.data.totalPages);
-        setCurrentCourses(currentCoursesResponse.data.currentCourses);
+        setCourses(allCoursesResponse.courses);
+        setTotalPages(allCoursesResponse.totalPages);
+        setCurrentCourses(currentCoursesResponse.currentCourses);
 
         if (user?.id) {
-          const wishlistResponse = await axios.get(`http://localhost:8000/api/user/wishlist/${user.id}`);
-          dispatch(setWishlist(wishlistResponse.data.wishlist));
+          const wishlistResponse = await apiService.get<WishlistResponse>(`/user/wishlist/${user.id}`);
+          dispatch(setWishlist(wishlistResponse.wishlist));
         }
 
         setLoading(false);
@@ -63,7 +80,6 @@ const UserCourseList: React.FC = () => {
         setLoading(false);
       }
     };
-
     if (user?.id) {
       fetchCourses();
     }
@@ -73,8 +89,8 @@ const UserCourseList: React.FC = () => {
     const isWishlisted = wishlist.some(item => item._id === course._id);
 
     try {
-      const url = isWishlisted ? '/wishlist/remove' : '/wishlist/add';
-      await axios.post(`http://localhost:8000/api/user${url}`, {
+      const url = isWishlisted ? '/user/wishlist/remove' : '/user/wishlist/add';
+      await apiService.post(url, {
         userId: user?.id,
         courseId: course._id,
       });

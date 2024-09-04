@@ -1,6 +1,6 @@
 // src/components/admin/TutorList.tsx
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import { apiService } from '../../../services/api';
 import Sidebar from './Sidebar';
 import Header from './Header';
 import Swal from 'sweetalert2';
@@ -33,23 +33,34 @@ const TutorList: React.FC = () => {
     fetchTutors(currentPage);
   }, [currentPage]);
 
+  interface TutorsResponse {
+    tutors: Tutor[];
+    totalPages: number;
+  }
+  
+
   const fetchTutors = async (page: number) => {
     setLoading(true);
     try {
-      const response = await axios.get('http://localhost:8000/api/admin/adminTutorsList', {
+      const response = await apiService.get<TutorsResponse>('/admin/adminTutorsList', {
         params: {
           page,
-          limit: 6, 
+          limit: 6,
         },
       });
-      setTutors(response.data.tutors);
-      setTotalPages(response.data.totalPages);
+      setTutors(response.tutors);
+      setTotalPages(response.totalPages);
       setLoading(false);
     } catch (error: any) {
       setError(error.message);
       setLoading(false);
     }
   };
+
+  interface TutorResponse {
+    tutor: Tutor;
+  }
+  
 
   const toggleTutorBanStatus = async (tutorId: string, currentStatus: boolean) => {
     try {
@@ -64,8 +75,8 @@ const TutorList: React.FC = () => {
       });
   
       if (result.isConfirmed) {
-        const response = await axios.put(`http://localhost:8000/api/admin/toggleTutorBanStatus/${tutorId}`);
-        const updatedTutor = response.data.tutor;
+        const response = await apiService.put<TutorResponse>(`/admin/toggleTutorBanStatus/${tutorId}`);
+        const updatedTutor = response.tutor;
   
         Swal.fire(
           'Updated!',
