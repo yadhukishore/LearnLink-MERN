@@ -1,7 +1,7 @@
 // src/components/admin/AdminCategory.tsx
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import { apiService } from '../../../services/api';
 import { useDispatch, useSelector } from 'react-redux';
 import { checkAdminAuthStatus } from '../../../features/admin/adminSlice';
 import { RootState } from '../../store/store';
@@ -43,12 +43,13 @@ const AdminCategory: React.FC = () => {
   const fetchCategories = async (page: number) => {
     setIsLoading(true);
     try {
-      const response = await axios.get('http://localhost:8000/api/admin/adminCoursesCategory', {
-        params: { page, limit: 6 } 
-      });
-      setCategories(response.data.categories);
-      setTotalPages(response.data.totalPages);
-    } catch (error) {
+      const response = await apiService.get<{ categories: Category[], totalPages: number }>(
+        '/admin/adminCoursesCategory',
+        { params: { page, limit: 6 } }
+      );
+      setCategories(response.categories);
+      setTotalPages(response.totalPages);
+    }  catch (error) {
       console.error('Error fetching categories:', error);
     } finally {
       setIsLoading(false);
@@ -57,14 +58,14 @@ const AdminCategory: React.FC = () => {
 
   const handleAddCategory = async () => {
     try {
-      await axios.post('http://localhost:8000/api/admin/adminCoursesCategory', { name: newCategoryName });
+      await apiService.post('/admin/adminCoursesCategory', { name: newCategoryName });
       setNewCategoryName('');
       setIsAddingCategory(false);
-      fetchCategories(currentPage); 
+      fetchCategories(currentPage);
       Swal.fire('Success', 'Category added successfully', 'success');
     } catch (error) {
-      if (axios.isAxiosError(error) && error.response) {
-        Swal.fire('Error', error.response.data.message || 'Error adding category', 'error');
+      if (error instanceof Error) {
+        Swal.fire('Error', error.message || 'Error adding category', 'error');
       } else {
         Swal.fire('Error', 'An unexpected error occurred', 'error');
       }
@@ -80,14 +81,14 @@ const AdminCategory: React.FC = () => {
       confirmButtonText: 'Save',
       preConfirm: (newName) => {
         if (newName && newName !== currentName) {
-          return axios.put(`http://localhost:8000/api/admin/adminEditCoursesCategory/${categoryId}`, { name: newName })
+          return apiService.put(`/admin/adminEditCoursesCategory/${categoryId}`, { name: newName })
             .then(response => {
-              fetchCategories(currentPage); 
-              return response.data;
+              fetchCategories(currentPage);
+              return response;
             })
             .catch(error => {
-              if (axios.isAxiosError(error) && error.response) {
-                Swal.showValidationMessage(error.response.data.message || 'Error updating category');
+              if (error instanceof Error) {
+                Swal.showValidationMessage(error.message || 'Error updating category');
               } else {
                 Swal.showValidationMessage('An unexpected error occurred');
               }
@@ -105,6 +106,7 @@ const AdminCategory: React.FC = () => {
     });
   };
 
+
   const handleDeleteCategory = (categoryId: string) => {
     Swal.fire({
       title: 'Are you sure?',
@@ -115,7 +117,7 @@ const AdminCategory: React.FC = () => {
       cancelButtonText: 'Cancel'
     }).then((result) => {
       if (result.isConfirmed) {
-        axios.delete(`http://localhost:8000/api/admin/adminCoursesCategory/${categoryId}`)
+        apiService.delete(`/admin/adminCoursesCategory/${categoryId}`)
           .then(() => {
             fetchCategories(currentPage);
             Swal.fire('Deleted!', 'The category has been deleted.', 'success');

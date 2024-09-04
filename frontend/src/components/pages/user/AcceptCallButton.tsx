@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import { apiService } from '../../../services/api';
 import { useNavigate } from 'react-router-dom';
 
 interface AcceptCallButtonProps {
@@ -14,22 +14,23 @@ const AcceptCallButton: React.FC<AcceptCallButtonProps> = ({ userId, courseId })
 
   useEffect(() => {
     const checkForCallLink = async () => {
-        try {
-          const response = await axios.get(`http://localhost:8000/api/user/check-call-link/${userId}/${courseId}`);
-          if (response.data.callLink) {
-            console.log("Received call link:", response.data.callLink);
-            setCallLink(response.data.callLink);
-            setIsCallEnded(response.data.isEnd);
-          } else {
-            setCallLink(null);
-            setIsCallEnded(false);
-          }
-        } catch (error) {
-          console.error('Error checking for call link:', error);
+      try {
+        const response = await apiService.get<{ callLink: string; isEnd: boolean }>(
+          `/user/check-call-link/${userId}/${courseId}`
+        );
+        if (response.callLink) {
+          console.log("Received call link:", response.callLink);
+          setCallLink(response.callLink);
+          setIsCallEnded(response.isEnd);
+        } else {
+          setCallLink(null);
+          setIsCallEnded(false);
         }
-      };
+      } catch (error) {
+        console.error('Error checking for call link:', error);
+      }
+    };
 
-    // Check for a call link every 5 seconds
     const interval = setInterval(checkForCallLink, 5000);
 
     return () => clearInterval(interval);

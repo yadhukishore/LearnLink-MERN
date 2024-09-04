@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import { apiService } from '../../../services/api';
 import { motion } from 'framer-motion';
 import { FaHeart, FaComment, FaShare, FaEllipsisV } from 'react-icons/fa';
 import { useSelector } from 'react-redux';
@@ -43,8 +43,8 @@ const BodyFeedsUser: React.FC = () => {
 
   const fetchFeeds = async () => {
     try {
-      const response = await axios.get<Feed[]>('http://localhost:8000/api/user/feeds');
-      setFeeds(response.data);
+      const response = await apiService.get<Feed[]>('/user/feeds');
+      setFeeds(response);
       setLoading(false);
     } catch (error) {
       console.error('Error fetching feeds:', error);
@@ -72,7 +72,7 @@ const BodyFeedsUser: React.FC = () => {
 
     if (result.isConfirmed) {
       try {
-        await axios.post(`http://localhost:8000/api/user/feedReport/${feedId}`);
+        await apiService.post(`/user/feedReport/${feedId}`);
         Swal.fire({
           title: 'Reported!',
           text: 'The feed has been reported successfully.',
@@ -103,7 +103,7 @@ const BodyFeedsUser: React.FC = () => {
 
     if (result.isConfirmed) {
       try {
-        await axios.post(`http://localhost:8000/api/user/userFeedDelete/${feedId}`);
+        await apiService.post(`/user/userFeedDelete/${feedId}`);
         Swal.fire({
           title: 'Deleted!',
           text: 'The feed has been Deleted successfully.',

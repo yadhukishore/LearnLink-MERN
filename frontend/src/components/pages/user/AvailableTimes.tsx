@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import { apiService } from '../../../services/api';
 import Swal from 'sweetalert2';
 
 interface AvailableTime {
@@ -26,8 +26,10 @@ const AvailableTimes: React.FC<AvailableTimesProps> = ({ courseId, userId }) => 
 
   const fetchAvailableTimes = async () => {
     try {
-      const response = await axios.get(`http://localhost:8000/api/user/available-times/${courseId}`);
-      setAvailableTimes(response.data.availableTimes);
+      const response = await apiService.get<{ availableTimes: AvailableTime[] }>(
+        `/user/available-times/${courseId}`
+      );
+      setAvailableTimes(response.availableTimes);
     } catch (error) {
       console.error('Error fetching available times:', error);
     }
@@ -43,14 +45,14 @@ const AvailableTimes: React.FC<AvailableTimesProps> = ({ courseId, userId }) => 
         showCancelButton: true,
         confirmButtonColor: '#3085d6',
         cancelButtonColor: '#d33',
-        confirmButtonText: `Yes, ${action} it!`
+        confirmButtonText: `Yes, ${action} it!`,
       });
 
       if (result.isConfirmed) {
         const endpoint = isCurrentlyBooked ? 'unschedule-call' : 'schedule-call';
-        await axios.post(`http://localhost:8000/api/user/${endpoint}/${courseId}`, {
+        await apiService.post(`/user/${endpoint}/${courseId}`, {
           userId,
-          timeId
+          timeId,
         });
         Swal.fire(
           `${action.charAt(0).toUpperCase() + action.slice(1)}ed!`,

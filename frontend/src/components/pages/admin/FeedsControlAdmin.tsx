@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import { apiService } from '../../../services/api';
 import { useDispatch, useSelector } from 'react-redux';
 import { checkAdminAuthStatus } from '../../../features/admin/adminSlice';
 import { RootState } from '../../store/store';
@@ -23,6 +23,14 @@ interface Feed {
   isReported: boolean;
   isDeleted: boolean;
 }
+
+interface FeedsResponse {
+  reportedFeeds: Feed[];
+  normalFeeds: Feed[];
+  totalReportedPages: number;
+  totalNormalPages: number;
+}
+
 
 const FeedControl: React.FC = () => {
   const [normalFeeds, setNormalFeeds] = useState<Feed[]>([]);
@@ -51,18 +59,18 @@ const FeedControl: React.FC = () => {
   const fetchFeeds = async (reportedPage: number, normalPage: number) => {
     setIsLoading(true);
     try {
-      const response = await axios.get('http://localhost:8000/api/admin/adminFeedControl', {
+      const response = await apiService.get<FeedsResponse>('/admin/adminFeedControl', {
         params: {
           reportedPage,
           normalPage,
-          reportedLimit: 3, 
-          normalLimit: 6,   
+          reportedLimit: 3,
+          normalLimit: 6,
         },
       });
-      setReportedFeeds(response.data.reportedFeeds);
-      setNormalFeeds(response.data.normalFeeds);
-      setTotalReportedPages(response.data.totalReportedPages);
-      setTotalNormalPages(response.data.totalNormalPages);
+      setReportedFeeds(response.reportedFeeds);
+      setNormalFeeds(response.normalFeeds);
+      setTotalReportedPages(response.totalReportedPages);
+      setTotalNormalPages(response.totalNormalPages);
     } catch (error) {
       console.error('Error fetching feeds:', error);
     } finally {
@@ -82,27 +90,19 @@ const FeedControl: React.FC = () => {
       confirmButtonColor: '#3085d6',
       cancelButtonColor: '#d33',
       confirmButtonText: 'Yes, remove it!',
-      cancelButtonText: 'Cancel'
+      cancelButtonText: 'Cancel',
     });
-  
+
     if (result.isConfirmed) {
       try {
-        await axios.post(`http://localhost:8000/api/admin/AdminRemoveFeed/${feedId}`);
-        setReportedFeeds(reportedFeeds.filter(feed => feed._id !== feedId));
-        setNormalFeeds(normalFeeds.filter(feed => feed._id !== feedId));
-  
-        MySwal.fire(
-          'Removed!',
-          'The post has been removed successfully.',
-          'success'
-        );
+        await apiService.post(`/admin/AdminRemoveFeed/${feedId}`);
+        setReportedFeeds(reportedFeeds.filter((feed) => feed._id !== feedId));
+        setNormalFeeds(normalFeeds.filter((feed) => feed._id !== feedId));
+
+        MySwal.fire('Removed!', 'The post has been removed successfully.', 'success');
       } catch (error) {
         console.error('Error removing feed:', error);
-        MySwal.fire(
-          'Error!',
-          'There was a problem removing the post.',
-          'error'
-        );
+        MySwal.fire('Error!', 'There was a problem removing the post.', 'error');
       }
     }
   };

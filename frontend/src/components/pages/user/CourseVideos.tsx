@@ -1,6 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import axios from 'axios';
 import { useSelector } from 'react-redux';
 import Swal from 'sweetalert2';
 import { RootState } from '../../store/store';
@@ -8,6 +7,7 @@ import Header from './HeaderUser';
 import { FaPlay, FaLock, FaCalendarAlt } from 'react-icons/fa';
 import AvailableTimes from './AvailableTimes';
 import AcceptCallButton from './AcceptCallButton';
+import { apiService } from '../../../services/api';
 
 interface Video {
   _id: string;
@@ -40,12 +40,13 @@ const CourseVideos: React.FC = () => {
   useEffect(() => {
     const fetchCourseVideos = async () => {
       try {
-        const response = await axios.get(`http://localhost:8000/api/user/course-videos/${courseId}`, {
-          params: { userId: user?.id }
-        });
-        if (response.data.hasAccess) {
-          setVideos(response.data.videos);
-          setCurrentVideo(response.data.videos[0]);
+        const response = await apiService.get<{ hasAccess: boolean; videos: Video[] }>(
+          `/user/course-videos/${courseId}`, 
+          { params: { userId: user?.id } }
+        );
+        if (response.hasAccess) {
+          setVideos(response.videos);
+          setCurrentVideo(response.videos[0]);
         } else {
           navigate('/courses');
         }
@@ -57,10 +58,13 @@ const CourseVideos: React.FC = () => {
       }
     };
 
+
     const fetchAvailableTimes = async () => {
       try {
-        const response = await axios.get(`http://localhost:8000/api/user/available-times/${courseId}`);
-        setAvailableTimes(response.data.availableTimes);
+        const response = await apiService.get<{ availableTimes: AvailableTime[] }>(
+          `/user/available-times/${courseId}`
+        );
+        setAvailableTimes(response.availableTimes);
       } catch (error) {
         console.error('Error fetching available times:', error);
       }
@@ -110,7 +114,7 @@ const CourseVideos: React.FC = () => {
 
   const handleScheduleCall = async (timeId: string) => {
     try {
-      await axios.post(`http://localhost:8000/api/user/schedule-call/${courseId}`, {
+      await apiService.post(`/user/schedule-call/${courseId}`, {
         userId: user?.id,
         timeId: timeId
       });
@@ -119,9 +123,10 @@ const CourseVideos: React.FC = () => {
         title: 'Call Scheduled!',
         text: 'Your call has been scheduled successfully.',
       });
-      // Refresh available times
-      const response = await axios.get(`http://localhost:8000/api/user/available-times/${courseId}`);
-      setAvailableTimes(response.data.availableTimes);
+      const response = await apiService.get<{ availableTimes: AvailableTime[] }>(
+        `/user/available-times/${courseId}`
+      );
+      setAvailableTimes(response.availableTimes);
     } catch (error) {
       console.error('Error scheduling call:', error);
       Swal.fire({

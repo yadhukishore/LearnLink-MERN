@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import { apiService } from '../../../services/api';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { checkAdminAuthStatus } from '../../../features/admin/adminSlice';
@@ -7,6 +7,12 @@ import { RootState } from '../../store/store';
 import Sidebar from './Sidebar';
 import Header from './Header';
 import { Pagination } from 'flowbite-react';
+
+interface Tutor {
+  _id: string;
+  name: string;
+  email: string;
+}
 
 const ApproveTutor: React.FC = () => {
   const [tutors, setTutors] = useState([]);
@@ -32,18 +38,17 @@ const ApproveTutor: React.FC = () => {
 
   const fetchTutors = async (page: number) => {
     try {
-      const response = await axios.get('http://localhost:8000/api/admin/adminApprove-tutor', {
-        params: {
-          page,
-          limit: 6, 
-        },
-      });
-      setTutors(response.data.tutors);
-      setTotalPages(response.data.totalPages);
+      const response = await apiService.get<{ tutors: Tutor[], totalPages: number }>(
+        '/admin/adminApprove-tutor',
+        { params: { page, limit: 6 } }
+      );
+      setTutors(response.tutors);
+      setTotalPages(response.totalPages);
     } catch (error) {
       console.error('Error fetching tutors:', error);
     }
   };
+
 
   const handleViewDetails = (tutorId: string) => {
     navigate(`/tutor-details/${tutorId}`);

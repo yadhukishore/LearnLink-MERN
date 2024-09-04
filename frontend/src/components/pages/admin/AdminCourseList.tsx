@@ -1,7 +1,7 @@
 // src/components/admin/CoursesList.tsx
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import { apiService } from '../../../services/api';
 import { useDispatch, useSelector } from 'react-redux';
 import { checkAdminAuthStatus } from '../../../features/admin/adminSlice';
 import { RootState } from '../../store/store';
@@ -47,11 +47,12 @@ const CoursesList: React.FC = () => {
   const fetchCourses = async (page: number) => {
     setIsLoading(true);
     try {
-      const response = await axios.get('http://localhost:8000/api/admin/adminCoursesList', {
-        params: { page, limit: 6 }, 
-      });
-      setCourses(response.data.courses);
-      setTotalPages(response.data.totalPages);
+      const response = await apiService.get<{ courses: Course[], totalPages: number }>(
+        '/admin/adminCoursesList', 
+        { params: { page, limit: 6 } }
+      );
+      setCourses(response.courses);
+      setTotalPages(response.totalPages);
     } catch (error) {
       console.error('Error fetching courses:', error);
       setError('Error fetching courses');

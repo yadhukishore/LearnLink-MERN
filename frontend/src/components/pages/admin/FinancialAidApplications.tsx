@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import { apiService } from '../../../services/api';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import Header from './Header';
@@ -37,11 +37,12 @@ const FinancialAidApplicationList: React.FC = () => {
   const fetchApplications = async (page: number) => {
     setIsLoading(true);
     try {
-      const response = await axios.get('http://localhost:8000/api/admin/financial-aid-applications', {
-        params: { page, limit: 5}, 
-      });
-      setApplications(response.data.applications);
-      setTotalPages(response.data.totalPages);
+      const response = await apiService.get<{ applications: Application[]; totalPages: number }>(
+        '/admin/financial-aid-applications', 
+        { params: { page, limit: 5 } }
+      );
+      setApplications(response.applications);
+      setTotalPages(response.totalPages);
     } catch (error) {
       console.error('Error fetching applications:', error);
       setError('Error fetching applications');

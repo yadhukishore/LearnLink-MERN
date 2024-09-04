@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import { apiService } from '../../../services/api';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../store/store';
 import Sidebar from './Sidebar';
@@ -68,8 +68,8 @@ const CourseDetails: React.FC = () => {
 
   const fetchCourseDetails = async () => {
     try {
-      const response = await axios.get(`http://localhost:8000/api/admin/adminCourseDetails/${courseId}`);
-      setCourse(response.data);
+      const data = await apiService.get<CourseDetails>(`/admin/adminCourseDetails/${courseId}`);
+      setCourse(data);
     } catch (error) {
       setError('Failed to fetch course details. Please try again.');
       console.error('Error fetching course details:', error);
@@ -80,18 +80,18 @@ const CourseDetails: React.FC = () => {
 
   const fetchEnrolledStudents = async () => {
     try {
-      const response = await axios.get(`http://localhost:8000/api/admin/adminEnrolledStudents/${courseId}`);
-      const paidCount = response.data.paidCount;
-      const financialAidCount = response.data.financialAidApprovedCount;
+      const data = await apiService.get<EnrollmentData>(`/admin/adminEnrolledStudents/${courseId}`);
+      const paidCount = data.paidCount;
+      const financialAidCount = data.financialAidApprovedCount;
       const totalEnrollment = paidCount + financialAidCount;
   
       setEnrollmentData({
-        enrolledStudents: response.data.enrolledStudents,
+        enrolledStudents: data.enrolledStudents,
         totalEnrollmentCount: totalEnrollment,
         financialAidApprovedCount: financialAidCount,
         paidCount: paidCount,
-        paidStudents: response.data.paidStudents,
-        financialAidStudents: response.data.financialAidStudents,
+        paidStudents: data.paidStudents,
+        financialAidStudents: data.financialAidStudents,
       });
     } catch (error) {
       setError('Failed to fetch enrolled students. Please try again.');
@@ -101,7 +101,7 @@ const CourseDetails: React.FC = () => {
 
   const handleToggleSuspension = async () => {
     try {
-      await axios.put(`http://localhost:8000/api/admin/adminToggleCourseSuspension/${courseId}`);
+      await apiService.put(`/admin/adminToggleCourseSuspension/${courseId}`);
       fetchCourseDetails();
     } catch (error) {
       setError('Failed to toggle course suspension. Please try again.');

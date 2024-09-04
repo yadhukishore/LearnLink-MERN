@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import axios from 'axios';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../store/store';
 import Header from './HeaderUser';
+import { apiService } from '../../../services/api';
 
 interface CourseDetail {
   _id: string;
@@ -33,13 +33,13 @@ const CheckoutCourse: React.FC = () => {
   useEffect(() => {
     const fetchCourseDetails = async () => {
       try {
-        const response = await axios.get(`http://localhost:8000/api/user/checkoutUserCourse/${courseId}`, {
+        const response = await apiService.get<{ course: CourseDetail }>(`/user/checkoutUserCourse/${courseId}`, {
           params: { userId: user?.id }
         });
-        setCourse(response.data.course);
-        setLoading(false);
+        setCourse(response.course);
       } catch (error) {
         console.error('Error fetching course details:', error);
+      } finally {
         setLoading(false);
       }
     };
@@ -49,18 +49,22 @@ const CheckoutCourse: React.FC = () => {
 
   const handlePayNow = async () => {
     try {
-      const response = await axios.post('http://localhost:8000/api/user/create-order', {
+      const response = await apiService.post<{
+        amount: number;
+        currency: string;
+        id: string;
+      }>(`/user/create-order`, {
         courseId: course?._id,
         userId: user?.id
       });
 
       const options = {
         key: process.env.RAZORPAY_KEY_ID || '',
-        amount: response.data.amount,
-        currency: response.data.currency,
+        amount: response.amount,
+        currency: response.currency,
         name: 'LearnLink',
         description: `Enrollment for ${course?.name}`,
-        order_id: response.data.id,
+        order_id: response.id,
         handler: function (response: any) {
           handlePaymentSuccess(response);
         },
@@ -82,7 +86,7 @@ const CheckoutCourse: React.FC = () => {
 
   const handlePaymentSuccess = async (response: any) => {
     try {
-      await axios.post('http://localhost:8000/api/user/verify', {
+      await apiService.post(`/user/verify`, {
         razorpay_order_id: response.razorpay_order_id,
         razorpay_payment_id: response.razorpay_payment_id,
         razorpay_signature: response.razorpay_signature,
@@ -92,7 +96,6 @@ const CheckoutCourse: React.FC = () => {
         currency: 'INR',
         status: 'paid'
       });
-      // Handle successful payment (e.g., show success message, redirect to course)
       navigate(`/course-videos/${course?._id}`);
     } catch (error) {
       console.error('Error verifying payment:', error);

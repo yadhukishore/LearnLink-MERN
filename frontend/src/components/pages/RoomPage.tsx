@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ZegoUIKitPrebuilt } from '@zegocloud/zego-uikit-prebuilt';
-import axios from 'axios';
+import { apiService } from '../../services/api';
 
 const RoomPage: React.FC = () => {
   const { roomId } = useParams<{ roomId: string }>();
@@ -53,8 +53,8 @@ const RoomPage: React.FC = () => {
     try {
       console.log('Leaving room:', roomId);
       const cleanRoomId = roomId?.startsWith('/room/') ? roomId.slice(6) : roomId;
-      const response = await axios.put(`http://localhost:8000/api/call/end/${cleanRoomId}`);
-      console.log('Leave room response:', response.data);
+      const response = await apiService.put(`/call/end/${cleanRoomId}`);
+      console.log('Leave room response:', response);
       navigate(-1);
     } catch (error) {
       console.error('Error ending call:', error);
