@@ -128,14 +128,26 @@ function generateUniqueCourseId(): string {
 export const getCourses = async (req: Request, res: Response) => {
   try {
     const tutorId = req.params.tutorId;
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 10;
+
     if (!tutorId) {
       return res.status(400).json({ success: false, message: 'Tutor ID is required' });
     }
-    const courses: ICourse[] = await Course.find({ tutorId: tutorId, isDelete: false });
+
+    const skip = (page - 1) * limit;
+
+    const courses = await Course.find({ tutorId: tutorId, isDelete: false })
+      .skip(skip)
+      .limit(limit);
+
+    const totalCourses = await Course.countDocuments({ tutorId: tutorId, isDelete: false });
 
     res.status(200).json({
       success: true,
       courses,
+      totalPages: Math.ceil(totalCourses / limit),
+      currentPage: page,
     });
   } catch (error) {
     res.status(500).json({ 
