@@ -51,6 +51,7 @@ const UserCourseList: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
   const coursesPerPage = 6; 
 
   useEffect(() => {
@@ -58,7 +59,7 @@ const UserCourseList: React.FC = () => {
       try {
         const [allCoursesResponse, currentCoursesResponse] = await Promise.all([
           apiService.get<CoursesResponse>(`/user/courses`, {
-            params: { page: currentPage, limit: coursesPerPage },
+            params: { page: currentPage, limit: coursesPerPage,sort:sortOrder },
           }),
           apiService.get<CurrentCoursesResponse>(`/user/current-courses`, {
             params: { userId: user?.id },
@@ -83,7 +84,7 @@ const UserCourseList: React.FC = () => {
     if (user?.id) {
       fetchCourses();
     }
-  }, [user, dispatch, currentPage]);
+  }, [user, dispatch, currentPage,sortOrder]);
 
   const handleWishlistToggle = useCallback(async (course: Course) => {
     const isWishlisted = wishlist.some(item => item._id === course._id);
@@ -102,6 +103,9 @@ const UserCourseList: React.FC = () => {
 
   const onPageChange = (page: number) => {
     setCurrentPage(page); 
+  };
+  const handleSortChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    setSortOrder(event.target.value as 'asc' | 'desc');
   };
 
   if (loading) {
@@ -122,6 +126,18 @@ const UserCourseList: React.FC = () => {
             Explore Our Courses
           </span>
         </h1>
+        <div className="flex justify-end mb-4">
+          <label htmlFor="sortOrder" className="mr-2 text-gray-300">Sort by Price:</label>
+          <select
+            id="sortOrder"
+            value={sortOrder}
+            onChange={handleSortChange}
+            className="bg-gray-800 text-white p-2 rounded"
+          >
+            <option value="asc">Low to High</option>
+            <option value="desc">High to Low</option>
+          </select>
+        </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
           {courses.map((course, index) => {
             const discount = course.estimatedPrice

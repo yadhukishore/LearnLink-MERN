@@ -11,6 +11,7 @@ import Enrollment from '../../models/Enrollment';
 import ScheduledTime from '../../models/ScheduledTime';
 import User, { IUser } from '../../models/User';
 import CallLinks from '../../models/CallLinks';
+import { PipelineStage } from 'mongoose';
 
 const razorpay = new Razorpay({
   key_id: process.env.RAZORPAY_KEY_ID || '',
@@ -24,9 +25,11 @@ export const getAllCourses = async (req: Request, res: Response): Promise<void> 
     const limit = parseInt(req.query.limit as string, 10) || 10;
     const skip = (page - 1) * limit;
 
-    const coursesAggregation = [
+    const sort: 1 | -1 = req.query.sort === 'asc' ? 1 : -1; 
+
+    const coursesAggregation: PipelineStage[] = [
       {
-        $match: { isDelete: false } 
+        $match: { isDelete: false },
       },
       {
         $project: {
@@ -36,32 +39,35 @@ export const getAllCourses = async (req: Request, res: Response): Promise<void> 
           price: 1,
           level: 1,
           category: 1,
-          estimatedPrice: 1
-        }
+          estimatedPrice: 1,
+        },
       },
       {
-        $skip: skip 
+        $sort: { price: sort }, 
       },
       {
-        $limit: limit 
-      }
+        $skip: skip,
+      },
+      {
+        $limit: limit,
+      },
     ];
 
     const [courses, totalCourses] = await Promise.all([
       Course.aggregate(coursesAggregation).exec(),
-      Course.countDocuments({ isDelete: false }).exec()
+      Course.countDocuments({ isDelete: false }).exec(),
     ]);
 
     res.status(200).json({
       success: true,
       courses,
       totalPages: Math.ceil(totalCourses / limit),
-      currentPage: page
+      currentPage: page,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: (error as Error).message
+      message: (error as Error).message,
     });
   }
 };
