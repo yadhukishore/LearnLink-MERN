@@ -3,6 +3,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import TutorHeader from './TutorHeader';
+import { Pagination } from 'flowbite-react';
 
 interface Application {
   _id: string;
@@ -21,16 +22,20 @@ interface Application {
 
 const FinancialAidListTutor: React.FC = () => {
   const [applications, setApplications] = useState<Application[]>([]);
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [totalItems, setTotalItems] = useState<number>(0);
+  const [itemsPerPage] = useState<number>(4);
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetchApplications();
-  }, []);
+    fetchApplications(currentPage);
+  }, [currentPage]);
 
-  const fetchApplications = async () => {
+  const fetchApplications = async (page: number) => {
     try {
-      const response = await axios.get('http://localhost:8000/api/tutor/tutorFinacial-aids');
-      setApplications(response.data);
+      const response = await axios.get(`http://localhost:8000/api/tutor/tutorFinacial-aids?page=${page}&limit=${itemsPerPage}`);
+      setApplications(response.data.applications);
+      setTotalItems(response.data.total);
     } catch (error) {
       console.error('Error fetching applications:', error);
     }
@@ -46,6 +51,8 @@ const FinancialAidListTutor: React.FC = () => {
         return 'bg-yellow-500';
     }
   };
+
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
 
   return (
     <div className="min-h-screen bg-[#071A2B] text-white flex flex-col">
@@ -87,6 +94,13 @@ const FinancialAidListTutor: React.FC = () => {
                     </motion.li>
                   ))}
                 </ul>
+                <div className="mt-6 flex justify-center">
+                  <Pagination
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    onPageChange={setCurrentPage}
+                  />
+                </div>
               </div>
             </div>
           </motion.div>
