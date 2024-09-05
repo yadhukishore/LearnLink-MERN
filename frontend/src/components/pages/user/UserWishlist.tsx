@@ -5,8 +5,17 @@ import { setWishlist, removeFromWishlist } from '../../../features/wishlist/wish
 import { Link } from 'react-router-dom';
 import { FaHeart } from 'react-icons/fa';
 import { motion } from 'framer-motion';
-import axios from 'axios';
 import Header from './HeaderUser';
+import { apiService } from '../../../services/api';
+
+interface WishlistResponse {
+  wishlist: Array<{
+    _id: string;
+    name: string;
+    thumbnail: { url: string };
+    price: number;
+  }>;
+}
 
 const UserWishlist: React.FC = () => {
   const wishlist = useSelector((state: RootState) => state.wishlist.items);
@@ -17,8 +26,8 @@ const UserWishlist: React.FC = () => {
   useEffect(() => {
     const fetchWishlist = async () => {
       try {
-        const response = await axios.get(`http://localhost:8000/api/user/wishlist/${user?.id}`);
-        dispatch(setWishlist(response.data.wishlist));
+        const response = await apiService.get<WishlistResponse>(`/user/wishlist/${user?.id}`);
+        dispatch(setWishlist(response.wishlist));
         setLoading(false);
       } catch (error) {
         console.error('Error fetching wishlist:', error);
@@ -33,7 +42,7 @@ const UserWishlist: React.FC = () => {
 
   const handleRemove = useCallback(async (courseId: string) => {
     try {
-      await axios.post('http://localhost:8000/api/user/wishlist/remove', {
+      await apiService.post('/user/wishlist/remove', {
         userId: user?.id,
         courseId,
       });
