@@ -43,7 +43,6 @@ export const createCourse = async (req: Request, res: Response): Promise<void> =
     const courseId = generateUniqueCourseId();
     console.log("CourseId:-", courseId);
 
-    // Upload thumbnail to Cloudinary
     let thumbnailUpload: UploadApiResponse | undefined;
     if (multerReq.files?.thumbnailFile && multerReq.files.thumbnailFile[0]) {
       thumbnailUpload = await cloudinary.uploader.upload(multerReq.files.thumbnailFile[0].path, {
@@ -51,7 +50,6 @@ export const createCourse = async (req: Request, res: Response): Promise<void> =
       });
     }
 
-    // Upload videos to Cloudinary
     const videoUploads: UploadApiResponse[] = [];
     if (multerReq.files?.videos) {
       for (const video of multerReq.files.videos) {
@@ -109,9 +107,8 @@ export const createCourse = async (req: Request, res: Response): Promise<void> =
     console.error("Error in createCourse:", error);
     const mongoError = error as MongoError;
     if (mongoError.code === 11000 && mongoError.keyPattern && mongoError.keyPattern.courseId) {
-      // Handle duplicate courseId
       console.log("Duplicate courseId, generating a new one and retrying...");
-      return createCourse(req, res); // Retry with new courseId
+      return createCourse(req, res); // Retry with tis new courseId
     }
     res.status(400).json({
       success: false,

@@ -565,3 +565,39 @@ export const endCall = async (req: Request, res: Response) => {
     res.status(500).json({ message: 'Error ending call' });
   }
 };
+
+
+
+
+export const searchCourses = async (req: Request, res: Response) => {
+  try {
+    const { query, page = 1, limit = 10 } = req.query;
+
+    const pageNumber = parseInt(page as string, 10);
+    const pageSize = parseInt(limit as string, 10);
+    const skip = (pageNumber - 1) * pageSize;
+
+    const searchCriteria = {
+      $or: [
+        { name: { $regex: query, $options: 'i' } },
+        { category: { $regex: query, $options: 'i' } }
+      ],
+      isDelete: false
+    };
+
+    const courses = await Course.find(searchCriteria)
+      .skip(skip)
+      .limit(pageSize)
+      .populate('category', 'name') 
+      .exec();
+
+    const totalCourses = await Course.countDocuments(searchCriteria);
+
+    res.status(200).json({
+      courses,
+      totalPages: Math.ceil(totalCourses / pageSize),
+    });
+  } catch (error) {
+    res.status(500).json({ error: 'An error occurred while searching for courses.' });
+  }
+};

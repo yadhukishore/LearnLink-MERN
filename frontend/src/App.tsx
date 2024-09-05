@@ -48,6 +48,7 @@ import CallUserList from './components/pages/tutor/CallUserList.tsx';
 import RoomPage from './components/pages/RoomPage.tsx';
 import TutorWallet from './components/pages/tutor/WalletTutor.tsx';
 import UserWishlist from './components/pages/user/UserWishlist.tsx';
+import SearchCourses from './components/pages/user/SearchCourses.tsx';
 
   const AppRoutes = () => {
     const isAuthenticated = useAuth();
@@ -96,6 +97,7 @@ import UserWishlist from './components/pages/user/UserWishlist.tsx';
         element={isAuthenticated ? <CourseVideos /> : <Navigate to="/login" />} 
       />
       <Route path='/userWishlist'element={<UserWishlist/>} />
+      <Route path='/searchCourse'element={<SearchCourses/>} />
 
           <Route 
         path='/tutorRegister' 

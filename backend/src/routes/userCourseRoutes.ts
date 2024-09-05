@@ -1,7 +1,7 @@
 // src/routes/userCourseRoutes.ts
 
 import express from 'express';
-import { applyForFinancialAid, checkCallLink, createOrder, getAllCourses,getAvailableTimes,getCheckoutCourseDetails,getCourseDetails, getCourseVideos, getCurrentCourses, scheduleCall, unscheduleCall, verifyPayment } from '../controllers/user/userCourseController'; 
+import { applyForFinancialAid, checkCallLink, createOrder, getAllCourses,getAvailableTimes,getCheckoutCourseDetails,getCourseDetails, getCourseVideos, getCurrentCourses, scheduleCall, searchCourses, unscheduleCall, verifyPayment } from '../controllers/user/userCourseController'; 
 import { addToWishlist, getWishlist, removeFromWishlist } from '../controllers/user/userWishlistController';
 
 const router = express.Router();
@@ -21,5 +21,6 @@ router.get('/check-call-link/:userId/:courseId', checkCallLink);
 router.post('/wishlist/add', addToWishlist);
 router.post('/wishlist/remove', removeFromWishlist);
 router.get('/wishlist/:userId', getWishlist);
+router.get('/searchCourse', searchCourses);
 
 export default router;

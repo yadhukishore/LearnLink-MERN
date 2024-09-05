@@ -10,6 +10,7 @@ import { RootState } from '../../store/store';
 import { addToWishlist, removeFromWishlist, setWishlist } from '../../../features/wishlist/wishlistSlice';
 import { FaHeart, FaRegHeart } from 'react-icons/fa';
 import { Pagination } from 'flowbite-react';
+import SearchButton from '../../helpers/SearchButtonUser';
 
 interface Course {
   _id: string;
@@ -120,6 +121,7 @@ const UserCourseList: React.FC = () => {
     <div className="min-h-screen bg-[#071A2B] text-white">
       <Header />
       <main className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+      <SearchButton />
         <CurrentLearningCourses courses={currentCourses} />
         <h1 className="text-4xl font-bold mb-8 text-center">
           <span className="bg-clip-text text-transparent bg-gradient-to-r from-pink-500 to-yellow-500">
