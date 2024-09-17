@@ -12,6 +12,7 @@ import ScheduledTime from '../../models/ScheduledTime';
 import User, { IUser } from '../../models/User';
 import CallLinks from '../../models/CallLinks';
 import { PipelineStage } from 'mongoose';
+import CourseCategory from '../../models/CourseCategory';
 
 const razorpay = new Razorpay({
   key_id: process.env.RAZORPAY_KEY_ID || '',
@@ -571,7 +572,7 @@ export const endCall = async (req: Request, res: Response) => {
 
 export const searchCourses = async (req: Request, res: Response) => {
   try {
-    const { query, page = 1, limit = 10 } = req.query;
+    const { query, page = 1, limit = 10, sort = 'asc' } = req.query;
 
     const pageNumber = parseInt(page as string, 10);
     const pageSize = parseInt(limit as string, 10);
@@ -584,8 +585,10 @@ export const searchCourses = async (req: Request, res: Response) => {
       ],
       isDelete: false
     };
+    const sortOrder = sort === 'asc' ? 1 : -1;
 
     const courses = await Course.find(searchCriteria)
+      .sort({ price: sortOrder })
       .skip(skip)
       .limit(pageSize)
       .populate('category', 'name') 
@@ -599,5 +602,25 @@ export const searchCourses = async (req: Request, res: Response) => {
     });
   } catch (error) {
     res.status(500).json({ error: 'An error occurred while searching for courses.' });
+  }
+};
+
+export const getCourseForCertificate = async (req: Request, res: Response) => {
+  try {
+    const { courseId } = req.params;
+
+    const course = await Course.findOne({ _id: courseId }, { name: 1, _id: 0 });
+
+    console.log(`Want certificate for ${courseId}`);
+
+    if (!course) {
+      console.log("Course can't be found");
+      return res.status(404).json({ message: 'Course not found' });
+    }
+
+    return res.status(200).json({ title: course.name });
+  } catch (error) {
+    console.error('Error in getCourseForCertificate:', error);
+    return res.status(500).json({ message: 'Server Error', error: error });
   }
 };

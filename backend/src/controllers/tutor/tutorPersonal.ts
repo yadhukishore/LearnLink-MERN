@@ -4,6 +4,8 @@ import Tutor , {ITutor} from '../../models/Tutor';
 import ScheduledTime from '../../models/ScheduledTime';
 import Course from '../../models/Course';
 import Enrollment from '../../models/Enrollment';
+import User from '../../models/User';
+// import Chat from '../../models/Chat';
 
 declare global {
     namespace Express {
@@ -156,3 +158,33 @@ export const getTutorWalletDetails = async (req: CustomRequest, res: Response) =
     res.status(500).json({ message: 'Error getting tutor wallet details' });
   }
 };
+
+
+// export const TutorChats = async (req: CustomRequest, res: Response) => {
+//   const { tutorId } = req.params;
+
+//   try {
+//     // Fetch distinct users who have chatted with the tutor
+//     const chatUsers = await Chat.find({ tutorId }).distinct('userId'); 
+
+//     const users = await User.find({ _id: { $in: chatUsers } }); // Fetch user details
+//     return res.json(users); // Return user details to the client
+//   } catch (err) {
+//     console.error(err);
+//     return res.status(500).json({ error: 'Failed to load chat users' });
+//   }
+// };
+
+
+// export const getChatHistoryTutor = async (req: Request, res: Response) => {
+//   const { tutorId, userId } = req.params;
+//   console.log(`Enterd Tutor ${tutorId} and user ${userId}`)
+
+//   try {
+//     const chatHistory = await Chat.find({ tutorId, userId }).sort({ createdAt: 1 });
+//     return res.json(chatHistory);
+//   } catch (err) {
+//     console.error(err);
+//     return res.status(500).json({ error: 'Failed to load chat history' });
+//   }
+// };

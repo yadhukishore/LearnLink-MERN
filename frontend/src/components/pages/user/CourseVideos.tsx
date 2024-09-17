@@ -31,6 +31,7 @@ const CourseVideos: React.FC = () => {
   const [currentVideo, setCurrentVideo] = useState<Video | null>(null);
   const [loading, setLoading] = useState(true);
   const [availableTimes, setAvailableTimes] = useState<AvailableTime[]>([]);
+  const [isPassed, setIsPassed] = useState(false);
   
   const { courseId } = useParams<{ courseId: string }>();
   const navigate = useNavigate();
@@ -73,6 +74,20 @@ const CourseVideos: React.FC = () => {
     fetchCourseVideos();
     fetchAvailableTimes();
 
+    const fetchQuizResult = async () => {
+      try {
+        const response = await apiService.get<{ isPassed: boolean }>(
+          `/user/quiz-result/${courseId}`,
+          { params: { userId: user?.id } }
+        );
+        setIsPassed(response.isPassed);
+      } catch (error) {
+        console.error('Error fetching quiz result:', error);
+      }
+    };
+
+    fetchQuizResult();
+
     const handleVisibilityChange = () => {
       if (document.hidden) {
         if (videoRef.current) {
@@ -110,6 +125,13 @@ const CourseVideos: React.FC = () => {
 
   const handleVideoSelect = (video: Video) => {
     setCurrentVideo(video);
+  };
+
+  const handleStartTest = () => {
+    navigate(`/quiz/${courseId}`);
+  };
+  const handleGetCertificate = () => {
+    navigate(`/get-certificate/${courseId}`);
   };
 
   const handleScheduleCall = async (timeId: string) => {
@@ -206,6 +228,26 @@ const CourseVideos: React.FC = () => {
 
             {/* Available Times */}
             <AvailableTimes courseId={courseId} userId={user?.id} />
+            {/* Start the Test Button */}
+              <div className="mt-4 pt-8">
+              <button
+                className="bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-green-700"
+                onClick={handleStartTest}
+              >
+                Start the Test
+              </button>
+            </div>
+              {/* Get Certificate Button */}
+              {isPassed && (
+              <div className="mt-4">
+                <button
+                  className="bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700"
+                  onClick={handleGetCertificate}
+                >
+                  Get Certificate
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </main>

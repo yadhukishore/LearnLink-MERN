@@ -65,6 +65,13 @@ const TutorHeader = () => {
               >
                Wallet
               </Link>
+              <Link
+                to={`/tutorChat`}  
+                className="block px-4 py-2 text-sm text-black hover:bg-white"
+                onClick={() => setIsDropdownOpen(false)}
+              >
+               Chats
+              </Link>
               <button
                 onClick={() => {
                   handleLogout();

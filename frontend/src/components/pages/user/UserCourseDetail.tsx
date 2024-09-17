@@ -40,7 +40,7 @@ const UserCourseDetail: React.FC = () => {
     const fetchCourseDetails = async () => {
       try {
         const response = await axios.get(`http://localhost:8000/api/user/courses/${courseId}`, {
-          params: { userId: user?.id } // Send userId as a query parameter
+          params: { userId: user?.id } 
         });
         setCourse(response.data.course);
         console.log("Full response:", response.data);
@@ -90,7 +90,12 @@ const UserCourseDetail: React.FC = () => {
   const handleEnrollNow = () => {
     navigate(`/checkoutUserCourse/${course._id}`);
   };
-
+  const handleConnectTutor = () => {
+    if (course && course.tutorId) {
+      navigate(`/userChatWithTutor/${course.tutorId}`);
+    }
+  };
+  
 
   return (
     <div className="min-h-screen bg-[#071A2B] text-white">
@@ -126,6 +131,12 @@ const UserCourseDetail: React.FC = () => {
                   {course.tutorName}
                 </span>
               </p>
+              <button
+              onClick={handleConnectTutor}
+                className=" mt-4 bg-gray-600 text-white px-4 py-2 rounded-lg shadow-lg transform hover:scale-105 transition duration-300 ease-in-out"
+              >
+              Connect with tutor
+              </button>
             </div>
 
             <div>

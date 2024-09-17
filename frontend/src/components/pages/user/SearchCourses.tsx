@@ -31,18 +31,19 @@ const SearchCourses: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(false);
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
 
   useEffect(() => {
     if (searchQuery) {
       fetchCourses();
     }
-  }, [searchQuery, currentPage]);
+  }, [searchQuery, currentPage,sortOrder]);
 
   const fetchCourses = async () => {
     setLoading(true);
     try {
       const response = await apiService.get<CoursesResponse>('/user/searchCourse', {
-        params: { query: searchQuery, page: currentPage, limit: 6 },
+        params: { query: searchQuery, page: currentPage, limit: 6, sort: sortOrder },
       });
       setCourses(response.courses);
       setTotalPages(response.totalPages);
@@ -56,6 +57,10 @@ const SearchCourses: React.FC = () => {
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(event.target.value);
     setCurrentPage(1); 
+  };
+
+  const handleSortChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    setSortOrder(event.target.value as 'asc' | 'desc');
   };
 
   const onPageChange = (page: number) => {
@@ -73,6 +78,18 @@ const SearchCourses: React.FC = () => {
           placeholder="🔍 Search your favourite courses..."
           className="w-full p-3 rounded-md text-black mb-8"
         />
+               {/* Sort by Price */}
+               <div className="mb-8 flex items-center">
+          <label className="mr-2 text-white">Sort by Price:</label>
+          <select
+            value={sortOrder}
+            onChange={handleSortChange}
+            className="p-2 rounded-md text-black"
+          >
+            <option value="asc">Low to High</option>
+            <option value="desc">High to Low</option>
+          </select>
+        </div>
         {loading ? (
           <div className="flex justify-center">
             <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-blue-500"></div>

@@ -1,4 +1,3 @@
-// src/services/api.ts
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
 
 const BASE_URL = 'http://localhost:8000/api';

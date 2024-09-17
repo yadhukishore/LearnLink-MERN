@@ -49,6 +49,12 @@ import RoomPage from './components/pages/RoomPage.tsx';
 import TutorWallet from './components/pages/tutor/WalletTutor.tsx';
 import UserWishlist from './components/pages/user/UserWishlist.tsx';
 import SearchCourses from './components/pages/user/SearchCourses.tsx';
+// import UserChatWithTutor from './components/pages/user/UserChatWithTutor.tsx';
+// import TutorChatWithUser from './components/pages/tutor/TutorChatWithUser.tsx';
+// import TutorChat from './components/pages/tutor/TutorChatWithUser.tsx';
+import TutorQuiz from './components/pages/tutor/TutorQuiz.tsx';
+import UserQuizPage from './components/pages/user/UserQuizPage.tsx';
+import GetCertificatePage from './components/pages/user/GetCertificatePage.tsx';
 
   const AppRoutes = () => {
     const isAuthenticated = useAuth();
@@ -98,7 +104,8 @@ import SearchCourses from './components/pages/user/SearchCourses.tsx';
       />
       <Route path='/userWishlist'element={<UserWishlist/>} />
       <Route path='/searchCourse'element={<SearchCourses/>} />
-
+      <Route path="/quiz/:courseId" element={<UserQuizPage />} />
+      <Route path="/get-certificate/:courseId" element={<GetCertificatePage />} />
           <Route 
         path='/tutorRegister' 
         element={tutorState.isAuthenticated ? <Navigate to="/tutor" /> : <TutorRegister />} 
@@ -115,6 +122,10 @@ import SearchCourses from './components/pages/user/SearchCourses.tsx';
         path='/submit-tutor-proofs/:tutorId' 
         element={<TutorProofs />} 
       />
+      {/* <Route path='/userChatWithTutor/:tutorId' element={<UserChatWithTutor/>} />
+      <Route path='/TutorChatWithUser/:userId' element={<TutorChatWithUser/>} />
+      <Route path="/tutorChat" element={<TutorChat />} /> */}
+      <Route path="/tutorCreateQuiz/:courseId" element={<TutorQuiz />} />
 
 <Route path="/tutorHome" element={tutorState.isAuthenticated ? <TutorHome /> : <Navigate to="/tutorLogin" />} />
 <Route path="/tutorCreateCourse" element={tutorState.isAuthenticated ? <TutorCreateCourse /> : <Navigate to="/tutorLogin" />} />

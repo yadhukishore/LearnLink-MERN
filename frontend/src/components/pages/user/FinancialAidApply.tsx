@@ -2,11 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import Header from './HeaderUser';
-import axios from 'axios';
 import Swal from 'sweetalert2';
 import withReactContent from 'sweetalert2-react-content';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../store/store';
+import { apiService } from '../../../services/api';
 
 interface CourseDetail {
   _id: string;
@@ -32,8 +32,8 @@ const ApplyFinancialAid: React.FC = () => {
   useEffect(() => {
     const fetchCourseDetails = async () => {
       try {
-        const response = await axios.get(`http://localhost:8000/api/user/courses/apply-financial-aid/${courseId}`);
-        setCourse(response.data.course);
+        const response = await apiService.get<{ course: CourseDetail }>(`/user/courses/apply-financial-aid/${courseId}`);
+        setCourse(response.course);
       } catch (error) {
         console.error('Error fetching course details:', error);
       }
@@ -66,17 +66,17 @@ const ApplyFinancialAid: React.FC = () => {
     });
 
     if (confirmation.isConfirmed) {
-        try {
-            const response = await axios.post(`http://localhost:8000/api/user/apply-financial-aid/${courseId}`, {
-                userId, // Make sure this is passed
-                reason,
-                description,
-                academicEmail,
-                careerGoals,
-            });
+      try {
+        await apiService.post(`/user/apply-financial-aid/${courseId}`, {
+          userId,
+          reason,
+          description,
+          academicEmail,
+          careerGoals,
+        });
 
-            MySwal.fire('Success!', 'Your application has been submitted.', 'success');
-            navigate('/courses'); 
+        MySwal.fire('Success!', 'Your application has been submitted.', 'success');
+        navigate('/courses'); 
         } catch (error: any) {
             if (error.response && error.response.status === 400) {
                 MySwal.fire('Info', error.response.data.message, 'info'); // Show existing application message

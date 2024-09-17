@@ -5,6 +5,7 @@ import { cloudinary } from '../../config/fileUploads';
 import { UploadApiResponse } from 'cloudinary';
 import CourseCategory from '../../models/CourseCategory';
 import mongoose from 'mongoose';
+import Quiz, { IQuiz } from '../../models/Quiz';
 
 interface MulterRequest extends Request {
   files?: {
@@ -387,5 +388,102 @@ export const getAllCategoriesForTutor = async (req: Request, res: Response) => {
   } catch (error) {
     console.error('Error fetching categories:', error);
     res.status(500).json({ message: 'Error fetching categories' });
+  }
+};
+
+export const createQuiz = async (req: Request, res: Response) => {
+  try {
+    const { courseId } = req.params;
+    const { questions } = req.body;
+
+    // Find the course by ID
+    const course = await Course.findById(courseId);
+    if (!course) {
+      return res.status(404).json({ message: 'Course not found' });
+    }
+
+    let quiz = await Quiz.findOne({ courseId });
+
+    if (quiz) {
+      // If the quiz exists, update the questions
+      quiz.questions = questions;
+      await quiz.save();
+    } else {
+      // If the quiz doesn't exist, create a new one and link it to the course
+      quiz = new Quiz({
+        courseId,
+        questions
+      });
+      await quiz.save();
+
+      // Update the course document with the quiz ID
+      course.quiz = quiz._id as mongoose.Types.ObjectId;
+      await course.save();
+    }
+
+    res.status(200).json({ message: 'Quiz created/updated successfully', quiz });
+  } catch (error) {
+    if (error instanceof Error) {
+      res.status(500).json({ message: 'Error creating/updating quiz', error: error.message });
+    } else {
+      res.status(500).json({ message: 'Error creating/updating quiz', error: 'Unknown error' });
+    }
+  }
+};
+
+
+export const getQuiz = async (req: Request, res: Response) => {
+  try {
+    const { courseId } = req.params;
+    const course = await Course.findById(courseId);
+    if (!course) {
+      return res.status(404).json({ message: 'Course not found' });
+    }
+    const quiz = await Quiz.findOne({ courseId });
+
+    if (!quiz) {
+      return res.status(404).json({ message: 'No quiz found for this course' });
+    }
+    res.status(200).json({ 
+      message: 'Quiz retrieved successfully',
+      quiz: {
+        id: quiz._id,
+        courseId: quiz.courseId,
+        questions: quiz.questions
+      }
+    });
+
+  } catch (error) {
+    console.error('Error in getQuiz:', error);
+    res.status(500).json({ message: 'Error retrieving quiz', error: error });
+  }
+};
+
+
+export const updateQuiz = async (req: Request, res: Response) => {
+  try {
+    const { courseId } = req.params;
+    const { questions } = req.body;
+
+    const quiz = await Quiz.findOne({ courseId });
+    if (!quiz) {
+      return res.status(404).json({ message: 'No quiz found for this course' });
+    }
+
+    // Update quiz questions
+    quiz.questions = questions;
+    await quiz.save();
+
+    res.status(200).json({
+      message: 'Quiz updated successfully',
+      quiz: {
+        id: quiz._id,
+        courseId: quiz.courseId,
+        questions: quiz.questions
+      }
+    });
+  } catch (error) {
+    console.error('Error in updateQuiz:', error);
+    res.status(500).json({ message: 'Error updating quiz', error: error });
   }
 };

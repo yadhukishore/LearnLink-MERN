@@ -3,7 +3,7 @@ import express from 'express';
 import multer from 'multer';
 import { tutorLogin, tutorRegister, tutorSubmitingProofs } from '../controllers/tutor/tutorAuthController';
 import { approveTutor } from '../controllers/admin/adminController';
-import { addCourseVideo, createCourse, getAllCategoriesForTutor, getCourseById, getCourses, updateCourse, updateCourseVideo } from '../controllers/tutor/coursesController';
+import { addCourseVideo, createCourse, createQuiz, getAllCategoriesForTutor, getCourseById, getCourses, getQuiz, updateCourse, updateCourseVideo, updateQuiz } from '../controllers/tutor/coursesController';
 import { createAvailableTime, deleteAvailableTime, getAllAvailableTimes, getNonExpiredAvailableTimes, getTutorProfile, getTutorWalletDetails, takeTheCourses, updateTutorProfile } from '../controllers/tutor/tutorPersonal';
 import { authenticateTutor } from '../middlewares/tutorAuth';
 import { getFinancialAidApplicationsForTutor, getFinancialAidDetailsForTutor, updateFinancialAidStatusForTutor } from '../controllers/tutor/tuttorFinacialAid';
@@ -41,5 +41,10 @@ router.get('/non-expired-available-times/:tutorId', getNonExpiredAvailableTimes)
 router.get('/booked-user-details/:timeId', getBookedUserDetails);
 router.post('/send-call-link', sendCallLink);
 router.get('/tutorWallet',getTutorWalletDetails);
+// router.get('/chat-users/:tutorId',TutorChats );
+// router.get('/chat-history/:tutorId/:userId', getChatHistoryTutor);
+router.post('/createQuiz/:courseId', authenticateTutor, createQuiz);
+router.get('/getQuiz/:courseId', authenticateTutor, getQuiz);
+router.put('/updateQuiz/:courseId', authenticateTutor, updateQuiz);
 
 export default router;

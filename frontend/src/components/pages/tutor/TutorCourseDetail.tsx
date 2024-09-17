@@ -58,6 +58,11 @@ const TutorCourseDetail: React.FC = () => {
     navigate(`/tutorEditCourse/${id}`);
   };
 
+  const handleCreateQuiz = () => {
+    navigate(`/tutorCreateQuiz/${id}`);
+  };
+
+
   const handleDelete = async () => {
     if (window.confirm('Are you sure you want to delete this course?')) {
       try {
@@ -128,6 +133,12 @@ const TutorCourseDetail: React.FC = () => {
               className="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded"
             >
               Delete Course
+            </button>
+            <button
+              onClick={handleCreateQuiz}
+              className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded"
+            >
+              Create Quiz
             </button>
           </div>
         </div>
