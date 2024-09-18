@@ -14,7 +14,7 @@ import VerifyOtpPassword from './components/pages/user/VerifyOtpPassword.tsx';
 import TutorRegister from './components/pages/tutor/TutorRegister.tsx';
 import TutorLogin from './components/pages/tutor/TutorLogin.tsx';
 import AdminLogin from './components/pages/admin/AdminLogin.tsx';
-import AdminDashboard from './components/pages/admin/AdminDashboard.tsx';
+import AdminDashboard from './components/pages/admin/adminDashboard/AdminDashboard.tsx';
 import TutorFeeds from './components/pages/tutor/TutorFeeds.tsx';
 import AdminStudentList from './components/pages/admin/AdminStudentList.tsx';
 import TutorProofs from './components/pages/tutor/TutorProofs.tsx';

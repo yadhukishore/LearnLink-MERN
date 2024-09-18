@@ -1,11 +1,14 @@
-
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { checkAdminAuthStatus } from '../../../features/admin/adminSlice';
-import { RootState } from '../../store/store';
-import Sidebar from './Sidebar';
-import Header from './Header';
+import { checkAdminAuthStatus } from '../../../../features/admin/adminSlice';
+import { RootState } from '../../../store/store';
+import Sidebar from '../Sidebar';
+import Header from '../Header';
+import UserLoginGraph from './UserLoginGraph';
+import TutorLoginGraph from './TutorLoginGraph';
+import CategoryCoursePie from './CategoryCoursePie';
+import StudentsEnrollments from './StudentsEnrollments';
 
 const AdminDashboard: React.FC = () => {
   const navigate = useNavigate();
@@ -33,10 +36,11 @@ const AdminDashboard: React.FC = () => {
         <Header />
         <main className="flex-1 overflow-y-auto p-6">
           <div className="grid grid-cols-2 gap-6">
-            <div className="bg-white p-6 rounded-lg shadow">Dashboard Component 1</div>
-            <div className="bg-white p-6 rounded-lg shadow">Dashboard Component 2</div>
-            <div className="bg-white p-6 rounded-lg shadow">Dashboard Component 3</div>
-            <div className="bg-white p-6 rounded-lg shadow">Dashboard Component 4</div>
+            <UserLoginGraph />
+            <TutorLoginGraph />
+            <CategoryCoursePie/>
+            <StudentsEnrollments/>
+            
           </div>
         </main>
       </div>

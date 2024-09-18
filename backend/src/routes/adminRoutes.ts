@@ -1,6 +1,7 @@
 import express from 'express';
 import { loginAdmin, registerAdmin } from '../controllers/admin/adminAuthController';
 import { addCategory, adminRemovePost, approveTutor,  deleteCategory,  getAdminFeeds,  getAllCategories,  getAllCoursesForAdmin, getCourseDetailsForAdmin, getEnrolledStudents, getFinancialAidApplications, getFinancialAidDetails, getPendingTutors, getTutorDetails, getUsers, showTutorsList, toggleTutorBanStatus, toggleUserBlockStatus, updateCategory, updateFinancialAidStatus } from '../controllers/admin/adminController';
+import { getCoursesCountByCategory, getStudentEnrollmentsByDate, getTutorLoginData, getUserLoginData } from '../controllers/admin/adminDashboardController';
 
 
 const router =express.Router();
@@ -25,5 +26,9 @@ router.get('/adminCoursesCategory',getAllCategories);
 router.post('/adminCoursesCategory',addCategory);
 router.put('/adminEditCoursesCategory/:id', updateCategory);
 router.delete('/adminCoursesCategory/:id', deleteCategory);
+router.get('/user-login-data', getUserLoginData);
+router.get('/tutor-login-data', getTutorLoginData);
+router.get('/courses-count-by-category', getCoursesCountByCategory);
+router.get('/student-enrollments', getStudentEnrollmentsByDate);
 
 export default router;

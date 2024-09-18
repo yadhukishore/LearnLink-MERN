@@ -19,6 +19,7 @@
     "@zegocloud/zego-uikit-prebuilt": "^2.8.1",
     "axios": "^1.7.2",
     "browser-image-compression": "^2.0.2",
+    "dayjs": "^1.11.13",
     "express-rate-limit": "^7.4.0",
     "express-validator": "^7.1.0",
     "firebase": "^10.12.4",
@@ -36,6 +37,7 @@
     "react-to-pdf": "^1.0.1",
     "react-to-print": "^2.15.1",
     "react-toastify": "^10.0.5",
+    "recharts": "^2.12.7",
     "socket.io-client": "^4.7.5",
     "sweetalert2": "^11.12.3",
     "sweetalert2-react-content": "^5.0.7"
