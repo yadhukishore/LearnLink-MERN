@@ -32,6 +32,7 @@ const SearchCourses: React.FC = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(false);
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
+  const [noCoursesFound, setNoCoursesFound] = useState(false);
 
   useEffect(() => {
     if (searchQuery) {
@@ -41,14 +42,19 @@ const SearchCourses: React.FC = () => {
 
   const fetchCourses = async () => {
     setLoading(true);
+    setNoCoursesFound(false);
     try {
       const response = await apiService.get<CoursesResponse>('/user/searchCourse', {
         params: { query: searchQuery, page: currentPage, limit: 6, sort: sortOrder },
       });
       setCourses(response.courses);
       setTotalPages(response.totalPages);
+      if (response.courses.length === 0) {
+        setNoCoursesFound(true);
+      }
     } catch (error) {
       console.error('Error fetching courses:', error);
+      setNoCoursesFound(true);
     } finally {
       setLoading(false);
     }
@@ -69,7 +75,7 @@ const SearchCourses: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-[#071A2B] text-white">
-        <Header/>
+      <Header />
       <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
         <input
           type="text"
@@ -78,8 +84,7 @@ const SearchCourses: React.FC = () => {
           placeholder="🔍 Search your favourite courses..."
           className="w-full p-3 rounded-md text-black mb-8"
         />
-               {/* Sort by Price */}
-               <div className="mb-8 flex items-center">
+        <div className="mb-8 flex items-center">
           <label className="mr-2 text-white">Sort by Price:</label>
           <select
             value={sortOrder}
@@ -93,6 +98,10 @@ const SearchCourses: React.FC = () => {
         {loading ? (
           <div className="flex justify-center">
             <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-blue-500"></div>
+          </div>
+        ) : noCoursesFound ? (
+          <div className="text-center text-2xl font-semibold mt-8">
+            No courses found. Please try a different search term.
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -139,17 +148,17 @@ const SearchCourses: React.FC = () => {
           </div>
         )}
 
-        {/* Pagination Component */}
-        <div className="flex justify-center mt-8">
-          <Pagination
-            currentPage={currentPage}
-            totalPages={totalPages}
-            onPageChange={onPageChange}
-          />
-        </div>
+        {!noCoursesFound && courses.length > 0 && (
+          <div className="flex justify-center mt-8">
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={onPageChange}
+            />
+          </div>
+        )}
       </div>
     </div>
   );
 };
-
 export default SearchCourses;

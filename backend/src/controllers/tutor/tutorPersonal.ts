@@ -7,13 +7,7 @@ import Enrollment from '../../models/Enrollment';
 import User from '../../models/User';
 // import Chat from '../../models/Chat';
 
-declare global {
-    namespace Express {
-      interface Request {
-        user?: ITutor;
-      }
-    }
-  }
+
 
   interface CustomRequest extends Request{
     tutor?:{_id:string};

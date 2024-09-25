@@ -1,19 +1,21 @@
-// src/api/axiosConfig.ts
-
+// axiosInstance.ts
 import axios from 'axios';
-import store from '../components/store/store';
-import { tokenExpired } from '../features/auth/authSlice';
 
 const axiosInstance = axios.create({
   baseURL: 'http://localhost:8000/api',
 });
 
-axiosInstance.interceptors.response.use(
-  response => response,
-  error => {
-    if (error.response && error.response.status === 401) {
-      store.dispatch(tokenExpired());
+axiosInstance.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('token');
+    console.log("TOKKEN: ",token)
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
     }
+    console.log("Request headers:", config.headers); // Log the headers being sent
+    return config;
+  },
+  (error) => {
     return Promise.reject(error);
   }
 );

@@ -55,6 +55,12 @@ import SearchCourses from './components/pages/user/SearchCourses.tsx';
 import TutorQuiz from './components/pages/tutor/TutorQuiz.tsx';
 import UserQuizPage from './components/pages/user/UserQuizPage.tsx';
 import GetCertificatePage from './components/pages/user/GetCertificatePage.tsx';
+import UserChatWithTutor from './components/pages/user/UserChatWithTutor.tsx';
+import TutorChatWithUser from './components/pages/tutor/TutorChatWithUser.tsx';
+import Chat from './components/helpers/Chat.tsx';
+import TutorChatList from './components/pages/tutor/TutorChatList.tsx';
+import TutorChat from './components/helpers/TutorChat.tsx';
+import ChatListTutor from './components/pages/tutor/ChatListTutor.tsx';
 
   const AppRoutes = () => {
     const isAuthenticated = useAuth();
@@ -106,6 +112,12 @@ import GetCertificatePage from './components/pages/user/GetCertificatePage.tsx';
       <Route path='/searchCourse'element={<SearchCourses/>} />
       <Route path="/quiz/:courseId" element={<UserQuizPage />} />
       <Route path="/get-certificate/:courseId" element={<GetCertificatePage />} />
+      <Route path="/userChatWithTutor/:tutorId" element={<UserChatWithTutor/>} />
+      <Route path="/chat/:roomId" element={<Chat/>} />
+      <Route path="/tutor-chats" element={<TutorChatList />} />
+        <Route path="/tutorChat/:roomId" element={<TutorChat />} />
+
+
           <Route 
         path='/tutorRegister' 
         element={tutorState.isAuthenticated ? <Navigate to="/tutor" /> : <TutorRegister />} 
@@ -126,7 +138,7 @@ import GetCertificatePage from './components/pages/user/GetCertificatePage.tsx';
       <Route path='/TutorChatWithUser/:userId' element={<TutorChatWithUser/>} />
       <Route path="/tutorChat" element={<TutorChat />} /> */}
       <Route path="/tutorCreateQuiz/:courseId" element={<TutorQuiz />} />
-
+      <Route path="/tutorChat" element={<ChatListTutor />} />
 <Route path="/tutorHome" element={tutorState.isAuthenticated ? <TutorHome /> : <Navigate to="/tutorLogin" />} />
 <Route path="/tutorCreateCourse" element={tutorState.isAuthenticated ? <TutorCreateCourse /> : <Navigate to="/tutorLogin" />} />
 <Route path="/tutorCourseDetail/:id" element={<TutorCourseDetail />} />
@@ -139,6 +151,7 @@ import GetCertificatePage from './components/pages/user/GetCertificatePage.tsx';
 <Route path="/callUserList/:timeId" element={<CallUserList />} />
 <Route path="/room/:roomId" element={<RoomPage />} />
 <Route path="/tutorWallet" element={< TutorWallet />} />
+<Route path="/tutorChatWithUser/:userId" element={<TutorChatWithUser/>} />
 
 <Route path="/admin-login" element={<AdminLogin />} />
 <Route path="/adminDashboard" element={<AdminDashboard />} />

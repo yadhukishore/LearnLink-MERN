@@ -149,7 +149,7 @@ export const tutorLogin = async (req: Request, res: Response) => {
       return res.status(403).json({ success: false, message: 'Your account is pending approval by the admin' });
     }
     const token = jwt.sign(
-      { id: tutor._id },
+      { id: tutor._id,userType: 'tutor'  },
       process.env.JWT_SECRET as string,
       { expiresIn: '1d' }
     );

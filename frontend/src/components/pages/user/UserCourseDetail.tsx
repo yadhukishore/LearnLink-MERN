@@ -5,6 +5,8 @@ import { motion } from 'framer-motion';
 import Header from './HeaderUser';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../store/store';
+import FeedbackCourse from './FeedbackCourse';
+import CourseReviews from './CourseReviews';
 
 interface CourseDetail {
   _id: string;
@@ -91,10 +93,12 @@ const UserCourseDetail: React.FC = () => {
     navigate(`/checkoutUserCourse/${course._id}`);
   };
   const handleConnectTutor = () => {
-    if (course && course.tutorId) {
-      navigate(`/userChatWithTutor/${course.tutorId}`);
+    if (course && course.tutorId && user) {
+      const roomId = `${user.id}_${course.tutorId}`;
+      navigate(`/chat/${roomId}`);
     }
   };
+  
   
 
   return (
@@ -203,6 +207,17 @@ const UserCourseDetail: React.FC = () => {
       </div>
 
         </motion.div>
+       {/* Feedback section */}
+       {course.hasAccess && (
+          <div className="mt-12">
+            <FeedbackCourse courseId={course._id} />
+          </div>
+        )}
+
+          {/* Course Reviews section */}
+          <div className="mt-12">
+          <CourseReviews courseId={course._id} />
+        </div>
       </main>
     </div>
   );

@@ -79,7 +79,7 @@ const ApplyFinancialAid: React.FC = () => {
         navigate('/courses'); 
         } catch (error: any) {
             if (error.response && error.response.status === 400) {
-                MySwal.fire('Info', error.response.data.message, 'info'); // Show existing application message
+                MySwal.fire('Info', error.response.data.message, 'info'); 
             } else {
                 MySwal.fire('Error!', 'Something went wrong. Please try again later.', 'error');
             }

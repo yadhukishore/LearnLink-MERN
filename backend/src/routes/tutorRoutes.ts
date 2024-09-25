@@ -8,6 +8,7 @@ import { createAvailableTime, deleteAvailableTime, getAllAvailableTimes, getNonE
 import { authenticateTutor } from '../middlewares/tutorAuth';
 import { getFinancialAidApplicationsForTutor, getFinancialAidDetailsForTutor, updateFinancialAidStatusForTutor } from '../controllers/tutor/tuttorFinacialAid';
 import { getBookedUserDetails, sendCallLink } from '../controllers/user/userCourseController';
+import authMiddleware from '../middlewares/jwt';
 
 
 const router = express.Router();
@@ -18,12 +19,15 @@ console.log("Registering submit-tutor-proofs route");
 router.post('/submit-tutor-proofs/:tutorId', tutorSubmitingProofs);
 router.post('/approve-tutor/:tutorId', approveTutor);
 router.post('/tutorLogin', tutorLogin);
+
+// router.use(authMiddleware('tutor'));
+
 router.post('/tutorCreateCourse', upload.fields([
   { name: 'thumbnailFile', maxCount: 1 },
   { name: 'videos', maxCount: 10 }, 
 ]), createCourse);
-router.get('/getCourses/:tutorId', getCourses);
-router.get('/tutorCourseDetail/:courseId', getCourseById);
+router.get('/getCourses/:tutorId', authMiddleware(['tutor']),getCourses);
+router.get('/tutorCourseDetail/:courseId',authMiddleware(['tutor']), getCourseById);
 router.patch('/updateCourse/:id', updateCourse);
 router.patch('/updateCourseVideo/:id/:videoId', updateCourseVideo);
 router.post('/addCourseVideo/:id', upload.single('video'), addCourseVideo);

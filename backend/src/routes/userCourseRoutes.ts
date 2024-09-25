@@ -5,8 +5,13 @@ import { applyForFinancialAid, checkCallLink, createOrder, getAllCourses,getAvai
 import { addToWishlist, getWishlist, removeFromWishlist } from '../controllers/user/userWishlistController';
 // import { getChatHistory } from '../controllers/user/chatController';
 import { getQuizForUser, getQuizResult, submitQuizAnswers } from '../controllers/user/userQuizController';
+import { getReviewsForCourse, postFeedbackAndRating } from '../controllers/user/courseReviewController';
+import authMiddleware from '../middlewares/jwt';
 
 const router = express.Router();
+
+// router.use(authMiddleware('user'));
+// router.use(authMiddleware(['user'])); 
 
 router.get('/courses', getAllCourses);
 router.get('/courses/:courseId', getCourseDetails);
@@ -30,5 +35,7 @@ router.post('/wishlist/remove', removeFromWishlist);
 router.get('/wishlist/:userId', getWishlist);
 router.get('/searchCourse', searchCourses);
 // router.get('/:userId/:tutorId',getChatHistory);
+router.post('/courseFeedback/:courseId',postFeedbackAndRating);
+router.get('/courseReviews/:courseId/', getReviewsForCourse);
 
 export default router;

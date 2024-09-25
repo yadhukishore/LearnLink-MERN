@@ -125,6 +125,7 @@ function generateUniqueCourseId(): string {
 // Get all courses
 export const getCourses = async (req: Request, res: Response) => {
   try {
+    console.log("getCourses controller called");
     const tutorId = req.params.tutorId;
     const page = parseInt(req.query.page as string) || 1;
     const limit = parseInt(req.query.limit as string) || 10;

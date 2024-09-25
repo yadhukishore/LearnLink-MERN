@@ -6,12 +6,12 @@ interface IComment extends Document {
   comment: string;
 }
 
-interface IReview extends Document {
-  user: object;
-  rating: number;
-  comment: string;
-  commentReplies: IComment[];
-}
+// interface IReview extends Document {
+//   user: object;
+//   rating: number;
+//   comment: string;
+//   commentReplies: IComment[];
+// }
 
 interface ILink extends Document {
   title: string;
@@ -56,9 +56,10 @@ export interface ICourse extends Document {
   level: string;
   demoUrl: string;
   category: ICategory['_id']; 
-  reviews: IReview[];
+  // reviews: IReview[];
   courseData: ICourseData[];
   ratings?: number;
+  numReviews: number;
   purchased?: number;
   isDelete: boolean;
   benefits: { title: string }[]; 
@@ -73,15 +74,15 @@ const CommentSchema = new Schema<IComment>({
   comment: String
 });
 
-const ReviewSchema = new Schema<IReview>({
-  user: Object,
-  rating: {
-    type: Number,
-    default: 0
-  },
-  comment: String,
-  commentReplies: [CommentSchema]
-});
+// const ReviewSchema = new Schema<IReview>({
+//   user: Object,
+//   rating: {
+//     type: Number,
+//     default: 0
+//   },
+//   comment: String,
+//   commentReplies: [CommentSchema]
+// });
 
 const LinkSchema = new Schema<ILink>({
   title: String,
@@ -165,9 +166,13 @@ const CourseSchema = new Schema<ICourse>({
     type: String,
     required: true
   },
-  reviews: [ReviewSchema],
+  // reviews: [ReviewSchema],
   courseData: [CourseDataSchema],
   ratings: {
+    type: Number,
+    default: 0
+  },
+  numReviews: {
     type: Number,
     default: 0
   },

@@ -2,11 +2,15 @@ import express from 'express';
 import { loginAdmin, registerAdmin } from '../controllers/admin/adminAuthController';
 import { addCategory, adminRemovePost, approveTutor,  deleteCategory,  getAdminFeeds,  getAllCategories,  getAllCoursesForAdmin, getCourseDetailsForAdmin, getEnrolledStudents, getFinancialAidApplications, getFinancialAidDetails, getPendingTutors, getTutorDetails, getUsers, showTutorsList, toggleTutorBanStatus, toggleUserBlockStatus, updateCategory, updateFinancialAidStatus } from '../controllers/admin/adminController';
 import { getCoursesCountByCategory, getStudentEnrollmentsByDate, getTutorLoginData, getUserLoginData } from '../controllers/admin/adminDashboardController';
+import authMiddleware from '../middlewares/jwt';
 
 
 const router =express.Router();
 
 router.post('/admin-login',loginAdmin);
+
+// router.use(authMiddleware('admin'));
+
 router.get('/adminStudentsList',getUsers);
 router.put('/toggleUserBlockStatus/:userId', toggleUserBlockStatus);
 router.get('/adminApprove-tutor', getPendingTutors);
