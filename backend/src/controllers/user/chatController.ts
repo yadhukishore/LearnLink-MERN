@@ -33,12 +33,21 @@ export const getChatHistory = async (req: Request, res: Response) => {
   console.log("Get chat history")
   try {
     const { roomId } = req.params;
+    const [userId, tutorId] = roomId.split('_');
     const chat = await Chat.findOne({ roomId });
 
     if (!chat) {
       console.log("Chat not found!");
       return res.status(404).json({ success: false, error: 'Chat not found' });
     }
+    const user = await User.findById(userId);
+    const tutor = await Tutor.findById(tutorId);
+
+    if (!user || !tutor) {
+      console.log("User or Tutor not found'")
+      return res.status(404).json({ success: false, error: 'User or Tutor not found' });
+    }
+
 
     const populatedMessages = await Promise.all(chat.messages.map(async (message) => {
       let sender;
@@ -57,7 +66,12 @@ export const getChatHistory = async (req: Request, res: Response) => {
       };
     }));
 
-    res.status(200).json({ success: true, chat: { ...chat.toObject(), messages: populatedMessages } });
+    res.status(200).json({ 
+      success: true, 
+      chat: { ...chat.toObject(), messages: populatedMessages },
+      userName: user.name,
+      tutorName: tutor.name
+    });
   } catch (error) {
     console.error('Error fetching chat history:', error);
     res.status(500).json({ success: false, error: 'Server error' });

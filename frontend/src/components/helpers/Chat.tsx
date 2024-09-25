@@ -19,6 +19,8 @@ const Chat: React.FC = () => {
   const [inputMessage, setInputMessage] = useState('');
   const [socket, setSocket] = useState<Socket | null>(null);
   const { roomId } = useParams<{ roomId: string }>();
+  const [userName, setUserName] = useState<string | null>(null);
+  const [tutorName, setTutorName] = useState<string | null>(null);
   const dispatch = useDispatch();
 
   const user = useSelector((state: RootState) => state.auth.user);
@@ -39,7 +41,6 @@ const Chat: React.FC = () => {
   };
 
   const userRole = getUserRole();
-
   const participant = userRole === 'Student' ? user : userRole === 'Tutor' ? tutor : null;
 
   useEffect(() => {
@@ -59,7 +60,7 @@ const Chat: React.FC = () => {
       socket.on('receive_message', (message: Message) => {
         setMessages((prevMessages) => [...prevMessages, message]);
       });
-  
+
       fetchChatHistory(roomId);
     } else {
       console.log('Socket or participant is missing');
@@ -73,8 +74,9 @@ const Chat: React.FC = () => {
   const fetchChatHistory = async (roomId: string) => {
     try {
       const response = await axios.get(`http://localhost:8000/api/chat/history/${roomId}`);
-      console.log('Chat History:', response.data.chat.messages);
       setMessages(response.data.chat.messages);
+      setUserName(response.data.userName);
+      setTutorName(response.data.tutorName);
     } catch (error) {
       console.error('Error fetching chat history:', error);
     }
@@ -99,48 +101,57 @@ const Chat: React.FC = () => {
 
   return (
     <div className="flex flex-col h-screen bg-gray-100">
-      <div className="bg-blue-500 text-white p-4">
-        <h1 className="text-2xl font-bold">Chat Room: {roomId}</h1>
-        <p>Logged in as: {participant?.name || 'Unknown'} ({userRole})</p>
+      {/* Header */}
+      <div className="bg-gradient-to-r from-indigo-900 to-purple-800 text-white p-4 shadow-lg">
+        <h1 className="text-3xl font-bold mb-2">
+          Chat: {userName || 'Send a message to connect with the Tutor'} &ndash; {tutorName || 'Wait...'}
+        </h1>
+        <p className="text-sm">Logged in as: {participant?.name || 'Unknown'} ({userRole})</p>
+        <p className="text-sm">Chatting with: {userRole === "Student"? tutorName:userName}</p>
+
       </div>
-      <div className="flex-1 overflow-y-auto p-4">
+
+      {/* Messages */}
+      <div className="flex-1 overflow-y-auto p-6 space-y-4 bg-gray-50">
         {messages.map((message) => (
           <div
             key={message._id}
-            className={`mb-4 ${
-              message.sender._id === participant?.id ? 'text-right' : 'text-left'
-            }`}
+            className={`flex ${message.sender._id === participant?.id ? 'justify-end' : 'justify-start'}`}
           >
             <div
-              className={`inline-block p-2 rounded-lg ${
+              className={`max-w-xs p-3 rounded-lg shadow-md ${
                 message.sender._id === participant?.id
-                  ? 'bg-blue-500 text-white'
-                  : 'bg-gray-300 text-black'
+                  ? 'bg-blue-600 text-white rounded-br-none'
+                  : 'bg-gray-200 text-gray-900 rounded-bl-none'
               }`}
             >
-              <p className="font-bold">{message.sender.name} ({message.senderRole})</p>
-              <p>{message.content}</p>
-              <p className="text-xs mt-1">
-                {new Date(message.timestamp).toLocaleString()}
+              <p className="text-sm font-semibold">
+                {message.sender.name} ({message.senderRole})
+              </p>
+              <p className="mt-1">{message.content}</p>
+              <p className="text-xs mt-2 text-gray-400">
+                {new Date(message.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
               </p>
             </div>
           </div>
         ))}
         <div ref={messagesEndRef} />
       </div>
-      <div className="p-4 bg-white">
-        <div className="flex">
+
+      {/* Input */}
+      <div className="p-4 bg-white border-t shadow-md">
+        <div className="flex items-center">
           <input
             type="text"
             value={inputMessage}
             onChange={(e) => setInputMessage(e.target.value)}
             onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
-            className="flex-1 border rounded-l-lg p-2"
+            className="flex-1 border border-gray-300 rounded-l-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
             placeholder="Type a message..."
           />
           <button
             onClick={sendMessage}
-            className="bg-blue-500 text-white px-4 py-2 rounded-r-lg"
+            className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-r-lg focus:outline-none"
           >
             Send
           </button>

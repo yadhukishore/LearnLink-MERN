@@ -43,7 +43,7 @@ const ChatListTutor: React.FC = () => {
     <div className="min-h-screen bg-gray-50">
         <TutorHeader/>
       <div className="max-w-4xl mx-auto py-8 px-4">
-        <h1 className="text-4xl font-bold mb-8 text-center text-gray-600">My Students</h1>
+        <h1 className="text-4xl font-bold mb-8 text-center text-gray-600">Chats</h1>
         {chatRooms.length === 0 ? (
           <p className="text-center text-gray-500 text-lg">No students connected yet.</p>
         ) : (
