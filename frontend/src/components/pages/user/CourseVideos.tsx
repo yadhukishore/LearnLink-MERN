@@ -8,6 +8,7 @@ import { FaPlay, FaLock, FaCalendarAlt } from 'react-icons/fa';
 import AvailableTimes from './AvailableTimes';
 import AcceptCallButton from './AcceptCallButton';
 import { apiService } from '../../../services/api';
+import ReportCourseButton from './ReportCourseButton';
 
 interface Video {
   _id: string;
@@ -250,6 +251,8 @@ const CourseVideos: React.FC = () => {
             )}
           </div>
         </div>
+                     {/* Report Course Button */}
+                     <ReportCourseButton courseId={courseId!} userId={user?.id} />
       </main>
     </div>
   );

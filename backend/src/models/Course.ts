@@ -67,6 +67,7 @@ export interface ICourse extends Document {
   tutorId: mongoose.Schema.Types.ObjectId;
   videos: IVideo[];
   quiz?: mongoose.Types.ObjectId; 
+  reportedBy: mongoose.Schema.Types.ObjectId[];
 }
 
 const CommentSchema = new Schema<IComment>({
@@ -196,7 +197,11 @@ const CourseSchema = new Schema<ICourse>({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Quiz',
     default: null
-  }
+  },
+  reportedBy: [{
+    type: Schema.Types.ObjectId,
+    ref: 'User'
+  }]
 },
 {
   timestamps: true
