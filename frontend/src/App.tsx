@@ -62,6 +62,7 @@ import TutorChatList from './components/pages/tutor/TutorChatList.tsx';
 import TutorChat from './components/helpers/TutorChat.tsx';
 import ChatListTutor from './components/pages/tutor/ChatListTutor.tsx';
 import CourseReport from './components/pages/admin/CourseReport.tsx';
+import ErrorPage from './components/pages/Error/ErrorPage.tsx';
 
   const AppRoutes = () => {
     const isAuthenticated = useAuth();
@@ -168,6 +169,7 @@ import CourseReport from './components/pages/admin/CourseReport.tsx';
 <Route path="/adminFeedControl" element={<FeedControl />} />
 <Route path="/adminCoursesCategory" element={<AdminCategory />}/>
 <Route path="/adminCourseReports" element={<CourseReport />} />
+<Route path="*" element={<ErrorPage />} />
   </Routes>
     );
   };
