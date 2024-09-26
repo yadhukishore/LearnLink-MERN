@@ -14,7 +14,7 @@ const Header: React.FC = () => {
   const routeTitles: Record<string, string> = {
     '/adminDashboard': 'Admin Dashboard',
     '/admin/books': 'Books List',
-    '/admin/orders': 'Order Detail',
+    '/adminCourseReports': 'Reported Courses',
     '/adminStudentsList': 'Students',
     '/adminCoursesList': 'Courses',
     '/adminCoursesCategory': 'Course Category',

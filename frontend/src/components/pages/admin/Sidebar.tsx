@@ -9,7 +9,7 @@ const Sidebar: React.FC = () => {
   const menuItems = [
     { name: 'Dashboard', path: '/adminDashboard' },
     { name: 'Books List', path: '/admin/books' },
-    { name: 'Order Detail', path: '/admin/orders' },
+    { name: 'Reported Courses', path: '/adminCourseReports' },
     { name: 'Students', path: '/adminStudentsList' },
     { name: 'Courses', path: '/adminCoursesList' },
     { name: 'Course Category', path: '/adminCoursesCategory' },

@@ -578,3 +578,55 @@ export const deleteCategory = async (req: Request, res: Response) => {
     res.status(500).json({ message: 'Error deleting category' });
   }
 };
+
+
+export const getReportedCourses = async (req: Request, res: Response) => {
+  console.log("On getting reported courses");
+  try {
+    const reportedCourses = await Course.aggregate([
+      {
+        $match: {
+          reportedBy: { $exists: true, $ne: [] }
+        }
+      },
+      {
+        $lookup: {
+          from: 'users', 
+          localField: 'reportedBy',
+          foreignField: '_id',
+          as: 'reportedByUsers'
+        }
+      },
+      {
+        $unwind: '$reportedByUsers'
+      },
+      {
+        $group: {
+          _id: '$_id',
+          name: { $first: '$name' },
+          description: { $first: '$description' },
+          reportedBy: {
+            $push: {
+              _id: '$reportedByUsers._id',
+              name: '$reportedByUsers.name',
+              email: '$reportedByUsers.email'
+            }
+          }
+        }
+      },
+      {
+        $project: {
+          _id: 1,
+          name: 1,
+          description: 1,
+          reportedBy: 1
+        }
+      }
+    ]);
+
+    res.status(200).json(reportedCourses);
+  } catch (error) {
+    console.error("Error fetching reported courses:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
