@@ -157,6 +157,61 @@ const UserQuizPage: React.FC = () => {
     }
   };
 
+
+  const handleQuitQuiz = useCallback(async () => {
+    const result = await Swal.fire({
+      title: 'Do you want to quit this quiz?',
+      text: "You're about to leave the quiz page. Are you sure?",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, quit',
+      cancelButtonText: 'No, stay',
+      allowOutsideClick: false,
+    });
+
+    if (result.isConfirmed) {
+      navigate('/courses');
+    }
+    return !result.isConfirmed;
+  }, [navigate]);
+
+  useEffect(() => {
+    const handleVisibilityChange = async () => {
+      if (document.hidden && !quizSubmitted) {
+        await handleQuitQuiz();
+      }
+    };
+
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (!quizSubmitted) {
+        e.preventDefault();
+        e.returnValue = '';
+      }
+    };
+
+    const handlePopState = async (e: PopStateEvent) => {
+      if (!quizSubmitted) {
+        e.preventDefault();
+        const shouldStay = await handleQuitQuiz();
+        if (shouldStay) {
+          window.history.pushState(null, '', window.location.pathname);
+        }
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    window.addEventListener('popstate', handlePopState);
+    window.history.pushState(null, '', window.location.pathname);
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+      window.removeEventListener('popstate', handlePopState);
+    };
+  }, [quizSubmitted, handleQuitQuiz]);
+
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-blue-900 to-indigo-900 text-white flex items-center justify-center">

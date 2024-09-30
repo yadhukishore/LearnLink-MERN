@@ -3,6 +3,7 @@ import { loginAdmin, registerAdmin } from '../controllers/admin/adminAuthControl
 import { addCategory, adminRemovePost, approveTutor,  deleteCategory,  getAdminFeeds,  getAllCategories,  getAllCoursesForAdmin, getCourseDetailsForAdmin, getEnrolledStudents, getFinancialAidApplications, getFinancialAidDetails, getPendingTutors, getReportedCourses, getTutorDetails, getUsers, showTutorsList, toggleTutorBanStatus, toggleUserBlockStatus, updateCategory, updateFinancialAidStatus } from '../controllers/admin/adminController';
 import { getCoursesCountByCategory, getStudentEnrollmentsByDate, getTutorLoginData, getUserLoginData } from '../controllers/admin/adminDashboardController';
 import authMiddleware from '../middlewares/jwt';
+import adminAuthMiddleware from '../middlewares/adminAuth';
 
 
 const router =express.Router();
@@ -10,10 +11,11 @@ const router =express.Router();
 router.post('/admin-login',loginAdmin);
 
 // router.use(authMiddleware('admin'));
+// router.use(adminAuthMiddleware); 
 
-router.get('/adminStudentsList',getUsers);
-router.put('/toggleUserBlockStatus/:userId', toggleUserBlockStatus);
-router.get('/adminApprove-tutor', getPendingTutors);
+router.get('/adminStudentsList',authMiddleware(['admin']),getUsers);
+router.put('/toggleUserBlockStatus/:userId',authMiddleware(['admin']) ,toggleUserBlockStatus);
+router.get('/adminApprove-tutor',getPendingTutors);
 router.get('/tutor-details/:tutorId',getTutorDetails);
 router.post('/approve-tutor/:tutorId',approveTutor);
 router.get('/financial-aid-applications', getFinancialAidApplications);
@@ -35,6 +37,6 @@ router.get('/tutor-login-data', getTutorLoginData);
 router.get('/courses-count-by-category', getCoursesCountByCategory);
 router.get('/student-enrollments', getStudentEnrollmentsByDate);
 
-router.get('/adminReportedCourses', getReportedCourses);
+router.get('/adminReportedCourses' ,getReportedCourses);
 
 export default router;

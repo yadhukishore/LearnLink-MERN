@@ -52,6 +52,8 @@ const AdminLogin: React.FC = () => {
    localStorage.setItem('adminToken', token);
    localStorage.setItem('adminUser', JSON.stringify(admin));
 
+   axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+
    navigate('/adminDashboard');
       if (response.status === 200) {
         dispatch(adminLoginSuccess(response.data));

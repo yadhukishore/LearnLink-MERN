@@ -84,12 +84,11 @@ export const getTutorChatRooms = async (req: Request, res: Response) => {
     const { tutorId } = req.params;
     console.log("TutorId", tutorId);
 
-    // Find chats where roomId ends with the tutorId (e.g., userId_tutorId)
     const chats = await Chat.find({ roomId: { $regex: `_${tutorId}$` } })
       .sort({ 'messages.timestamp': -1 });
 
     const chatRooms = await Promise.all(chats.map(async (chat) => {
-      // Find the student by excluding the tutorId from participants
+
       const studentId = chat.participants.find(p => p.toString() !== tutorId);
       const student = await User.findById(studentId);
 

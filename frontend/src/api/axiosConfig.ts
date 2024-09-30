@@ -1,14 +1,27 @@
 // axiosInstance.ts
 import axios from 'axios';
 
+const getToken = () => {
+  const userType = localStorage.getItem('userType'); 
+  switch (userType) {
+    case 'user':
+      return localStorage.getItem('userToken');
+    case 'tutor':
+      return localStorage.getItem('tutorToken');
+    case 'admin':
+      return localStorage.getItem('adminToken');
+    default:
+      return null;
+  }
+};
+
 const axiosInstance = axios.create({
   baseURL: 'http://localhost:8000/api',
 });
 
 axiosInstance.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('token');
-    console.log("TOKKEN: ",token)
+    const token = getToken();
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }

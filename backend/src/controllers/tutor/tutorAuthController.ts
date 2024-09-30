@@ -150,7 +150,7 @@ export const tutorLogin = async (req: Request, res: Response) => {
     }
     const token = jwt.sign(
       { id: tutor._id,userType: 'tutor'  },
-      process.env.JWT_SECRET as string,
+      process.env.TUTOR_JWT_SECRET as string,
       { expiresIn: '1d' }
     );
 console.log("Tokened");

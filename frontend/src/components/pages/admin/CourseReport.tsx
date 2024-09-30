@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { apiService } from '../../../services/api';
+import axiosInstance from '../../../api/axiosConfig';
 import { Link } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import Header from './Header';
@@ -15,9 +15,12 @@ const CourseReport: React.FC = () => {
 
   useEffect(() => {
     const fetchReportedCourses = async () => {
+      const token = localStorage.getItem('adminToken');
+      console.log("Admin Token:", token); 
+      
       try {
-        const response = await apiService.get('/admin/adminReportedCourses');
-        setReportedCourses(response);
+        const response = await axiosInstance.get('/admin/adminReportedCourses');
+        setReportedCourses(response.data); 
       } catch (error) {
         console.error('Error fetching reported courses:', error);
       }
@@ -32,7 +35,6 @@ const CourseReport: React.FC = () => {
       <div className="flex flex-col flex-1">
         <Header />
         <div className="p-8">
-
           {reportedCourses.length === 0 ? (
             <p className="text-lg text-gray-500">No courses have been reported yet.</p>
           ) : (

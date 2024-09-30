@@ -43,6 +43,7 @@ export const getUsers = async (req: Request, res: Response): Promise<void> => {
       totalPages:Math.ceil(totalUsers/limit),
       currentPage:page,
     });
+    console.log("Poreee")
   } catch (err) {
     console.error('Error in getUsers:', err);
     res.status(500).json({ error: 'Server error' });
