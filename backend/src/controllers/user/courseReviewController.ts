@@ -74,8 +74,8 @@ export const getReviewsForCourse = async (req: Request, res: Response) => {
   export const reportCourse = async (req: Request, res: Response) => {
     try {
       const { courseId } = req.params;
-      const { userId } = req.body;
-      console.log(`Reporting Course: ${courseId}`);
+      const { userId, reason } = req.body; // Retrieve the reason from the request body
+      console.log(`Reporting Course: ${courseId} for reason: ${reason}`);
   
       if (!mongoose.Types.ObjectId.isValid(userId)) {
         return res.status(400).json({ message: 'Invalid user ID' });
@@ -89,11 +89,22 @@ export const getReviewsForCourse = async (req: Request, res: Response) => {
       }
   
       const userObjectId = new mongoose.Types.ObjectId(userId);
+  
+      // Check if the user has already reported the course
       if (!course.reportedBy.some(id => id.toString() === userObjectId.toString())) {
+        // Add the user ID to the reportedBy array
         course.reportedBy.push(userObjectId as any);
+  
+        // Save the report reason (you might want to store this in a separate field or log it)
+        if (!course.reportReasons) {
+          course.reportReasons = [];
+        }
+        course.reportReasons.push(reason);
+  
         await course.save();
       }
-      console.log("Course reported successfully")
+  
+      console.log("Course reported successfully");
       res.status(200).json({ message: 'Course reported successfully' });
     } catch (error) {
       console.error('Error reporting course:', error);

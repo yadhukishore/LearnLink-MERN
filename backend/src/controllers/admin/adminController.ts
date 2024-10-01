@@ -610,7 +610,10 @@ export const getReportedCourses = async (req: Request, res: Response) => {
             $push: {
               _id: '$reportedByUsers._id',
               name: '$reportedByUsers.name',
-              email: '$reportedByUsers.email'
+              email: '$reportedByUsers.email',
+              reason: { 
+                $arrayElemAt: ['$reportReasons', { $indexOfArray: ['$reportedBy', '$reportedByUsers._id'] }] 
+              } 
             }
           }
         }
@@ -620,7 +623,8 @@ export const getReportedCourses = async (req: Request, res: Response) => {
           _id: 1,
           name: 1,
           description: 1,
-          reportedBy: 1
+          reportedBy: 1,
+          createdAt: 1
         }
       }
     ]);

@@ -68,6 +68,7 @@ export interface ICourse extends Document {
   videos: IVideo[];
   quiz?: mongoose.Types.ObjectId; 
   reportedBy: mongoose.Schema.Types.ObjectId[];
+  reportReasons: string[];
 }
 
 const CommentSchema = new Schema<IComment>({
@@ -201,7 +202,8 @@ const CourseSchema = new Schema<ICourse>({
   reportedBy: [{
     type: Schema.Types.ObjectId,
     ref: 'User'
-  }]
+  }],
+  reportReasons: [String],
 },
 {
   timestamps: true

@@ -9,6 +9,12 @@ interface ReportedCourse {
   name: string;
   reportedBy: Array<{ _id: string, name: string, email: string }>;
 }
+interface ReportedByUser {
+  _id: string;
+  name: string;
+  email: string;
+  reason?: string;  
+}
 
 const CourseReport: React.FC = () => {
   const [reportedCourses, setReportedCourses] = useState<ReportedCourse[]>([]);
@@ -55,9 +61,12 @@ const CourseReport: React.FC = () => {
                       </td>
                       <td className="px-6 py-4 border-b border-gray-200 text-sm">
                         {course.reportedBy.map((user) => (
-                          <div key={user._id}>
+                          <div key={user._id} className="mb-4">
                             <p className="text-gray-700">
                               {user.name} <span className="text-blue-600">( {user.email} )</span>
+                            </p>
+                            <p className="text-sm text-gray-500">
+                              Reason: {user.reason ? user.reason : "other"}
                             </p>
                           </div>
                         ))}

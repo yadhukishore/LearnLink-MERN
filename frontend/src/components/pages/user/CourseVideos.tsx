@@ -252,7 +252,9 @@ const CourseVideos: React.FC = () => {
           </div>
         </div>
                      {/* Report Course Button */}
-                     <ReportCourseButton courseId={courseId!} userId={user?.id} />
+                     <div className="mt-8">
+          <ReportCourseButton courseId={courseId!} />
+        </div>
       </main>
     </div>
   );
