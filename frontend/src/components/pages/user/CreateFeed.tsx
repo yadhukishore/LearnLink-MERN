@@ -8,12 +8,18 @@ import Swal from 'sweetalert2';
 interface CreateFeedProps {
   onFeedCreated: () => void;
 }
+interface User {
+  id: string;
+  name: string;
+  email: string;
+  profilePicture?: string; 
+}
 
 const CreateFeed: React.FC<CreateFeedProps> = ({ onFeedCreated }) => {
   const [content, setContent] = useState('');
   const [files, setFiles] = useState<File[]>([]);
   const [previewUrls, setPreviewUrls] = useState<string[]>([]);
-  const user = useSelector((state: RootState) => state.auth.user);
+  const user: User | null = useSelector((state: RootState) => state.auth.user);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -41,8 +47,10 @@ const CreateFeed: React.FC<CreateFeedProps> = ({ onFeedCreated }) => {
         const formData = new FormData();
         formData.append('content', content);
         files.forEach((file) => formData.append('files', file));
-        formData.append('userId', user?.id);
 
+        if (user?.id) {
+          formData.append('userId', user.id);
+        }
         try {
           await axios.post('http://localhost:8000/api/user/feeds', formData, {
             headers: { 'Content-Type': 'multipart/form-data' },
