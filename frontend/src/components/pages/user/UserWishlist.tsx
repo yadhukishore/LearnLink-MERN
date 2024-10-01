@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../../store/store';
 import { setWishlist, removeFromWishlist } from '../../../features/wishlist/wishlistSlice';
-import { Link } from 'react-router-dom';
+import { Link, Navigate } from 'react-router-dom';
 import { FaHeart } from 'react-icons/fa';
 import { motion } from 'framer-motion';
 import Header from './HeaderUser';
@@ -52,6 +52,9 @@ const UserWishlist: React.FC = () => {
     }
   }, [user, dispatch]);
   
+  if (!user) {
+    return <Navigate to="/login" />;
+  }
 
   if (loading) {
     return (
