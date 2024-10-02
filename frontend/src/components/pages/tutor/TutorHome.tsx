@@ -1,5 +1,5 @@
 
-import React, { useEffect, useState } from 'react';
+import  { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { RootState } from '../../../components/store/store';
@@ -9,12 +9,17 @@ import TutorHeader from './TutorHeader';
 import { motion } from 'framer-motion';
 import TutorCourseList from '../../helpers/TutorCourseList';
 
+interface TrendingCourse {
+  id: number;
+  title: string;
+}
+
 const TutorHome = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   useTokenExpiration();
 
-  const [trendingCourses, setTrendingCourses] = useState([]);
+  const [trendingCourses, setTrendingCourses] = useState<TrendingCourse[]>([]);
 
   useEffect(() => {
     const checkAuthStatus = async () => {
@@ -26,7 +31,6 @@ const TutorHome = () => {
     };
     checkAuthStatus();
     
-    // Fetch trending courses (mock data for now)
     setTrendingCourses([
       { id: 1, title: 'Introduction to React' },
       { id: 2, title: 'Advanced JavaScript' },

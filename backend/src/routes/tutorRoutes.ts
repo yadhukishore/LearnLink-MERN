@@ -33,7 +33,7 @@ router.patch('/updateCourseVideo/:id/:videoId', updateCourseVideo);
 router.post('/addCourseVideo/:id', upload.single('video'), addCourseVideo);
 router.get('/tutorProfile', authMiddleware(['tutor']), getTutorProfile);
 router.patch('/updateProfile', authenticateTutor, updateTutorProfile);
-router.get('/getAllCategoriesForTutor',authMiddleware(['tutor']) ,getAllCategoriesForTutor);
+router.get('/getAllCategoriesForTutor' ,getAllCategoriesForTutor);
 router.get('/tutorFinacial-aids',getFinancialAidApplicationsForTutor);
 router.get('/FinacialapplyDetail/:applicationId',getFinancialAidDetailsForTutor);
 router.put('/financial-aid-status/:applicationId',updateFinancialAidStatusForTutor);

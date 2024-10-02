@@ -15,7 +15,7 @@ interface Tutor {
 }
 
 const ApproveTutor: React.FC = () => {
-  const [tutors, setTutors] = useState([]);
+  const [tutors, setTutors] = useState<Tutor[]>([]); 
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
   const navigate = useNavigate();
