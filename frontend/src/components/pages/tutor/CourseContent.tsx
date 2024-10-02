@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-
+import Swal from 'sweetalert2';
 interface VideoData {
   file: File | null;
   title: string;
@@ -7,7 +7,7 @@ interface VideoData {
   previewUrl: string | null;
 }
 
-const CourseContent: React.FC<{ courseData: any; setCourseData: any; onNextStep: any }> = ({ courseData, setCourseData }) => {
+const CourseContent: React.FC<{ setCourseData: any; onNextStep: any }> = ({ setCourseData }) => {
   const [videos, setVideos] = useState<VideoData[]>([
     { file: null, title: '', description: '', previewUrl: null },
   ]);
@@ -21,12 +21,13 @@ const CourseContent: React.FC<{ courseData: any; setCourseData: any; onNextStep:
     setCourseData((prevData: any) => ({ ...prevData, videos: newVideos }));
   };
 
-  const handleInputChange = (index: number, field: keyof VideoData, value: string) => {
+  const handleInputChange = (index: number, field: keyof Omit<VideoData, 'file'>, value: string) => {
     const newVideos = [...videos];
     newVideos[index][field] = value;
     setVideos(newVideos);
     setCourseData((prevData: any) => ({ ...prevData, videos: newVideos }));
   };
+  
 
   const addVideoContainer = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault(); 
@@ -34,8 +35,12 @@ const CourseContent: React.FC<{ courseData: any; setCourseData: any; onNextStep:
     if (lastVideo.file && lastVideo.title && lastVideo.description) {
       setVideos([...videos, { file: null, title: '', description: '', previewUrl: null }]);
     } else {
-      alert('Please fill in all fields for the current video before adding a new one.');
-    }
+      Swal.fire({
+        title: 'Incomplete Video',
+        text: 'Please fill in all fields for the current video before adding a new one.',
+        icon: 'warning',
+        confirmButtonText: 'Ok'
+      });    }
   };
 
   const removeVideoContainer = (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -53,7 +58,12 @@ const CourseContent: React.FC<{ courseData: any; setCourseData: any; onNextStep:
       console.log('Videos data:', videos);
       // Data needs to be sented bckEd
     } else {
-      alert('Please fill in all fields for all videos before proceeding.');
+      Swal.fire({
+        title: 'Incomplete Data',
+        text: 'Please fill in all fields for all videos before proceeding.',
+        icon: 'error',
+        confirmButtonText: 'Ok'
+      });
     }
   };
 
