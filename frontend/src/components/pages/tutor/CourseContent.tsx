@@ -7,27 +7,33 @@ interface VideoData {
   previewUrl: string | null;
 }
 
-const CourseContent: React.FC<{ setCourseData: any; onNextStep: any }> = ({ setCourseData }) => {
-  const [videos, setVideos] = useState<VideoData[]>([
+interface CourseContentProps {
+  courseData: {
+    videos: VideoData[];
+  };
+  setCourseData: React.Dispatch<React.SetStateAction<any>>;
+  onNextStep: () => void;
+}
+
+const CourseContent: React.FC<CourseContentProps> = ({ courseData, setCourseData, onNextStep }) => {
+  const [videos, setVideos] = useState<VideoData[]>(courseData.videos.length > 0 ? courseData.videos : [
     { file: null, title: '', description: '', previewUrl: null },
   ]);
-
+  
   const handleVideoUpload = (index: number, file: File) => {
     const previewUrl = URL.createObjectURL(file);
     const newVideos = [...videos];
-    newVideos[index].file = file;
-    newVideos[index].previewUrl = previewUrl;
+    newVideos[index] = { ...newVideos[index], file, previewUrl };
     setVideos(newVideos);
     setCourseData((prevData: any) => ({ ...prevData, videos: newVideos }));
   };
 
-  const handleInputChange = (index: number, field: keyof Omit<VideoData, 'file'>, value: string) => {
+  const handleInputChange = (index: number, field: keyof VideoData, value: string) => {
     const newVideos = [...videos];
-    newVideos[index][field] = value;
+    newVideos[index] = { ...newVideos[index], [field]: value };
     setVideos(newVideos);
     setCourseData((prevData: any) => ({ ...prevData, videos: newVideos }));
   };
-  
 
   const addVideoContainer = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault(); 
@@ -40,7 +46,8 @@ const CourseContent: React.FC<{ setCourseData: any; onNextStep: any }> = ({ setC
         text: 'Please fill in all fields for the current video before adding a new one.',
         icon: 'warning',
         confirmButtonText: 'Ok'
-      });    }
+      });
+    }
   };
 
   const removeVideoContainer = (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -56,7 +63,7 @@ const CourseContent: React.FC<{ setCourseData: any; onNextStep: any }> = ({ setC
     e.preventDefault();
     if (canProceed) {
       console.log('Videos data:', videos);
-      // Data needs to be sented bckEd
+      onNextStep();
     } else {
       Swal.fire({
         title: 'Incomplete Data',
@@ -66,7 +73,6 @@ const CourseContent: React.FC<{ setCourseData: any; onNextStep: any }> = ({ setC
       });
     }
   };
-
   return (
     <div>
       {videos.map((video, index) => (

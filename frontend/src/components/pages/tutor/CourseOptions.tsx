@@ -2,18 +2,32 @@ import  { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import axios from 'axios';
 
+interface CourseData {
+  name: string;
+  description: string;
+  price: number;
+  estimatedPrice: number;
+  tags: string;
+  level: string;
+  demoUrl: string;
+  thumbnailFile: File | null;
+  benefits: { title: string }[];
+  prerequisites: { title: string }[];
+  courseId: string;
+  category: string;
+  videos: {
+    file: File | null;
+    title: string;
+    description: string;
+    previewUrl: string | null;
+  }[];
+}
+
+
 interface CourseOptionsProps {
-  courseData: {
-    category: string;
-    benefits: { title: string }[];
-    prerequisites: { title: string }[];
-  };
+  courseData: CourseData;
   handleInputChange: (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => void;
-  setCourseData: React.Dispatch<React.SetStateAction<{
-    category: string;
-    benefits: { title: string }[];
-    prerequisites: { title: string }[];
-  }>>;
+  setCourseData: React.Dispatch<React.SetStateAction<CourseData>>;
 }
 
 interface Category {

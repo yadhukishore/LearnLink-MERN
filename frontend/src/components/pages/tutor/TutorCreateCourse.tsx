@@ -13,6 +13,30 @@ import StepIndicator from '../../helpers/StepIndicator';
 import Swal from 'sweetalert2';
 import TutorHeader from './TutorHeader';
 
+
+interface VideoData {
+  file: File | null;
+  title: string;
+  description: string;
+  previewUrl: string | null;
+}
+
+interface CourseData {
+  name: string;
+  description: string;
+  price: number;
+  estimatedPrice: number;
+  tags: string;
+  level: string;
+  demoUrl: string;
+  thumbnailFile: File | null;
+  benefits: { title: string }[];
+  prerequisites: { title: string }[];
+  courseId: string;
+  category: string;
+  videos: VideoData[];
+}
+
 const TutorCreateCourse: React.FC = () => {
   const navigate = useNavigate();
   const token = useSelector((state: RootState) => state.tutor.token);
@@ -20,7 +44,7 @@ const TutorCreateCourse: React.FC = () => {
   const [currentStep, setCurrentStep] = useState(0);
   const steps = ['Course Information', 'Course Options', 'Course Content', 'Course Preview'];
 
-  const [courseData, setCourseData] = useState({
+  const [courseData, setCourseData] =  useState<CourseData>({
     name: '',
     description: '',
     price: 0,
@@ -41,13 +65,14 @@ const TutorCreateCourse: React.FC = () => {
     }[], 
   });
 
-  const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setCourseData(prevState => ({
-      ...prevState,
-      [name]: value
-    }));
-  };
+const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+  const { name, value } = e.target;
+  setCourseData(prevState => ({
+    ...prevState,
+    [name]: value
+  }));
+};
+
 
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0] || null;
@@ -83,11 +108,12 @@ const TutorCreateCourse: React.FC = () => {
         if (key === 'thumbnailFile' && value instanceof File) {
           formData.append('thumbnailFile', value);
         } else if (key === 'videos' && Array.isArray(value)) {
-          value.forEach((video, index) => {
+          value.forEach((video) => {
             if (video.file instanceof File) {
               formData.append(`videos`, video.file);
             }
           });
+          
         } else if (key === 'benefits' || key === 'prerequisites') {
           formData.append(key, JSON.stringify(value));
         } else {
