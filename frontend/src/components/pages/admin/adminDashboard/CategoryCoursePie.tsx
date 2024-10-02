@@ -95,7 +95,7 @@ const CategoryCoursePie: React.FC = () => {
             fill="#8884d8"
             onMouseEnter={onPieEnter}
           >
-            {categoryCourseData.map((entry, index) => (
+           {categoryCourseData.map((_, index) => (
               <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
             ))}
           </Pie>

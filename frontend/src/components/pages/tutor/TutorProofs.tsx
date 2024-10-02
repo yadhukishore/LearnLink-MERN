@@ -37,11 +37,12 @@ const SubmitProofs: React.FC = () => {
     }
   };
   useEffect(() => {
-    const validateForm = () => {
-      return teacherProof && qualifications && experienceProofs && description.trim() !== '';
+    const validateForm = (): boolean => {
+      return !!(teacherProof && qualifications && experienceProofs && description.trim() !== '');
     };
     setIsFormValid(validateForm());
   }, [teacherProof, qualifications, experienceProofs, description]);
+  
   
   const fileToBase64 = (file: File): Promise<string> => {
     return new Promise((resolve, reject) => {
