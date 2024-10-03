@@ -44,7 +44,7 @@ const TutorCourseDetail: React.FC = () => {
         setLoading(false);
       } catch (err) {
         console.error('Error fetching course:', err);
-        setError('Failed to fetch course details: ' + (err.response?.data?.message || err.message));
+        setError('Failed to fetch course details: ' + err);
         setLoading(false);
       }
     };
