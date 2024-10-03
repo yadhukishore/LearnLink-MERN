@@ -59,7 +59,7 @@ const CheckoutCourse: React.FC = () => {
       });
 
       const options = {
-        key: process.env.RAZORPAY_KEY_ID || '',
+       key: import.meta.env.VITE_RAZORPAY_KEY_ID || '',
         amount: response.amount,
         currency: response.currency,
         name: 'LearnLink',
@@ -78,6 +78,10 @@ const CheckoutCourse: React.FC = () => {
       };
 
       const rzp = new window.Razorpay(options);
+      rzp.on('payment.failed', function (response: any) {
+        console.error('Payment failed:', response.error);
+        // Handle payment failure (e.g., show an error message to the user)
+      });
       rzp.open();
     } catch (error) {
       console.error('Error creating order:', error);
@@ -92,7 +96,7 @@ const CheckoutCourse: React.FC = () => {
         razorpay_signature: response.razorpay_signature,
         courseId: course?._id,
         userId: user?.id,
-        amount: course?.price * 100,
+        amount: (course?.price ?? 0) * 100,
         currency: 'INR',
         status: 'paid'
       });
