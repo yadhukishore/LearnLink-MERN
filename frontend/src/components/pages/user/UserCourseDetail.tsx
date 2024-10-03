@@ -26,6 +26,7 @@ interface CourseDetail {
   prerequisites: Array<{ title: string; _id: string }>;
   videoCount: number;
   tutorName: string;
+  tutorId: string;
   hasApprovedFinancialAid: boolean;
   hasAccess: boolean;
 }
@@ -99,7 +100,9 @@ const UserCourseDetail: React.FC = () => {
     }
   };
   
-  
+  const handleFeedbackSubmitted = () => {
+    console.log('Feedback submitted');
+  };
 
   return (
     <div className="min-h-screen bg-[#071A2B] text-white">
@@ -207,12 +210,13 @@ const UserCourseDetail: React.FC = () => {
       </div>
 
         </motion.div>
-       {/* Feedback section */}
-       {course.hasAccess && (
-          <div className="mt-12">
-            <FeedbackCourse courseId={course._id} />
-          </div>
-        )}
+ 
+          {/* Feedback section */}
+          {course.hasAccess && (
+            <div className="mt-12">
+              <FeedbackCourse courseId={course._id} onFeedbackSubmitted={handleFeedbackSubmitted} />
+            </div>
+          )}
 
           {/* Course Reviews section */}
           <div className="mt-12">
