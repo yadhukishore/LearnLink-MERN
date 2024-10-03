@@ -158,7 +158,7 @@ const TutorEditCourse: React.FC = () => {
             },
             onUploadProgress: (progressEvent) => {
               const percentCompleted = Math.round(
-                (progressEvent.loaded * 100) / progressEvent.total
+                (progressEvent.loaded * 100) / (progressEvent.total || progressEvent.loaded)
               );
               const progressBar = document.getElementById('progress');
               if (progressBar) {
