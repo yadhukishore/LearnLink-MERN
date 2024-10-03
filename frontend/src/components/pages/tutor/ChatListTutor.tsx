@@ -15,6 +15,9 @@ interface ChatRoom {
   lastMessageSender: string;
 }
 
+interface ApiResponse {
+  chatRooms: ChatRoom[]; 
+}
 const ChatListTutor: React.FC = () => {
   const [chatRooms, setChatRooms] = useState<ChatRoom[]>([]);
   const tutor = useSelector((state: RootState) => state.tutor.tutor);
@@ -24,7 +27,7 @@ const ChatListTutor: React.FC = () => {
     const fetchChatRooms = async () => {
       if (tutor) {
         try {
-          const response = await apiService.get(`/chat/tutorChat/${tutor.id}`);
+          const response = await apiService.get<ApiResponse>(`/chat/tutorChat/${tutor.id}`);
           setChatRooms(response.chatRooms);
         } catch (error) {
           console.error('Error fetching chat rooms:', error);
