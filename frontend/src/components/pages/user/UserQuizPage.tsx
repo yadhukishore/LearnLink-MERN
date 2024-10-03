@@ -26,7 +26,7 @@ const UserQuizPage: React.FC = () => {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState<number[]>([]);
   const [quizSubmitted, setQuizSubmitted] = useState(false);
-  const [score, setScore] = useState<number | null>(null);
+  // const [score, setScore] = useState<number | null>(null);
   const [timeRemaining, setTimeRemaining] = useState(15 * 60); 
 
   const user = useSelector((state: RootState) => state.auth.user);
@@ -61,7 +61,7 @@ const UserQuizPage: React.FC = () => {
       });
 
       const score = response?.score ?? 0;
-      setScore(score);
+      // setScore(score);
       setQuizSubmitted(true);
 
       if (isAutoSubmit) {

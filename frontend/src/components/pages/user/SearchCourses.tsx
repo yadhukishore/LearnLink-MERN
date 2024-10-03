@@ -4,7 +4,7 @@ import { apiService } from '../../../services/api';
 import { Pagination } from 'flowbite-react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { FaHeart, FaRegHeart } from 'react-icons/fa';
+import { FaRegHeart } from 'react-icons/fa';
 import Header from './HeaderUser';
 
 interface Course {
