@@ -4,7 +4,7 @@ import { useSelector } from 'react-redux';
 import Swal from 'sweetalert2';
 import { RootState } from '../../store/store';
 import Header from './HeaderUser';
-import { FaPlay, FaLock, FaCalendarAlt } from 'react-icons/fa';
+import { FaPlay, FaLock } from 'react-icons/fa';
 import AvailableTimes from './AvailableTimes';
 import AcceptCallButton from './AcceptCallButton';
 import { apiService } from '../../../services/api';
@@ -31,7 +31,7 @@ const CourseVideos: React.FC = () => {
   const [videos, setVideos] = useState<Video[]>([]);
   const [currentVideo, setCurrentVideo] = useState<Video | null>(null);
   const [loading, setLoading] = useState(true);
-  const [availableTimes, setAvailableTimes] = useState<AvailableTime[]>([]);
+  // const [availableTimes, setAvailableTimes] = useState<AvailableTime[]>([]);
   const [isPassed, setIsPassed] = useState(false);
   
   const { courseId } = useParams<{ courseId: string }>();
@@ -63,10 +63,9 @@ const CourseVideos: React.FC = () => {
 
     const fetchAvailableTimes = async () => {
       try {
-        const response = await apiService.get<{ availableTimes: AvailableTime[] }>(
+        await apiService.get<{ availableTimes: AvailableTime[] }>(
           `/user/available-times/${courseId}`
         );
-        setAvailableTimes(response.availableTimes);
       } catch (error) {
         console.error('Error fetching available times:', error);
       }
@@ -135,30 +134,30 @@ const CourseVideos: React.FC = () => {
     navigate(`/get-certificate/${courseId}`);
   };
 
-  const handleScheduleCall = async (timeId: string) => {
-    try {
-      await apiService.post(`/user/schedule-call/${courseId}`, {
-        userId: user?.id,
-        timeId: timeId
-      });
-      Swal.fire({
-        icon: 'success',
-        title: 'Call Scheduled!',
-        text: 'Your call has been scheduled successfully.',
-      });
-      const response = await apiService.get<{ availableTimes: AvailableTime[] }>(
-        `/user/available-times/${courseId}`
-      );
-      setAvailableTimes(response.availableTimes);
-    } catch (error) {
-      console.error('Error scheduling call:', error);
-      Swal.fire({
-        icon: 'error',
-        title: 'Oops...',
-        text: 'Failed to schedule call. Please try again.',
-      });
-    }
-  };
+  // const handleScheduleCall = async (timeId: string) => {
+  //   try {
+  //     await apiService.post(`/user/schedule-call/${courseId}`, {
+  //       userId: user?.id,
+  //       timeId: timeId
+  //     });
+  //     Swal.fire({
+  //       icon: 'success',
+  //       title: 'Call Scheduled!',
+  //       text: 'Your call has been scheduled successfully.',
+  //     });
+  //     const response = await apiService.get<{ availableTimes: AvailableTime[] }>(
+  //       `/user/available-times/${courseId}`
+  //     );
+  //     setAvailableTimes(response.availableTimes);
+  //   } catch (error) {
+  //     console.error('Error scheduling call:', error);
+  //     Swal.fire({
+  //       icon: 'error',
+  //       title: 'Oops...',
+  //       text: 'Failed to schedule call. Please try again.',
+  //     });
+  //   }
+  // };
 
   if (loading) {
     return (
@@ -172,7 +171,9 @@ const CourseVideos: React.FC = () => {
     <div className="min-h-screen bg-[#071A2B] text-white">
       <Header />
       <main className="container mx-auto py-8 px-4">
+      {courseId && user?.id && (
       <AcceptCallButton userId={user?.id} courseId={courseId!} />
+      )}
         <div className="flex flex-col lg:flex-row gap-8">
           {/* Video Player */}
           <div className="lg:w-3/4">
@@ -228,7 +229,9 @@ const CourseVideos: React.FC = () => {
             </div>
 
             {/* Available Times */}
-            <AvailableTimes courseId={courseId} userId={user?.id} />
+            {courseId && user?.id && (
+              <AvailableTimes courseId={courseId} userId={user.id} />
+            )}
             {/* Start the Test Button */}
               <div className="mt-4 pt-8">
               <button
