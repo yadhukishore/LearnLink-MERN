@@ -7,14 +7,9 @@ import Header from './Header';
 interface ReportedCourse {
   _id: string;
   name: string;
-  reportedBy: Array<{ _id: string, name: string, email: string }>;
+  reportedBy: Array<{ _id: string, name: string, email: string, reason?: string }>; 
 }
-interface ReportedByUser {
-  _id: string;
-  name: string;
-  email: string;
-  reason?: string;  
-}
+
 
 const CourseReport: React.FC = () => {
   const [reportedCourses, setReportedCourses] = useState<ReportedCourse[]>([]);
