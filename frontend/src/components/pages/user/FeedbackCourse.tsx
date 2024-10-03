@@ -10,6 +10,18 @@ interface FeedbackProps {
   onFeedbackSubmitted: () => void;
 }
 
+interface FeedbackResponse {
+  message: string;
+  review: {
+    _id: string;
+    rating: number;
+    comment: string;
+    user: string;
+    course: string;
+  };
+}
+
+
 const FeedbackCourse: React.FC<FeedbackProps> = ({ courseId, onFeedbackSubmitted }) => {
   const [rating, setRating] = useState<number>(0);
   const [comment, setComment] = useState<string>('');
@@ -36,7 +48,7 @@ const FeedbackCourse: React.FC<FeedbackProps> = ({ courseId, onFeedbackSubmitted
     }
 
     try {
-      const response = await apiService.post(`/user/courseFeedback/${courseId}`, {
+      const response = await apiService.post<FeedbackResponse>(`/user/courseFeedback/${courseId}`, {
         rating,
         comment,
         userId: user?.id
