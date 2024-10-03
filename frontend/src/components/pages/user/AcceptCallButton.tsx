@@ -42,6 +42,17 @@ const AcceptCallButton: React.FC<AcceptCallButtonProps> = ({ userId, courseId })
     }
   };
 
+  //if call getz ented:-
+  if (isCallEnded) {
+    return (
+      <div className="fixed inset-0 flex items-center justify-center z-50">
+        <p className="bg-red-500 text-white font-bold py-3 px-6 rounded-lg">
+          The call has ended
+        </p>
+      </div>
+    );
+  }
+
   if (!callLink) {
     return null;
   }
