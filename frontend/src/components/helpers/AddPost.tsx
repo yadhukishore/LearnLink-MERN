@@ -8,7 +8,7 @@ const AddPost: React.FC = () => {
   const [content, setContent] = useState('');
   const [image, setImage] = useState('');
   const dispatch = useDispatch<AppDispatch>();
-  const userId = useSelector((state: RootState) => state.auth.user?._id);
+  const userId = useSelector((state: RootState) => state.auth.user?.id);
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();

@@ -23,7 +23,7 @@ import ApproveTutor from './components/pages/admin/ApproveTutor.tsx';
 import TutorDetails from './components/pages/admin/TutorDetails.tsx';
 import TutorHome from './components/pages/tutor/TutorHome.tsx';
 // import { checkAdminAuthStatus } from './features/admin/adminSlice.ts';
-import { checkTutorAuthStatus } from './features/tutor/tutorSlice';
+// import { checkTutorAuthStatus } from './features/tutor/tutorSlice';
 import TutorCreateCourse from './components/pages/tutor/TutorCreateCourse.tsx';
 import TutorCourseDetail from './components/pages/tutor/TutorCourseDetail.tsx';
 import UserCourseList from './components/pages/user/UserCourseList.tsx';
@@ -39,7 +39,7 @@ import TutorProfile from './components/pages/tutor/TutorProfile.tsx';
 import TutorList from './components/pages/admin/TutorsListAdmin.tsx';
 import FeedControl from './components/pages/admin/FeedsControlAdmin.tsx';
 import AdminCategory from './components/pages/admin/CategoryAdmin.tsx';
-import FinancialAidApplicationList from './components/pages/tutor/FinacialAidListTutor.tsx';
+// import FinancialAidApplicationList from './components/pages/tutor/FinacialAidListTutor.tsx';
 import FinancialAidListTutor from './components/pages/tutor/FinacialAidListTutor.tsx';
 import FinancialAidDetailsTutor from './components/pages/tutor/FinacialAidDetailsTutor.tsx';
 import CheckoutCourse from './components/pages/user/CheckoutCourse.tsx';
@@ -67,7 +67,7 @@ import ErrorPage from './components/pages/Error/ErrorPage.tsx';
   const AppRoutes = () => {
     const isAuthenticated = useAuth();
     const isRegistered = useSelector((state: RootState) => state.auth.isRegistered);
-    const adminState = useSelector((state: RootState)=> state.admin);
+    // const adminState = useSelector((state: RootState)=> state.admin);
     const tutorState = useSelector((state:RootState)=> state.tutor);
   
     return (
