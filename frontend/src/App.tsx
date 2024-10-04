@@ -63,6 +63,7 @@ import TutorChat from './components/helpers/TutorChat.tsx';
 import ChatListTutor from './components/pages/tutor/ChatListTutor.tsx';
 import CourseReport from './components/pages/admin/CourseReport.tsx';
 import ErrorPage from './components/pages/Error/ErrorPage.tsx';
+import UserProfile from './components/pages/user/UserProfile.tsx';
 
   const AppRoutes = () => {
     const isAuthenticated = useAuth();
@@ -111,6 +112,7 @@ import ErrorPage from './components/pages/Error/ErrorPage.tsx';
         element={isAuthenticated ? <CourseVideos /> : <Navigate to="/login" />} 
       />
       <Route path='/userWishlist'element={<UserWishlist/>} />
+      <Route path="/userProfile" element={<UserProfile />} />
       <Route path='/searchCourse'element={<SearchCourses/>} />
       <Route path="/quiz/:courseId" element={<UserQuizPage />} />
       <Route path="/get-certificate/:courseId" element={<GetCertificatePage />} />
