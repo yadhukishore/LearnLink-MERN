@@ -1,6 +1,8 @@
 
 import { Request, Response } from 'express';
 import User,{IUser} from '../../models/User';
+import { cloudinary } from '../../config/fileUploads';
+import fs from 'fs';
 
 export const getUserProfile = async (req: Request, res: Response) => {
   try {
@@ -22,6 +24,7 @@ export const getUserProfile = async (req: Request, res: Response) => {
       _id: user._id,
       name: user.name,
       email: user.email,
+      profilePicture: user.profilePicture,
       createdAt: user.createdAt,
     //   wishlist: user.wishlist,
     };
@@ -33,40 +36,39 @@ export const getUserProfile = async (req: Request, res: Response) => {
   }
 };
 
-
 export const updateUserProfile = async (req: Request, res: Response) => {
     try {
-      const userId = req.params.userId;
+      const { userId } = req.params;
       const { name } = req.body;
   
-      if (!userId) {
-        return res.status(400).json({ message: 'User ID is required' });
+      let profilePictureUrl;
+      if (req.file) {
+        const result = await cloudinary.uploader.upload(req.file.path, {
+          folder: 'userProfilePictures', 
+          public_id: `${userId}_profilePicture`,
+          overwrite: true,
+        });
+  
+        profilePictureUrl = result.secure_url;
+        fs.unlinkSync(req.file.path);
       }
   
-      if (!name) {
-        return res.status(400).json({ message: 'Name is required' });
-      }
-  
-      const user = await User.findByIdAndUpdate(
+      const updatedUser = await User.findByIdAndUpdate(
         userId,
-        { name },
-        { new: true, runValidators: true }
-      ).select('-password');
+        {
+          name,
+          ...(profilePictureUrl && { profilePicture: profilePictureUrl }),
+        },
+        { new: true }
+      );
   
-      if (!user) {
+      if (!updatedUser) {
         return res.status(404).json({ message: 'User not found' });
       }
-  
-      const userProfile = {
-        _id: user._id,
-        name: user.name,
-        email: user.email,
-        createdAt: user.createdAt,
-      };
-  
-      res.json({ user: userProfile });
+  console.log("Updated user profile",updatedUser)
+      res.json({ message: 'Profile updated successfully', user: updatedUser });
     } catch (error) {
-      console.error('Error in updateUserProfile:', error);
-      res.status(500).json({ message: 'Server error' });
+      console.error('Error updating profile:', error);
+      res.status(500).json({ message: 'Server error while updating profile' });
     }
   };

@@ -13,6 +13,6 @@ router.post('/feeds', upload.array('files', 10), createFeed);
 router.post('/feedReport/:feedId/', reportFeed);
 router.post('/userFeedDelete/:feedId/', DeleteFeed);
 router.get('/userProfile/:userId', getUserProfile);
-router.patch('/updateProfile/:userId', updateUserProfile);
+router.patch('/updateProfile/:userId', upload.single('profilePicture'), updateUserProfile);
 
 export default router;

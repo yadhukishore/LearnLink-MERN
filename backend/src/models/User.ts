@@ -5,6 +5,7 @@ export interface IUser extends Document {
   name: string;
   email: string;
   password: string;
+  profilePicture?: string; 
   createdAt?: Date;
   googleId?:string;
   isBlocked?: boolean;
@@ -17,6 +18,7 @@ const userSchema = new Schema({
   name: { type: String, required: true },
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
+  profilePicture: { type: String },
   googleId: {type:String},
   isBlocked: { type: Boolean, default: false }, 
   wishlist: [{ type: Schema.Types.ObjectId, ref: 'Course' }],

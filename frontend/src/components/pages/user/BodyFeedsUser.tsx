@@ -12,6 +12,7 @@ interface Feed {
   user: {
     _id: string;
     name: string;
+    profilePicture?: string;
   };
   files: Array<{
     url: string;
@@ -154,23 +155,32 @@ const BodyFeedsUser: React.FC = () => {
                   : 'bg-gradient-to-br from-white to-gray-100'
               }`}
             >
-              <div className="flex items-center mb-4">
-                <div className="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center text-white text-xl font-bold mr-4">
-                  {feed.user.name[0]}
-                </div>
-                <div>
-                  <h3 className="font-bold text-lg">{feed.user.name}</h3>
-                  <p className="text-sm text-gray-500">
-                    {new Date(feed.createdAt).toLocaleString()}
-                  </p>
-                </div>
-                <button
-                  onClick={() => toggleDropdown(feed._id)}
-                  className="ml-auto focus:outline-none"
-                >
-                  <FaEllipsisV />
-                </button>
-              </div>
+      <div className="flex items-center mb-4">
+          {feed.user.profilePicture ? (
+            <img
+            src={feed.user.profilePicture}
+            alt={`${feed.user.name}'s profile`}
+            className="w-12 h-12 rounded-full mr-4 object-cover"
+      />
+      ) : (
+        <div className="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center text-white text-xl font-bold mr-4">
+            {feed.user.name[0]}
+        </div>
+       )}
+        <div>
+          <h3 className="font-bold text-lg">{feed.user.name}</h3>
+          <p className="text-sm text-gray-500">
+          {new Date(feed.createdAt).toLocaleString()}
+          </p>
+        </div>
+      <button
+        onClick={() => toggleDropdown(feed._id)}
+        className="ml-auto focus:outline-none"
+      >
+    <FaEllipsisV />
+  </button>
+</div>
+
 
               {/* Dropdown menu for Edit/Delete or Report options */}
               {dropdownOpen === feed._id && (

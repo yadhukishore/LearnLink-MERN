@@ -4,7 +4,7 @@ import { jwtDecode } from 'jwt-decode';
 interface AuthState {
   isAuthenticated: boolean;
   isRegistered: boolean;
-  user: { id: string; name: string; email: string } | null;
+  user: { id: string; name: string; email: string; profilePicture?: string } | null;
   error: string | null;
   token: string | null;
 }
@@ -21,7 +21,7 @@ const authSlice = createSlice({
   name: 'auth',
   initialState,
   reducers: {
-    loginSuccess(state, action: PayloadAction<{ token: string; user: { id: string; name: string; email: string } }>) {
+    loginSuccess(state, action: PayloadAction<{ token: string; user: { id: string; name: string; email: string; profilePicture?: string } }>) {
       state.isAuthenticated = true;
       state.user = action.payload.user;
       state.token = action.payload.token;

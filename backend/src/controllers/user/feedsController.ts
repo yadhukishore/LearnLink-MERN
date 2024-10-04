@@ -38,7 +38,7 @@ export const createFeed = async (req: Request, res: Response) => {
 
 export const getFeeds = async (req: Request, res: Response) => {
   try {
-    const feeds = await Feed.find({ isDeleted: false }).sort({ createdAt: -1 }).populate('user', 'name');
+    const feeds = await Feed.find({ isDeleted: false }).sort({ createdAt: -1 }).populate('user', 'name profilePicture');
     res.json(feeds);
   } catch (error) {
     console.error('Error fetching feeds:', error);
