@@ -38,6 +38,7 @@ export const createFeed = async (req: Request, res: Response) => {
 
 export const getFeeds = async (req: Request, res: Response) => {
   try {
+    console.log("Feed pagee")
     const feeds = await Feed.find({ isDeleted: false }).sort({ createdAt: -1 }).populate('user', 'name profilePicture');
     res.json(feeds);
   } catch (error) {

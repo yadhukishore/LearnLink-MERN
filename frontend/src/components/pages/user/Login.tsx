@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import axios from 'axios';
 import { useDispatch } from 'react-redux';
 import { useNavigate, Link } from 'react-router-dom';
 import { loginSuccess, setError } from '../../../features/auth/authSlice';
@@ -8,6 +7,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 import GoogleAuthBtn from './GoogleAuthBtn';
+import { apiService } from '../../../services/api';
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -32,32 +32,22 @@ const Login: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!validateForm()) return;
-
+  
     setIsLoading(true);
     try {
-      const response = await axios.post('http://localhost:8000/api/auth/login', {
+      const response = await apiService.post<{ token: string; user: any }>('/auth/login', {
         email,
         password
       });
-
-      if (response.status === 200) {
-        dispatch(loginSuccess(response.data));
-        toast.success('Login successful');
-        navigate('/feeds');
-      } else {
-        console.error('Login failed:', response.data.message);
-        dispatch(setError(response.data.message));
-        toast.error(response.data.message || 'Login failed');
-      }
-    } catch (error) {
-      if (axios.isAxiosError(error) && error.response) {
-        console.error('Axios error response:', error.response.data);
-        dispatch(setError(error.response.data.message || 'An error occurred during login'));
-        toast.error(error.response.data.message || 'Invalid email or password');
-      } else {
-        console.error('Error during login:', error);
-        toast.error('An unexpected error occurred');
-      }
+  
+      dispatch(loginSuccess(response));
+      toast.success('Login successful');
+      navigate('/feeds');
+    } catch (error: any) {
+      console.error('Error during login:', error);
+      const errorMessage = error.response?.data?.message || 'An unexpected error occurred';
+      dispatch(setError(errorMessage));
+      toast.error(errorMessage);
     } finally {
       setIsLoading(false);
     }

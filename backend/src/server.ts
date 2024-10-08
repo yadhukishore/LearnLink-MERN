@@ -8,7 +8,7 @@ import Tutor from './models/Tutor';
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: 'http://localhost:5173',
+    origin: 'http://localhost:5173',//env
     methods: ['GET', 'POST']
   }
 });
@@ -18,7 +18,7 @@ io.on('connection', (socket) => {
 
   socket.on('join_room', (roomId) => {
     socket.join(roomId);
-    console.log(`User joined room: ${roomId}`);
+    console.log(`User joined room: ${roomId}`);//socket on diff route
   });
 
   socket.on('send_message', async ({ roomId, senderId, content, senderRole }) => {
