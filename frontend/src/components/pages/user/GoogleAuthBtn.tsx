@@ -22,7 +22,8 @@ const GoogleAuthBtn: React.FC<GoogleAuthBtnProps> = ({ isLoginPage }) => {
             const result = await signInWithPopup(auth, provider);
             console.log('Google sign-in result:', result);
 
-            const res = await fetch('http://localhost:8000/api/auth/googleAuth', {
+            const API_URL = 'https://learnlink.themedihub.shop/api';
+            const res = await fetch(`${API_URL}/auth/googleAuth`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -31,7 +32,7 @@ const GoogleAuthBtn: React.FC<GoogleAuthBtnProps> = ({ isLoginPage }) => {
                     name: result.user.displayName,
                     email: result.user.email,
                     googleId: result.user.uid,
-                    loginPage:isLoginPage
+                    loginPage: isLoginPage
                 }),
             });
             console.log('Response from backend:', res);
@@ -56,6 +57,7 @@ const GoogleAuthBtn: React.FC<GoogleAuthBtnProps> = ({ isLoginPage }) => {
             }
         } catch (error) {
             console.error('Google authentication error:', error);
+            toast.error('Google authentication failed. Please try again.');
         }
     };
 
