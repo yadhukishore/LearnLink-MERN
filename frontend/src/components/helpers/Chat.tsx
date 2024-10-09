@@ -52,7 +52,13 @@ const Chat: React.FC = () => {
   const participant = userRole === 'Student' ? user : userRole === 'Tutor' ? tutor : null;
 
   useEffect(() => {
-    const newSocket = io('https://learnlink.themedihub.shop'); 
+    const newSocket = io('https://learnlink.themedihub.shop',{
+      withCredentials: true,
+    transports: ['websocket']
+    }); 
+    newSocket.on('connect_error', (error) => {
+      console.error('Socket connection error:', error);
+    });
     setSocket(newSocket);
 
     return () => {

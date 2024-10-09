@@ -18,7 +18,10 @@ applyGlobalMiddleware(app);
 
 // Connect to MongoDB
 connectDB();
-app.use(cors());
+app.use(cors({
+    origin: ['https://learn-link-mern.vercel.app', 'http://localhost:5173'],
+    credentials: true
+  }));
 // Routes
 app.use('/api', routes);
 
