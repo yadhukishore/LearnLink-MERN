@@ -16,7 +16,7 @@ const getToken = () => {
 };
 
 const axiosInstance = axios.create({
-  baseURL: 'http://localhost:8000/api',
+  baseURL: 'https://learnlink.themedihub.shop/api',
 });
 
 axiosInstance.interceptors.request.use(
