@@ -66,6 +66,7 @@ const Chat: React.FC = () => {
       console.log(`Joined room: ${roomId}`);
       
       socket.on('receive_message', (message: Message) => {
+        console.log('Received message:', message);
         setMessages((prevMessages) => [...prevMessages, message]);
       });
 
@@ -98,8 +99,16 @@ const Chat: React.FC = () => {
         content: inputMessage,
         senderRole: userRole  
       };
-      socket.emit('send_message', messageData);
-      setInputMessage('');
+      console.log('Sending message:', messageData);
+      socket.emit('send_message', messageData,(error:any)=>{
+        if (error) {
+          console.error('Error sending message:', error);
+          // Handle the error (e.g., show an error message to the user)
+        } else {
+          setInputMessage('');
+        }
+      });
+  
     }
   };
 

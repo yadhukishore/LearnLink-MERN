@@ -66,7 +66,7 @@ io.on('connection', (socket) => {
         ...newMessage,
         sender: { _id: sender._id, name: sender.name },
       };
-  
+      console.log('Message saved to DB:', newMessage);
       io.to(roomId).emit('receive_message', populatedMessage);
       console.log(`Message emitted to room: ${roomId}`, populatedMessage);
     } catch (error) {
