@@ -105,19 +105,19 @@ const Chat: React.FC = () => {
         content: inputMessage,
         senderRole: userRole  
       };
+      
+      setInputMessage('');
+  
       console.log('Sending message:', messageData);
-      socket.emit('send_message', messageData,(error:any)=>{
+      socket.emit('send_message', messageData, (error: any) => {
         if (error) {
           console.error('Error sending message:', error);
-          // Handle the error (e.g., show an error message to the user)
-        } else {
-          setInputMessage('');
+          setInputMessage(inputMessage);
         }
       });
-  
     }
   };
-
+  
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
