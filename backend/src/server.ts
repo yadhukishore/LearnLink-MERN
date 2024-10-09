@@ -8,7 +8,7 @@ import Tutor from './models/Tutor';
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: 'https://learn-link-mern.vercel.app/',//env
+    origin: 'https://learn-link-mern.vercel.app',
     methods: ['GET', 'POST']
   }
 });

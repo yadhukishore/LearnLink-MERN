@@ -44,7 +44,7 @@ const Chat: React.FC = () => {
   const participant = userRole === 'Student' ? user : userRole === 'Tutor' ? tutor : null;
 
   useEffect(() => {
-    const newSocket = io('http://localhost:8000');
+    const newSocket = io('https://learnlink.themedihub.shop'); 
     setSocket(newSocket);
 
     return () => {
