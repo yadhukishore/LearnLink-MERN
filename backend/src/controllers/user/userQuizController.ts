@@ -11,27 +11,23 @@ export const getQuizForUser = async (req: Request, res: Response) => {
         if (!courseId) {
             return res.status(400).json({ message: 'Course ID is required' });
         }
-
-        // Validate courseId as ObjectId
         if (!mongoose.Types.ObjectId.isValid(courseId)) {
             return res.status(400).json({ message: 'Invalid Course ID format' });
         }
-
-        // Aggregation to fetch course along with quiz details
         const courseWithQuiz = await Course.aggregate([
             {
                 $match: { _id: new mongoose.Types.ObjectId(courseId) }
             },
             {
                 $lookup: {
-                    from: 'quizzes', // collection name of the Quiz model
-                    localField: 'quiz', // field in the Course model
-                    foreignField: '_id', // field in the Quiz model
+                    from: 'quizzes', 
+                    localField: 'quiz', 
+                    foreignField: '_id',
                     as: 'quiz'
                 }
             },
             {
-                $unwind: '$quiz' // to treat the quiz array as a single object
+                $unwind: '$quiz' 
             },
             {
                 $project: {
@@ -73,7 +69,7 @@ export const submitQuizAnswers = async (req: Request, res: Response): Promise<vo
         return;
       }
   
-      // Calculate the score
+  
       let score = 0;
       quiz.questions.forEach((question, index) => {
         const submittedAnswer = answers[index];
@@ -84,26 +80,24 @@ export const submitQuizAnswers = async (req: Request, res: Response): Promise<vo
   
       const totalQuestions = quiz.questions.length;
       const passingScore = Math.ceil(totalQuestions * 0.6); // 60% passing criteria
-      const isPassed = score >= passingScore;  // Determine if the user passed
+      const isPassed = score >= passingScore;  
       console.log("Passing Score:", passingScore);
   
-      // Check if userId already exists in the userResults array
       const userResultExists = quiz.userResults.some(result => result.userId.toString() === userId);
   
       if (userResultExists) {
-        // Update the existing user result for the same userId
+
         await Quiz.updateOne(
-          { _id: quiz._id, 'userResults.userId': userId },  // Find quiz with the specific userId in userResults
+          { _id: quiz._id, 'userResults.userId': userId }, 
           {
             $set: {
-              'userResults.$.score': score,      // Update score
-              'userResults.$.isPassed': isPassed // Update isPassed status
+              'userResults.$.score': score,     
+              'userResults.$.isPassed': isPassed 
             }
           }
         );
         console.log("Updated existing user result");
       } else {
-        // Add a new user result if userId doesn't exist
         await Quiz.updateOne(
           { _id: quiz._id },
           {
