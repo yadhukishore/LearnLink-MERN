@@ -1,10 +1,10 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import { io, Socket } from 'socket.io-client';
-import axios from 'axios';
 import { useDispatch, useSelector } from 'react-redux';
 import { checkTutorAuthStatus } from '../../features/tutor/tutorSlice';
 import { RootState } from '../store/store';
+import { apiService } from '../../services/api';
 
 interface Message {
   _id: string;
@@ -13,6 +13,14 @@ interface Message {
   content: string;
   timestamp: string;
 }
+interface ChatHistoryResponse {
+  chat: {
+    messages: Message[];
+  };
+  userName: string;
+  tutorName: string;
+}
+
 
 const Chat: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -73,10 +81,10 @@ const Chat: React.FC = () => {
 
   const fetchChatHistory = async (roomId: string) => {
     try {
-      const response = await axios.get(`http://localhost:8000/api/chat/history/${roomId}`);
-      setMessages(response.data.chat.messages);
-      setUserName(response.data.userName);
-      setTutorName(response.data.tutorName);
+      const response = await apiService.get<ChatHistoryResponse>(`/chat/history/${roomId}`);
+      setMessages(response.chat.messages);
+      setUserName(response.userName);
+      setTutorName(response.tutorName);
     } catch (error) {
       console.error('Error fetching chat history:', error);
     }
