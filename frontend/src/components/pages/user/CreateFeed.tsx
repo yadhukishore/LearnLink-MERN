@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import axios from 'axios';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../store/store';
 import { FiImage, FiSend } from 'react-icons/fi';
 import Swal from 'sweetalert2';
+import { apiService } from '../../../services/api';
 
 interface CreateFeedProps {
   onFeedCreated: () => void;
@@ -52,7 +52,7 @@ const CreateFeed: React.FC<CreateFeedProps> = ({ onFeedCreated }) => {
           formData.append('userId', user.id);
         }
         try {
-          await axios.post('http://localhost:8000/api/user/feeds', formData, {
+          await apiService.post('user/feeds', formData, {
             headers: { 'Content-Type': 'multipart/form-data' },
           });
           setContent('');
