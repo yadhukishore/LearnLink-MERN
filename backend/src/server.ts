@@ -4,10 +4,11 @@ import app from './app';
 import { initializeSocket } from './sockets/socketHandler';
 
 const server = http.createServer(app);
-
+const allowedOrigins = process.env.ORIGIN_URLS?.split(',') || [];
+console.log("allowedOrigins:",allowedOrigins);
 const io = new Server(server, {
   cors: {
-    origin: ['https://learn-link-mern.vercel.app', 'http://localhost:5173'],
+    origin: allowedOrigins,
     methods: ['GET', 'POST']
   }
 });
