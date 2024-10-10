@@ -13,6 +13,7 @@ interface ChatRoom {
   lastMessage: string;
   lastMessageTime: string;
   lastMessageSender: string;
+  isLastMessageRead: boolean; // Add this field
 }
 
 interface ApiResponse {
@@ -64,15 +65,17 @@ const ChatListTutor: React.FC = () => {
                       <p className="text-lg font-semibold text-gray-900">
                         {room.userName || 'Unknown Student'}
                       </p>
-                      <p className="text-sm text-gray-500">
-                         {room.lastMessageSender || 'Unknown'}: {room.lastMessage || 'No messages yet'}
+                        <p className={`text-sm ${room.isLastMessageRead ? 'text-gray-500' : 'text-gray-900 font-bold'}`}>
+                        {room.lastMessageSender || 'Unknown'}: {room.lastMessage || 'No messages yet'}
                       </p>
                     </div>
                   </div>
                   <div className="text-right">
-                    <p className="text-sm text-gray-500">{new Date(room.lastMessageTime).toLocaleString()}</p>
-                    <p className="text-xs text-gray-400">Room ID: {room.roomId}</p>
-                  </div>
+                    <p className="text-sm text-gray-500 py-2">{new Date(room.lastMessageTime).toLocaleString()}</p>
+                    {!room.isLastMessageRead && (
+                      <p className="text-xs font-semibold bg-green-200 text-center rounded-lg mx-6 p-1" >New Message</p>
+                    )}                 
+                     </div>
                 </div>
               </li>
             ))}

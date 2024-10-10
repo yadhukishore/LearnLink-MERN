@@ -48,6 +48,7 @@ export function initializeSocket(io: Server) {
           senderRole,
           content,
           timestamp: new Date(),
+          isRead: false // Set isRead to false for new messages
         };
         console.log("newMessage", newMessage);
         chat.messages.push(newMessage);
@@ -63,6 +64,27 @@ export function initializeSocket(io: Server) {
         console.log(`Message emitted to room: ${roomId}`, populatedMessage);
       } catch (error) {
         console.error('Error saving message:', error);
+      }
+    });
+
+    socket.on('mark_messages_as_read', async ({ roomId, userId }) => {
+      try {
+        const chat = await Chat.findOne({ roomId });
+        if (chat) {
+          let updated = false;
+          chat.messages.forEach(message => {
+            if (message.sender.toString() !== userId && !message.isRead) {
+              message.isRead = true;
+              updated = true;
+            }
+          });
+          if (updated) {
+            await chat.save();
+            io.to(roomId).emit('messages_marked_as_read', userId);
+          }
+        }
+      } catch (error) {
+        console.error('Error marking messages as read:', error);
       }
     });
 

@@ -6,6 +6,7 @@ interface IMessage {
   senderRole: 'Student' | 'Tutor';
   content: string;
   timestamp: Date;
+  isRead: boolean; // Add this field
 }
 
 interface IChat extends Document {
@@ -21,7 +22,8 @@ const ChatSchema: Schema = new Schema({
     sender: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
     senderRole: { type: String, enum: ['Student', 'Tutor'], required: true },
     content: { type: String, required: true },
-    timestamp: { type: Date, default: Date.now }
+    timestamp: { type: Date, default: Date.now },
+    isRead: { type: Boolean, default: false } // Add this field
   }]
 });
 

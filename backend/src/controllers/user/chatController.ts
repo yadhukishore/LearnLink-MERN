@@ -93,6 +93,7 @@ export const getTutorChatRooms = async (req: Request, res: Response) => {
       const student = await User.findById(studentId);
 
       const lastMessage = chat.messages[chat.messages.length - 1];
+      const isLastMessageRead = lastMessage ? lastMessage.isRead : true;
       let sender;
       if (lastMessage.senderRole === 'Student') {
         sender = await User.findById(lastMessage.sender);
@@ -106,7 +107,8 @@ export const getTutorChatRooms = async (req: Request, res: Response) => {
         userName: student?.name || 'Unknown Student',
         lastMessage: lastMessage?.content || 'No messages yet',
         lastMessageTime: lastMessage?.timestamp || null,
-        lastMessageSender: sender ? sender.name : 'Unknown'
+        lastMessageSender: sender ? sender.name : 'Unknown',
+        isLastMessageRead // Add this field
       };
     }));
 

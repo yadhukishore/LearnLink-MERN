@@ -12,6 +12,7 @@ interface Message {
   senderRole: 'Student' | 'Tutor';
   content: string;
   timestamp: string;
+  isRead: boolean;
 }
 interface ChatHistoryResponse {
   chat: {
@@ -75,6 +76,19 @@ const Chat: React.FC = () => {
       socket.on('receive_message', (message: Message) => {
         console.log('Received message:', message);
         setMessages((prevMessages) => [...prevMessages, message]);
+        if (message.sender._id !== participant.id) {
+          socket.emit('mark_messages_as_read', { roomId, userId: participant.id });
+        }
+      });
+
+      socket.on('messages_marked_as_read', (userId: string) => {
+        if (userId !== participant.id) {
+          setMessages((prevMessages) =>
+            prevMessages.map((msg) =>
+              msg.sender._id === participant.id ? { ...msg, isRead: true } : msg
+            )
+          );
+        }
       });
 
       fetchChatHistory(roomId);
@@ -93,11 +107,13 @@ const Chat: React.FC = () => {
       setMessages(response.chat.messages);
       setUserName(response.userName);
       setTutorName(response.tutorName);
+      if (socket && participant) {
+        socket.emit('mark_messages_as_read', { roomId, userId: participant.id });
+      }
     } catch (error) {
       console.error('Error fetching chat history:', error);
     }
   };
-
   const sendMessage = () => {
     if (socket && inputMessage.trim() !== '' && participant) {
       const messageData = { 
@@ -135,8 +151,8 @@ const Chat: React.FC = () => {
 
       </div>
 
-      {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-6 space-y-4 bg-gray-50">
+    {/* Messages */}
+    <div className="flex-1 overflow-y-auto p-6 space-y-4 bg-gray-50">
         {messages.map((message) => (
           <div
             key={message._id}
@@ -155,12 +171,18 @@ const Chat: React.FC = () => {
               <p className="mt-1">{message.content}</p>
               <p className="text-xs mt-2 text-gray-400">
                 {new Date(message.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                {message.sender._id === participant?.id && (
+                  <span className="ml-2">
+                    {message.isRead ? '✓✓' : '✓'}
+                  </span>
+                )}
               </p>
             </div>
           </div>
         ))}
         <div ref={messagesEndRef} />
       </div>
+
 
       {/* Input */}
       <div className="p-4 bg-white border-t shadow-md">
