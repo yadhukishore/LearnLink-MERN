@@ -52,7 +52,8 @@ const Chat: React.FC = () => {
   const participant = userRole === 'Student' ? user : userRole === 'Tutor' ? tutor : null;
 
   useEffect(() => {
-    const newSocket = io('https://learnlink.themedihub.shop',{
+    const socketServerUrl = import.meta.env.VITE_BASE_URL; 
+    const newSocket = io(socketServerUrl, {
       withCredentials: true,
     transports: ['websocket']
     }); 
