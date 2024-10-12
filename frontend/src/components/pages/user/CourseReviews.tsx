@@ -22,17 +22,20 @@ const CourseReviews: React.FC<CourseReviewsProps> = ({ courseId }) => {
   useEffect(() => {
     const fetchReviews = async () => {
       try {
-        const response = await apiService.get<Review[]>(`user/courseReviews/${courseId}`);
-        setReviews(response);
+        const response = await apiService.get<{ success: boolean; reviews: Review[] }>(
+          `user/courseReviews/${courseId}`
+        );
+        setReviews(response.reviews); 
         setLoading(false);
       } catch (error) {
         console.error('Error fetching reviews:', error);
         setLoading(false);
       }
     };
-  
+
     fetchReviews();
   }, [courseId]);
+
 
   if (loading) {
     return <div className="text-center">Loading reviews...</div>;
