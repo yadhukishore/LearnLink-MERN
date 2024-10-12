@@ -120,3 +120,20 @@ export const getTutorChatRooms = async (req: Request, res: Response) => {
     res.status(500).json({ success: false, error: 'Server error' });
   }
 };
+
+export const checkUnreadMessages = async (req: Request, res: Response) => {
+  try {
+    const { tutorId } = req.params;
+    console.log(`Checking any massages for ${tutorId}`)
+    
+    const unreadMessagesExist = await Chat.exists({
+      roomId: { $regex: `_${tutorId}$` },
+      messages: { $elemMatch: { isRead: false, senderRole: 'Student' } }
+    });
+
+    res.status(200).json({ success: true, hasUnreadMessages: unreadMessagesExist });
+  } catch (error) {
+    console.error('Error checking unread messages:', error);
+    res.status(500).json({ success: false, error: 'Server error' });
+  }
+};

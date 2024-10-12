@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { io, Socket } from 'socket.io-client';
 import { useDispatch, useSelector } from 'react-redux';
 import { checkTutorAuthStatus } from '../../features/tutor/tutorSlice';
@@ -31,6 +31,7 @@ const Chat: React.FC = () => {
   const [userName, setUserName] = useState<string | null>(null);
   const [tutorName, setTutorName] = useState<string | null>(null);
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const user = useSelector((state: RootState) => state.auth.user);
   const tutor = useSelector((state: RootState) => state.tutor.tutor);
@@ -51,6 +52,9 @@ const Chat: React.FC = () => {
 
   const userRole = getUserRole();
   const participant = userRole === 'Student' ? user : userRole === 'Tutor' ? tutor : null;
+  if(!participant){
+    navigate('/notFound')
+  }
 
   useEffect(() => {
     const socketServerUrl = import.meta.env.VITE_BASE_URL; 

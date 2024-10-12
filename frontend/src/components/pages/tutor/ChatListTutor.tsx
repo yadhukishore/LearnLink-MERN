@@ -13,7 +13,7 @@ interface ChatRoom {
   lastMessage: string;
   lastMessageTime: string;
   lastMessageSender: string;
-  isLastMessageRead: boolean; // Add this field
+  isLastMessageRead: boolean; 
 }
 
 interface ApiResponse {
