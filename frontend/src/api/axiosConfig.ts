@@ -16,7 +16,7 @@ const getToken = () => {
 };
 
 const axiosInstance = axios.create({
-  baseURL: 'https://learnlink.themedihub.shop/api',
+    baseURL: import.meta.env.VITE_BASE_URL + '/api',
 });
 
 axiosInstance.interceptors.request.use(
@@ -25,7 +25,7 @@ axiosInstance.interceptors.request.use(
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
-    console.log("Request headers:", config.headers); // Log the headers being sent
+    console.log("Request headers:", config.headers); 
     return config;
   },
   (error) => {
