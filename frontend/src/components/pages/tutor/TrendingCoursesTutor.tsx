@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
 import { motion } from 'framer-motion';
+import { apiService } from '../../../services/api';
 
 interface TrendingCourse {
   _id: string;
@@ -16,8 +16,8 @@ const TrendingCourseTutor: React.FC = () => {
   useEffect(() => {
     const fetchTrendingCourses = async () => {
       try {
-        const response = await axios.get('http://localhost:8000/api/tutor/trending-courses');
-        setTrendingCourses(response.data);
+        const response = await apiService.get<TrendingCourse[]>('/tutor/trending-courses'); 
+        setTrendingCourses(response);
       } catch (error) {
         console.error('Error fetching trending courses:', error);
       }
@@ -25,7 +25,6 @@ const TrendingCourseTutor: React.FC = () => {
 
     fetchTrendingCourses();
   }, []);
-
   // Sort by averageRating and limit to the top 3 courses
   const topCourses = trendingCourses
     .sort((a, b) => b.averageRating - a.averageRating)
