@@ -182,3 +182,64 @@ export const getTutorWalletDetails = async (req: CustomRequest, res: Response) =
 //     return res.status(500).json({ error: 'Failed to load chat history' });
 //   }
 // };
+
+export const getTrendingCourses = async (req: Request, res: Response) => {
+  try {
+    console.log("getTrendingCourses...page...");
+    const trendingCourses = await Course.aggregate([
+      {
+        $lookup: {
+          from: 'reviewcourses',
+          localField: '_id',
+          foreignField: 'course',
+          as: 'reviews',
+        },
+      },
+      {
+        $addFields: {
+          averageRating: {
+            $cond: {
+              if: { $gt: [{ $size: '$reviews' }, 0] },
+              then: { $avg: '$reviews.rating' },
+              else: 0,
+            },
+          },
+          reviewCount: { $size: '$reviews' },
+          studentCount: {
+            $cond: {
+              if: { $isArray: '$students' },
+              then: { $size: '$students' },
+              else: 0,
+            },
+          },
+        },
+      },
+      {
+        $sort: {
+          averageRating: -1,
+          reviewCount: -1,
+          studentCount: -1,
+        },
+      },
+      {
+        $limit: 6,
+      },
+      {
+        $project: {
+          _id: 1,
+          name: 1, 
+          level:1,
+          averageRating: 1,
+          studentCount: 1,
+        },
+      },
+    ]);
+
+    console.log('TrendingCoursesss: ', trendingCourses);
+
+    res.json(trendingCourses);
+  } catch (error) {
+    console.error('Error fetching trending courses:', error);
+    res.status(500).json({ message: 'Error fetching trending courses' });
+  }
+};

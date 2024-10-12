@@ -4,7 +4,7 @@ import multer from 'multer';
 import { tutorLogin, tutorRegister, tutorSubmitingProofs } from '../controllers/tutor/tutorAuthController';
 import { approveTutor } from '../controllers/admin/adminController';
 import { addCourseVideo, createCourse, createQuiz, getAllCategoriesForTutor, getCourseById, getCourses, getQuiz, updateCourse, updateCourseVideo, updateQuiz } from '../controllers/tutor/coursesController';
-import { createAvailableTime, deleteAvailableTime, getAllAvailableTimes, getNonExpiredAvailableTimes, getTutorProfile, getTutorWalletDetails, takeTheCourses, updateTutorProfile } from '../controllers/tutor/tutorPersonal';
+import { createAvailableTime, deleteAvailableTime, getAllAvailableTimes, getNonExpiredAvailableTimes, getTrendingCourses, getTutorProfile, getTutorWalletDetails, takeTheCourses, updateTutorProfile } from '../controllers/tutor/tutorPersonal';
 import { authenticateTutor } from '../middlewares/tutorAuth';
 import { getFinancialAidApplicationsForTutor, getFinancialAidDetailsForTutor, updateFinancialAidStatusForTutor } from '../controllers/tutor/tuttorFinacialAid';
 import { getBookedUserDetails, sendCallLink } from '../controllers/user/userCourseController';
@@ -50,5 +50,6 @@ router.get('/tutorWallet',getTutorWalletDetails);
 router.post('/createQuiz/:courseId', authenticateTutor, createQuiz);
 router.get('/getQuiz/:courseId', authenticateTutor, getQuiz);
 router.put('/updateQuiz/:courseId', authenticateTutor, updateQuiz);
+router.get('/trending-courses', getTrendingCourses);
 
 export default router;

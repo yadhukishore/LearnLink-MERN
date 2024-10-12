@@ -8,6 +8,7 @@ import { checkTutorAuthStatus } from '../../../features/tutor/tutorSlice';
 import TutorHeader from './TutorHeader';
 import { motion } from 'framer-motion';
 import TutorCourseList from '../../helpers/TutorCourseList';
+import TrendingCourseTutor from './TrendingCoursesTutor';
 
 interface TrendingCourse {
   id: number;
@@ -54,39 +55,7 @@ const TutorHome = () => {
         <div className="px-4 py-6 sm:px-0">
           <h2 className="text-3xl font-semibold mb-6">Welcome back, {name}!</h2>
           
-          <div className="mb-12">
-            <h3 className="text-2xl font-semibold mb-6 text-center">
-              <span className="bg-clip-text text-transparent bg-gradient-to-r from-pink-500 to-yellow-500 animate-pulse">
-                Trending Courses
-              </span>
-            </h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {trendingCourses.map((course, index) => (
-                <motion.div
-                  key={course.id}
-                  className="bg-gradient-to-br from-blue-600 to-purple-600 p-1 rounded-lg shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1"
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, delay: index * 0.1 }}
-                >
-                  <div className="bg-gray-900 p-4 rounded-lg h-full">
-                    <h4 className="text-lg font-semibold mb-2">{course.title}</h4>
-                    <p className="text-sm text-gray-300">Learn the hottest skills in demand!</p>
-                    <div className="mt-4 flex items-center">
-                      <span className="text-yellow-400 mr-1">★★★★★</span>
-                      <span className="text-sm text-gray-400">(4.9)</span>
-                    </div>
-                    <div className="mt-2 flex items-center">
-                      <svg className="w-4 h-4 text-red-500 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clipRule="evenodd" />
-                      </svg>
-                      <span className="text-sm text-gray-400">2.3k students</span>
-                    </div>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-          </div>
+    <TrendingCourseTutor/>
       {/* Tutor Course part */}
       <motion.div 
             className="mb-12"
