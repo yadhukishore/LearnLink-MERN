@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import { motion } from 'framer-motion';
+import { apiService } from '../../../services/api';
 
 interface Review {
   _id: string;
@@ -19,19 +19,18 @@ interface CourseReviewsProps {
 const CourseReviews: React.FC<CourseReviewsProps> = ({ courseId }) => {
   const [reviews, setReviews] = useState<Review[]>([]);
   const [loading, setLoading] = useState(true);
-
   useEffect(() => {
     const fetchReviews = async () => {
       try {
-        const response = await axios.get(`http://localhost:8000/api/user/courseReviews/${courseId}`);
-        setReviews(response.data.reviews);
+        const response = await apiService.get<Review[]>(`user/courseReviews/${courseId}`);
+        setReviews(response);
         setLoading(false);
       } catch (error) {
         console.error('Error fetching reviews:', error);
         setLoading(false);
       }
     };
-
+  
     fetchReviews();
   }, [courseId]);
 
