@@ -18,7 +18,7 @@ const TutorModal: React.FC<TutorModalProps> = ({ isOpen, onClose }) => {
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-      <div className="bg-white rounded-lg p-8 max-w-md">
+      <div className="bg-gray-950 rounded-lg p-8 max-w-md">
         <h2 className="text-2xl font-bold mb-4">Become a Tutor</h2>
         <p className="mb-6">
           By agreeing to become a tutor, you commit to sharing your knowledge and helping others learn. Do you want to proceed?
