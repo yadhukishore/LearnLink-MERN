@@ -1,25 +1,39 @@
 import { Request, Response } from 'express';
 import Tutor , {ITutor} from '../../models/Tutor';
 import FinancialAid from "../../models/FinancialAid";
+import Course from '../../models/Course';
 
 export const getFinancialAidApplicationsForTutor = async (req: Request, res: Response) => {
   try {
-    const page = parseInt(req.query.page as string) || 1; 
-    const limit = parseInt(req.query.limit as string) || 10; 
-    const skip = (page - 1) * limit; 
+    const tutorId = req.query.tutorId as string;
+    console.log("getFinancialAidApplicationsForTutor", tutorId);
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 10;
+    const skip = (page - 1) * limit;
+
+    if (!tutorId) {
+      return res.status(400).json({ message: 'Tutor ID is required' });
+    }
+
+    // Get the courses taught by the tutor
+    const tutorCourses = await Course.find({ tutorId: tutorId }).select('_id');
+    const tutorCourseIds = tutorCourses.map(course => course._id);
+    console.log(`tutorCourses: ${JSON.stringify(tutorCourses)} tutorCourseIds: ${tutorCourseIds}`);
 
     const [applications, total] = await Promise.all([
-      FinancialAid.find()
+      FinancialAid.find({ courseId: { $in: tutorCourseIds } })
         .populate('userId', 'name email')
         .populate('courseId', 'name')
         .select('userId courseId status createdAt')
         .skip(skip)
         .limit(limit),
-      FinancialAid.countDocuments(),
+      FinancialAid.countDocuments({ courseId: { $in: tutorCourseIds } }),
     ]);
+    console.log("Financial aid applications", applications);
 
     res.json({ applications, total });
   } catch (error) {
+    console.error('Error fetching financial aid applications:', error);
     res.status(500).json({ message: 'Error fetching financial aid applications' });
   }
 };

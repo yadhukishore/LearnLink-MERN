@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import TutorHeader from './TutorHeader';
 import { Pagination } from 'flowbite-react';
+import { useSelector } from 'react-redux';
+import { RootState } from '../../store/store';
+import { apiService } from '../../../services/api';
 
 interface Application {
   _id: string;
@@ -19,6 +21,12 @@ interface Application {
   status: string;
   createdAt: string;
 }
+interface FinancialAidResponse {
+
+    applications: Application[];
+    total: number;
+ 
+}
 
 const FinancialAidListTutor: React.FC = () => {
   const [applications, setApplications] = useState<Application[]>([]);
@@ -27,20 +35,30 @@ const FinancialAidListTutor: React.FC = () => {
   const [itemsPerPage] = useState<number>(4);
   const navigate = useNavigate();
 
+  const tutorId = useSelector((state: RootState) => state.tutor.tutor?.id);
+
   useEffect(() => {
     fetchApplications(currentPage);
   }, [currentPage]);
 
   const fetchApplications = async (page: number) => {
     try {
-      const response = await axios.get(`http://localhost:8000/api/tutor/tutorFinacial-aids?page=${page}&limit=${itemsPerPage}`);
-      setApplications(response.data.applications);
-      setTotalItems(response.data.total);
+      const response = await apiService.get<FinancialAidResponse>('/tutor/tutorFinacial-aids', {
+        params: {
+          page,
+          limit: itemsPerPage,
+          tutorId,
+        },
+        withCredentials: true,
+      });
+      console.log('Fetched applications:', response);
+      setApplications(response.applications);
+      setTotalItems(response.total);
     } catch (error) {
       console.error('Error fetching applications:', error);
     }
   };
-
+  
   const getStatusColor = (status: string) => {
     switch (status.toLowerCase()) {
       case 'approved':
