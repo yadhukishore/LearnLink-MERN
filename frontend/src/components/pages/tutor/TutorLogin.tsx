@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import axios from 'axios';
 import { useDispatch } from 'react-redux';
 import { useNavigate, Link } from 'react-router-dom';
 import { tutorLoginSuccess,setTutorError } from '../../../features/tutor/tutorSlice'; 
@@ -7,6 +6,17 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
+import { apiService } from '../../../services/api';
+interface LoginResponse {
+  success: boolean;
+  message: string;
+  token: string;
+  tutor: {
+    id: string;
+    name: string;
+    email: string;
+  };
+}
 
 const TutorLogin: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -34,34 +44,30 @@ const TutorLogin: React.FC = () => {
 
     setIsLoading(true);
     try {
-      const response = await axios.post('http://localhost:8000/api/tutor/tutorLogin', {
+      const response = await apiService.post<LoginResponse>('/tutor/tutorLogin', {
         email,
         password
       });
 
-      if (response.status === 200) {
-        dispatch(tutorLoginSuccess(response.data));
+
+      if (response.success) {
+        dispatch(tutorLoginSuccess(response));
         toast.success('Login successful');
         navigate('/');
       } else {
-        console.error('Login failed:', response.data.message);
-        dispatch(setTutorError(response.data.message));
-        toast.error(response.data.message || 'Login failed');
+        console.error('Login failed:', response.message);
+        dispatch(setTutorError(response.message));
+        toast.error(response.message || 'Login failed');
       }
-    } catch (error) {
-      if (axios.isAxiosError(error) && error.response) {
-        console.error('Axios error response:', error.response.data);
-        dispatch(setTutorError(error.response.data.message || 'An error occurred during login'));
-        toast.error(error.response.data.message || 'Invalid email or password');
-      } else {
-        console.error('Error during login:', error);
-        toast.error('An unexpected error occurred');
-      }
+    } catch (error: any) {
+      console.error('Error during login:', error);
+      const errorMessage = error.response?.data?.message || 'An unexpected error occurred';
+      dispatch(setTutorError(errorMessage));
+      toast.error(errorMessage);
     } finally {
       setIsLoading(false);
     }
   };
-
   return (
     <div className="min-h-screen flex flex-row justify-center items-center bg-gradient-to-br from-indigo-800 via-violet-700 to-fuchsia-900">
       <div className="absolute inset-0 backdrop-blur-sm z-0"></div>

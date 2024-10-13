@@ -1,61 +1,58 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import axios from 'axios';
 import { RootState } from '../../store/store';
 import TutorHeader from './TutorHeader';
 import Swal from 'sweetalert2';
 import TutorProfileShimmer from '../../helpers/TutorProfileShimmer';
 import { tutorLoginSuccess } from '../../../features/tutor/tutorSlice';
+import { apiService } from '../../../services/api';
 
-interface ITutor {
-  _id: string;
-  name: string;
-  email: string;
-  subjects: string[];
-  description: string;
-}
+
 
 const TutorProfile: React.FC = () => {
   const [tutor, setTutor] = useState<ITutor | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const token = useSelector((state: RootState) => state.tutor.token);
+  const tutorFromRedux = useSelector((state: RootState) => state.tutor.tutor);
   const dispatch = useDispatch();
-
+  interface ITutor {
+    _id: string;
+    name: string;
+    email: string;
+    subjects: string[];
+    description: string;
+  }
   useEffect(() => {
     const fetchTutorProfile = async () => {
-      try {
-        const response = await axios.get('http://localhost:8000/api/tutor/tutorProfile', {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        setTutor(response.data.tutor);
-        setLoading(false);
-      } catch (err) {
-        console.error('Error fetching tutor profile:', err);
-        setError('Failed to fetch tutor profile');
-        setLoading(false);
-      }
-    };
+        try {
+        
+          const response = await apiService.get<{ tutor: ITutor }>(`/tutor/tutorProfile?tutorId=${tutorFromRedux?.id}`);
 
-    if (token) {
-      fetchTutorProfile();
+            setTutor(response.tutor);
+            setLoading(false);
+        } catch (err) {
+            console.error('Error fetching tutor profile:', err);
+            setError('Failed to fetch tutor profile');
+            setLoading(false);
+        }
+    };
+    
+    if (token && tutorFromRedux?.id) {
+        fetchTutorProfile();
     }
-  }, [token]);
+}, [token, tutorFromRedux]);
 
   const handleEdit = async (field: string, value: string | string[]) => {
     try {
-      const response = await axios.patch(
-        'http://localhost:8000/api/tutor/updateProfile',
-        { [field]: value },
+      const response = await apiService.patch<{ tutor: ITutor }>(
+        '/tutor/updateProfile',
         {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          tutorId: tutorFromRedux?.id, // Send the tutor ID from Redux
+          [field]: value,
         }
       );
-      setTutor(response.data.tutor);
+      setTutor(response.tutor);
 
       // Update the Redux state after a successful edit
       if (field === 'name') {
@@ -63,9 +60,9 @@ const TutorProfile: React.FC = () => {
           tutorLoginSuccess({
             token: token!,
             tutor: {
-              id: response.data.tutor._id,
-              name: response.data.tutor.name,
-              email: response.data.tutor.email,
+              id: response.tutor._id,
+              name: response.tutor.name,
+              email: response.tutor.email,
             },
           })
         );
@@ -77,6 +74,7 @@ const TutorProfile: React.FC = () => {
         text: `${field} has been updated successfully.`,
       });
     } catch (err) {
+      console.error('Error updating profile:', err);
       Swal.fire({
         icon: 'error',
         title: 'Oops...',

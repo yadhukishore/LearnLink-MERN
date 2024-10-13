@@ -15,36 +15,50 @@ import User from '../../models/User';
 
   export const getTutorProfile = async (req: Request, res: Response) => {
     try {
-        console.log("Getting TutorProfile")
-      if (!req.user) {
-        console.log("Unauthorized")
-        return res.status(401).json({ message: 'Unauthorized' });
-      }
-      const tutor = await Tutor.findById(req.user._id).select('-password');
-      if (!tutor) {
-        console.log("Tutor not found")
-        return res.status(404).json({ message: 'Tutor not found' });
-      }
-      res.json({ tutor });
+        const { tutorId } = req.query; 
+        console.log("Getting TutorProfile", tutorId);
+
+        if (!tutorId) {
+            console.log("Tutor ID is required");
+            return res.status(400).json({ message: 'Tutor ID is required' });
+        }
+
+        const tutor = await Tutor.findById(tutorId).select('-password');
+        if (!tutor) {
+            console.log("Tutor not found");
+            return res.status(404).json({ message: 'Tutor not found' });
+        }
+
+        res.json({ tutor });
     } catch (error) {
-      res.status(500).json({ message: 'Server error', error });
+        console.error('Error fetching tutor profile:', error);
+        res.status(500).json({ message: 'Server error', error });
     }
-  };
+};
+
 
   export const updateTutorProfile = async (req: Request, res: Response) => {
     try {
-      if (!req.user) {
-        return res.status(401).json({ message: 'Unauthorized' });
+      const { tutorId, ...updateData } = req.body;
+      console.log("Update tutor profile", tutorId, updateData);
+  
+      if (!tutorId) {
+        return res.status(400).json({ message: 'Tutor ID is required' });
       }
-      const tutor = await Tutor.findByIdAndUpdate(req.user._id, req.body, { new: true }).select('-password');
+  
+      const tutor = await Tutor.findByIdAndUpdate(tutorId, updateData, { new: true }).select('-password');
       if (!tutor) {
+        console.log("Tutor Not Found")
         return res.status(404).json({ message: 'Tutor not found' });
       }
+  
+      console.log("Updated tutor:", tutor);
       res.json({ tutor });
     } catch (error) {
-      res.status(500).json({ message: 'Server error', error });
+      console.error("Error updating tutor profile:", error);
+      res.status(500).json({ message: 'Server error', error: error });
     }
-  };
+  }
   export const createAvailableTime = async (req: Request, res: Response) => {
     try {
       const { tutorId, courseId, startTime, endTime } = req.body;
@@ -185,7 +199,7 @@ export const getTutorWalletDetails = async (req: CustomRequest, res: Response) =
 
 export const getTrendingCourses = async (req: Request, res: Response) => {
   try {
-    console.log("getTrendingCourses...page...");
+    // console.log("getTrendingCourses...page...");
     const trendingCourses = await Course.aggregate([
       {
         $lookup: {
@@ -235,7 +249,7 @@ export const getTrendingCourses = async (req: Request, res: Response) => {
       },
     ]);
 
-    console.log('TrendingCoursesss: ', trendingCourses);
+    // console.log('TrendingCoursesss: ', trendingCourses);
 
     res.json(trendingCourses);
   } catch (error) {

@@ -31,8 +31,8 @@ router.get('/tutorCourseDetail/:courseId',authMiddleware(['tutor']), getCourseBy
 router.patch('/updateCourse/:id', updateCourse);
 router.patch('/updateCourseVideo/:id/:videoId', updateCourseVideo);
 router.post('/addCourseVideo/:id', upload.single('video'), addCourseVideo);
-router.get('/tutorProfile', authMiddleware(['tutor']), getTutorProfile);
-router.patch('/updateProfile', authenticateTutor, updateTutorProfile);
+router.get('/tutorProfile', getTutorProfile);
+router.patch('/updateProfile', updateTutorProfile);
 router.get('/getAllCategoriesForTutor' ,getAllCategoriesForTutor);
 router.get('/tutorFinacial-aids',getFinancialAidApplicationsForTutor);
 router.get('/FinacialapplyDetail/:applicationId',getFinancialAidDetailsForTutor);

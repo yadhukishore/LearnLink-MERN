@@ -153,7 +153,7 @@ export const tutorLogin = async (req: Request, res: Response) => {
       process.env.TUTOR_JWT_SECRET as string,
       { expiresIn: '1d' }
     );
-console.log("Tokened");
+console.log("Tokened",token);
 
     res.json({
       success: true,
