@@ -1,7 +1,6 @@
 // TutorCreateCourse.tsx
 import React, { useState, ChangeEvent, FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
 import { motion } from 'framer-motion';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../store/store';
@@ -12,6 +11,7 @@ import CoursePreview from './CoursePreview';
 import StepIndicator from '../../helpers/StepIndicator';
 import Swal from 'sweetalert2';
 import TutorHeader from './TutorHeader';
+import { apiService } from '../../../services/api';
 
 
 interface VideoData {
@@ -35,6 +35,11 @@ interface CourseData {
   courseId: string;
   category: string;
   videos: VideoData[];
+}
+interface CourseCreationResponse {
+  success: boolean;
+  course: any; 
+  message: string;
 }
 
 const TutorCreateCourse: React.FC = () => {
@@ -124,20 +129,21 @@ const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement
       formData.append('tutorId', tutorId);
       console.log("FormDataz:",formData)
 
-      const response = await axios.post('http://localhost:8000/api/tutor/tutorCreateCourse', formData, {
+      const response = await apiService.post<CourseCreationResponse>('/tutor/tutorCreateCourse', formData, {
         headers: {
-          Authorization: `Bearer ${token}`,
           'Content-Type': 'multipart/form-data',
         },
       });
 
-      if (response.status === 201) {
+      if (response.success) {
         Swal.fire('Success', 'Course created successfully!', 'success');
         navigate('/tutorHome');
+      } else {
+        throw new Error(response.message);
       }
     } catch (error) {
       console.error('Error creating course:', error);
-      throw error; 
+      Swal.fire('Error', 'Failed to create course. Please try again.', 'error');
     }
   };
 
