@@ -1,8 +1,20 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { apiService } from '../../../services/api';
+
+interface LocationState {
+  email: string;
+}
+
+interface OtpVerificationResponse {
+  message: string;
+}
+
+interface ResendOtpResponse {
+  message: string;
+}
 
 const VerifyOtpPassword: React.FC = () => {
   const [otp, setOtp] = useState('');
@@ -10,7 +22,7 @@ const VerifyOtpPassword: React.FC = () => {
   const [canResend, setCanResend] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
-  const email = location.state?.email;
+  const email = (location.state as LocationState)?.email;
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -30,31 +42,32 @@ const VerifyOtpPassword: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
-      const response = await axios.post('http://localhost:8000/api/auth/verify-otp-password', { email, otp });
-      if (response.status === 200) {
-        toast.success('OTP verified successfully');
-        navigate('/reset-password', { state: { email } });
+      const response = await apiService.post<OtpVerificationResponse>('/auth/verify-otp-password', { email, otp });
+      toast.success(response.message);
+      navigate('/reset-password', { state: { email } });
+    } catch (error) {
+      if (error instanceof Error) {
+        toast.error(error.message);
       } else {
         toast.error('Invalid or expired OTP');
       }
-    } catch (error) {
-      toast.error('Invalid or expired OTP');
     }
   };
 
   const handleResendOtp = async () => {
     try {
-      const response = await axios.post('http://localhost:8000/api/auth/resend-otp-password', { email });
-      if (response.status === 200) {
-        setTimer(600);
-        setCanResend(false);
-        toast.success('New OTP sent successfully');
-      }
+      const response = await apiService.post<ResendOtpResponse>('/auth/resend-otp-password', { email });
+      setTimer(600);
+      setCanResend(false);
+      toast.success(response.message);
     } catch (error) {
-      toast.error('Failed to resend OTP');
+      if (error instanceof Error) {
+        toast.error(error.message);
+      } else {
+        toast.error('Failed to resend OTP');
+      }
     }
   };
-
   return (
     <div className="min-h-screen flex flex-row justify-center items-center bg-gradient-to-br from-indigo-800 via-violet-700 to-fuchsia-900">
       <ToastContainer />
