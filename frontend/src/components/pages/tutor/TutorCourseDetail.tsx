@@ -5,6 +5,7 @@ import axios from 'axios';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../store/store'; 
 import TutorHeader from './TutorHeader';
+import { apiService } from '../../../services/api';
 
 interface ICourse {
   _id: string;
@@ -35,20 +36,19 @@ const TutorCourseDetail: React.FC = () => {
   useEffect(() => {
     const fetchCourse = async () => {
       try {
-        const response = await axios.get(`http://localhost:8000/api/tutor/tutorCourseDetail/${id}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        setCourse(response.data.course);
-        setLoading(false);
+        // Use ApiService to fetch the course details
+        const response = await apiService.get<{ success: boolean; course: ICourse }>(
+          `/tutor/tutorCourseDetail/${id}`
+        );
+        setCourse(response.course);
       } catch (err) {
         console.error('Error fetching course:', err);
-        setError('Failed to fetch course details: ' + err);
+        setError('Failed to fetch course details: ' + (err as Error).message);
+      } finally {
         setLoading(false);
       }
     };
-  
+
     if (token && id) {
       fetchCourse();
     }
