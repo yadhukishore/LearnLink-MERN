@@ -1,7 +1,6 @@
 // TutorCourseDetail.tsx
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import axios from 'axios';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../store/store'; 
 import TutorHeader from './TutorHeader';
@@ -66,11 +65,7 @@ const TutorCourseDetail: React.FC = () => {
   const handleDelete = async () => {
     if (window.confirm('Are you sure you want to delete this course?')) {
       try {
-        await axios.delete(`http://localhost:8000/api/tutor/deleteCourse/${id}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        await apiService.delete(`/tutor/deleteCourse/${id}`);
         navigate('/tutorHome');
       } catch (err) {
         setError('Failed to delete course');
