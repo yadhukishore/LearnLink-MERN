@@ -1,10 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
+import { apiService } from '../../../services/api';
+
+interface ResetPasswordResponse {
+  message: string;
+}
+
+interface LocationState {
+  email: string;
+}
 
 const ResetPassword: React.FC = () => {
   const [password, setPassword] = useState('');
@@ -15,7 +23,7 @@ const ResetPassword: React.FC = () => {
   const [passwordsMatch, setPasswordsMatch] = useState(true);
   const navigate = useNavigate();
   const location = useLocation();
-  const email = location.state?.email;
+  const email = (location.state as LocationState)?.email;
 
   useEffect(() => {
     setPasswordsMatch(password === confirmPassword);
@@ -56,14 +64,12 @@ const ResetPassword: React.FC = () => {
 
     setIsLoading(true);
     try {
-      const response = await axios.post('http://localhost:8000/api/auth/reset-password', { email, password });
-      if (response.status === 200) {
-        toast.success('Password reset successfully');
-        navigate('/login');
-      }
+      const response = await apiService.post<ResetPasswordResponse>('/auth/reset-password', { email, password });
+      toast.success(response.message);
+      navigate('/login');
     } catch (error) {
-      if (axios.isAxiosError(error) && error.response) {
-        toast.error(error.response.data.message || 'An error occurred. Please try again.');
+      if (error instanceof Error) {
+        toast.error(error.message || 'An error occurred. Please try again.');
       } else {
         toast.error('An unexpected error occurred. Please try again.');
       }
@@ -71,6 +77,7 @@ const ResetPassword: React.FC = () => {
       setIsLoading(false);
     }
   };
+
 
   return (
     <div className="min-h-screen flex flex-row justify-center items-center bg-gradient-to-br from-violet-900 via-blue-900 to-indigo-900">
