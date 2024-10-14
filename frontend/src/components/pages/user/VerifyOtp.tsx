@@ -1,10 +1,22 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { loginSuccess, setError } from '../../../features/auth/authSlice';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { apiService } from '../../../services/api';
+
+interface VerifyOtpResponse {
+  message: string;
+  token: string;
+  user: {
+    id: string;
+    name: string;
+    email: string;
+    profilePicture?: string;
+  };
+}
+
 
 const VerifyOtp: React.FC = () => {
   const [otp, setOtp] = useState('');
@@ -34,37 +46,30 @@ const VerifyOtp: React.FC = () => {
     e.preventDefault();
 
     try {
-      const response = await axios.post('http://localhost:8000/api/auth/verify-otp', {
+      const response = await apiService.post<VerifyOtpResponse>('/auth/verify-otp', {
         email,
         otp,
         name,
         password,
       });
 
-      if (response.status === 201) {
-        dispatch(loginSuccess(response.data.user));
+      if (response) {
+        dispatch(loginSuccess({ token: response.token, user: response.user }));
         navigate('/login', { state: { message: 'Registration successful. Please log in.' } });
       } else {
-        dispatch(setError(response.data.message));
+        dispatch(setError('OTP verification failed'));
       }
     } catch (error) {
-      if (axios.isAxiosError(error) && error.response) {
-        dispatch(setError(error.response.data.message || 'An error occurred during OTP verification'));
-        toast.error(error.response.data.message || 'An error occurred during OTP verification');
-      } else {
-        dispatch(setError('An error occurred during OTP verification'));
-        toast.error('An error occurred during OTP verification');
-      }
+      dispatch(setError('An error occurred during OTP verification'));
+      toast.error('An error occurred during OTP verification');
     }
   };
 
   const handleResendOtp = async () => {
     try {
-      const response = await axios.post('http://localhost:8000/api/auth/resend-otp', { email });
-      if (response.status === 200) {
-        setTimer(600);
-        setCanResend(false);
-      }
+      await apiService.post<{ message: string }>('/auth/resend-otp', { email });
+      setTimer(600);
+      setCanResend(false);
     } catch (error) {
       dispatch(setError('Failed to resend OTP'));
       toast.error('Failed to resend OTP');
@@ -75,7 +80,7 @@ const VerifyOtp: React.FC = () => {
     <div className="min-h-screen flex flex-row justify-center items-center bg-gradient-to-br from-indigo-800 via-violet-700 to-fuchsia-900">
       <ToastContainer />
       <div className="absolute inset-0 backdrop-blur-sm z-0"></div>
-      
+
       <div className="flex w-full max-w-7xl relative z-10">
         <div className="w-1/2 hidden md:flex items-center justify-center p-8">
           <img src="/PinkHat.png" alt="Logo" className="w-full h-auto rounded-lg shadow-2xl" />
