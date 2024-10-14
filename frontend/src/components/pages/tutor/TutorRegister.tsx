@@ -1,15 +1,20 @@
 import React, { useState } from 'react';
-import axios from 'axios';
 import { Link, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { apiService } from '../../../services/api';
 
 interface TutorData {
   name: string;
   email: string;
   password: string;
+}
+
+interface TutorRegisterResponse {
+  message: string;
+  tutorId: string;
 }
 
 const TutorRegister: React.FC = () => {
@@ -28,22 +33,17 @@ const TutorRegister: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-      // Check if all fields are filled
     if (!tutorData.name || !tutorData.email || !tutorData.password) {
       toast.error('All fields are required');
       return;
     }
     try {
-      const response = await axios.post('http://localhost:8000/api/tutor/tutorRegister', tutorData);
-      if (response.status === 201) {
-        const tutorId = response.data.tutorId;
-        localStorage.setItem('tutorId', tutorId);
-        navigate(`/submit-tutor-proofs/${tutorId}`);
-      } else {
-        console.error('Registration failed:', response.data.message);
-      }
-    } catch (error) {
-      if (axios.isAxiosError(error) && error.response) {
+      const response = await apiService.post<TutorRegisterResponse>('/tutor/tutorRegister', tutorData);
+      const tutorId = response.tutorId;
+      localStorage.setItem('tutorId', tutorId);
+      navigate(`/submit-tutor-proofs/${tutorId}`);
+    } catch (error: any) {
+      if (error.response) {
         if (error.response.status === 400 && error.response.data.message === 'Tutor with this email already exists') {
           toast.error('A tutor with this email already exists');
         } else {
@@ -55,7 +55,6 @@ const TutorRegister: React.FC = () => {
       console.error('Registration failed:', error);
     }
   };
-
   return (
     <div className="min-h-screen flex flex-col md:flex-row bg-gradient-to-br from-purple-600 via-indigo-700 to-blue-800">
        <ToastContainer position="top-right" autoClose={5000} />

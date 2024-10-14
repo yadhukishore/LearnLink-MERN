@@ -1,13 +1,17 @@
 import React, { useState, ChangeEvent, useEffect } from 'react';
-import axios from 'axios';
 import { useNavigate, useParams } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUpload } from '@fortawesome/free-solid-svg-icons';
 import Swal from 'sweetalert2';
 import withReactContent from 'sweetalert2-react-content';
 import imageCompression from 'browser-image-compression';
+import { apiService } from '../../../services/api';
 
 const MySwal = withReactContent(Swal);
+
+interface ProofSubmissionResponse {
+  message: string;
+}
 
 const SubmitProofs: React.FC = () => {
   const [teacherProof, setTeacherProof] = useState<File | null>(null);
@@ -112,21 +116,13 @@ const SubmitProofs: React.FC = () => {
         description
       };
       console.log('Data being sent:', JSON.stringify(data));
-      console.log('Sending request to:', `http://localhost:8000/api/tutor/submit-tutor-proofs/${tutorId}`);
-      const response = await axios.post(`http://localhost:8000/api/tutor/submit-tutor-proofs/${tutorId}`, data, {
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      });
+      const response = await apiService.post<ProofSubmissionResponse>(`/tutor/submit-tutor-proofs/${tutorId}`, data);
       
-      console.log('Server response:', response.data);
-      MySwal.fire('Submitted!', 'Your proofs have been submitted.', 'success');
-      navigate('/waiting-for-approval');
+        console.log('Server response:', response);
+        MySwal.fire('Submitted!', 'Your proofs have been submitted.', 'success');
+        navigate('/waiting-for-approval');
       } catch (error) {
         console.error('Error submitting proofs:', error);
-        if (axios.isAxiosError(error) && error.response) {
-          console.error('Server error response:', error.response.data);
-        }
         MySwal.fire('Error', 'There was an issue submitting your proofs. Please try again.', 'error');
       }
     }
