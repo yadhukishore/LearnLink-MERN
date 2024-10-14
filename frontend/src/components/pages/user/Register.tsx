@@ -9,6 +9,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 import GoogleAuthBtn from './GoogleAuthBtn';
 import TutorModal from '../TutorModal';
+import { apiService } from '../../../services/api';
 
 const Register: React.FC = () => {
   const [name, setName] = useState('');
@@ -59,39 +60,25 @@ const Register: React.FC = () => {
     }
     return true;
   };
-
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!validateForm()) return;
 
     setIsLoading(true);
     try {
-      console.log('Submitting registration with:', { name, email, password });
+      const response = await apiService.post<{ message: string }>(
+        '/auth/register',
+        { name, email, password }
+      );
 
-      const response = await axios.post('http://localhost:8000/api/auth/register', {
-        name,
-        email,
-        password
-      });
-
-      if (response.status === 200) {
-        console.log('Registration successful:', response.data);
-        navigate('/verify-otp', { state: { email, name, password } });
+      console.log('Registration successful:', response);
+      navigate('/verify-otp', { state: { email, name, password } });
+    } catch (error: any) {
+      console.error('Registration error:', error);
+      if (error.response && error.response.status === 400 && error.response.data.message === 'User already exists') {
+        toast.error('User already exists');
       } else {
-        console.error('Registration failed:', response.data.message);
-        dispatch(setError(response.data.message));
-      }
-    } catch (error) {
-      if (axios.isAxiosError(error) && error.response) {
-        console.error('Axios error response:', error.response.data);
-        if (error.response.status === 400 && error.response.data.message === 'User already exists') {
-          toast.error('User already exists');
-        } else {
-          dispatch(setError(error.response.data.message || 'An error occurred during registration'));
-        }
-      } else {
-        console.error('Unknown error:', error);
-        dispatch(setError('An error occurred during registration'));
+        dispatch(setError(error.response?.data?.message || 'An error occurred during registration'));
       }
     } finally {
       setIsLoading(false);

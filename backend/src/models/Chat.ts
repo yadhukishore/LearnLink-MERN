@@ -6,7 +6,8 @@ interface IMessage {
   senderRole: 'Student' | 'Tutor';
   content: string;
   timestamp: Date;
-  isRead: boolean; 
+  isRead: boolean;
+  replyTo?: mongoose.Types.ObjectId | string; 
 }
 
 interface IChat extends Document {
@@ -23,7 +24,8 @@ const ChatSchema: Schema = new Schema({
     senderRole: { type: String, enum: ['Student', 'Tutor'], required: true },
     content: { type: String, required: true },
     timestamp: { type: Date, default: Date.now },
-    isRead: { type: Boolean, default: false } 
+    isRead: { type: Boolean, default: false } ,
+    replyTo: { type: Schema.Types.Mixed, required: false }
   }]
 });
 

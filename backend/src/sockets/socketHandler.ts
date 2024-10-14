@@ -14,9 +14,9 @@ export function initializeSocket(io: Server) {
       console.log(`User joined room: ${roomId}`);
     });
 
-    socket.on('send_message', async ({ roomId, senderId, content, senderRole }) => {
+    socket.on('send_message', async ({ roomId, senderId, content, senderRole,replyTo }) => {
       try {
-        console.log('Message received on server:', { roomId, senderId, content, senderRole });
+        console.log('Message received on server:', { roomId, senderId, content, senderRole,replyTo });
 
         let chat = await Chat.findOne({ roomId });
         
@@ -48,7 +48,8 @@ export function initializeSocket(io: Server) {
           senderRole,
           content,
           timestamp: new Date(),
-          isRead: false // Set isRead to false for new messages
+          isRead: false ,
+          replyTo: replyTo || null
         };
         console.log("newMessage", newMessage);
         chat.messages.push(newMessage);

@@ -14,8 +14,6 @@ export const getFinancialAidApplicationsForTutor = async (req: Request, res: Res
     if (!tutorId) {
       return res.status(400).json({ message: 'Tutor ID is required' });
     }
-
-    // Get the courses taught by the tutor
     const tutorCourses = await Course.find({ tutorId: tutorId }).select('_id');
     const tutorCourseIds = tutorCourses.map(course => course._id);
     console.log(`tutorCourses: ${JSON.stringify(tutorCourses)} tutorCourseIds: ${tutorCourseIds}`);
@@ -29,7 +27,6 @@ export const getFinancialAidApplicationsForTutor = async (req: Request, res: Res
         .limit(limit),
       FinancialAid.countDocuments({ courseId: { $in: tutorCourseIds } }),
     ]);
-    console.log("Financial aid applications", applications);
 
     res.json({ applications, total });
   } catch (error) {
