@@ -1,10 +1,13 @@
 // src/components/pages/user/ForgotPassword.tsx
 import React, { useState } from 'react';
-import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import {ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { apiService } from '../../../services/api';
 
+interface ForgotPasswordResponse {
+  message: string;
+}
 
 const ForgotPassword: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -14,16 +17,18 @@ const ForgotPassword: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
-      const response = await axios.post('http://localhost:8000/api/auth/forgot-password', { email });
-      if (response.status === 200) {
-        toast.success('Verification code sent to your email');
-        navigate('/verify-otp-password', { state: { email } });
-      }
+      const response = await apiService.post<ForgotPasswordResponse>('/auth/forgot-password', { email });
+      toast.success(response.message);
+      navigate('/verify-otp-password', { state: { email } });
     } catch (error) {
-      if (axios.isAxiosError(error) && error.response?.status === 404) {
-        toast.error('Email not found in our database');
+      if (error instanceof Error) {
+        if ((error as any).response?.status === 404) {
+          toast.error('Email not found in our database');
+        } else {
+          toast.error(error.message || 'An error occurred. Please try again.');
+        }
       } else {
-        toast.error('An error occurred. Please try again.');
+        toast.error('An unexpected error occurred. Please try again.');
       }
     }
   };
