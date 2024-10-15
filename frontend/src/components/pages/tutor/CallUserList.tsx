@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import axios from 'axios';
 import { useNavigate, useParams } from 'react-router-dom';
 import TutorHeader from './TutorHeader';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../store/store';
+import { apiService } from '../../../services/api';
 
 interface BookedUser {
   _id: string;
@@ -12,7 +12,15 @@ interface BookedUser {
   courseName: string;
   courseId: string;
 }
+interface BookedUserDetailsResponse {
+  bookedUsers: BookedUser[];
+  courseName: string;
+}
 
+interface SendCallLinkResponse {
+  success: boolean;
+  message: string;
+}
 const CallUserList: React.FC = () => {
   const [bookedUsers, setBookedUsers] = useState<BookedUser[]>([]);
   const [courseName, setCourseName] = useState<string>('');
@@ -24,9 +32,9 @@ const CallUserList: React.FC = () => {
   useEffect(() => {
     const fetchBookedUserDetails = async () => {
       try {
-        const response = await axios.get(`http://localhost:8000/api/tutor/booked-user-details/${timeId}`);
-        setBookedUsers(response.data.bookedUsers);
-        setCourseName(response.data.courseName);
+        const response = await apiService.get<BookedUserDetailsResponse>(`/tutor/booked-user-details/${timeId}`);
+        setBookedUsers(response.bookedUsers);
+        setCourseName(response.courseName);
       } catch (error) {
         console.error('Error fetching booked user details:', error);
       }
@@ -40,14 +48,18 @@ const CallUserList: React.FC = () => {
       const roomId = `${timeId}-${user._id}-${Date.now()}`;
       const callLink = `/room/${roomId}`;
       
-      await axios.post(`http://localhost:8000/api/tutor/send-call-link`, {
+      const response = await apiService.post<SendCallLinkResponse>('/tutor/send-call-link', {
         userId: user._id,
         tutorId: tutorId,
         courseId: user.courseId,
         callLink,
       });
 
-      navigate(callLink);
+      if (response.success) {
+        navigate(callLink);
+      } else {
+        throw new Error(response.message);
+      }
     } catch (error) {
       console.error('Error starting call:', error);
     }
