@@ -1,10 +1,10 @@
 // TutorCourseDetail.tsx
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../store/store'; 
 import TutorHeader from './TutorHeader';
-import { apiService } from '../../../services/api';
 
 interface ICourse {
   _id: string;
@@ -35,19 +35,20 @@ const TutorCourseDetail: React.FC = () => {
   useEffect(() => {
     const fetchCourse = async () => {
       try {
-        // Use ApiService to fetch the course details
-        const response = await apiService.get<{ success: boolean; course: ICourse }>(
-          `/tutor/tutorCourseDetail/${id}`
-        );
-        setCourse(response.course);
+        const response = await axios.get(`http://localhost:8000/api/tutor/tutorCourseDetail/${id}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        setCourse(response.data.course);
+        setLoading(false);
       } catch (err) {
         console.error('Error fetching course:', err);
-        setError('Failed to fetch course details: ' + (err as Error).message);
-      } finally {
+        setError('Failed to fetch course details: ' + err);
         setLoading(false);
       }
     };
-
+  
     if (token && id) {
       fetchCourse();
     }
@@ -65,7 +66,11 @@ const TutorCourseDetail: React.FC = () => {
   const handleDelete = async () => {
     if (window.confirm('Are you sure you want to delete this course?')) {
       try {
-        await apiService.delete(`/tutor/deleteCourse/${id}`);
+        await axios.delete(`http://localhost:8000/api/tutor/deleteCourse/${id}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
         navigate('/tutorHome');
       } catch (err) {
         setError('Failed to delete course');

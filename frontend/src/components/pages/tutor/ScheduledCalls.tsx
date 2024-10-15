@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../store/store';
 import TutorHeader from './TutorHeader';
@@ -7,6 +6,7 @@ import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import Swal from 'sweetalert2';
 import { useNavigate } from 'react-router-dom';
+import { apiService } from '../../../services/api';
 
 interface Course {
   _id: string;
@@ -23,6 +23,24 @@ interface ScheduledTime {
   endTime: string;
   isBooked: boolean;
 }
+interface TutorCoursesResponse {
+  courses: Course[];
+}
+
+interface AvailableTimesResponse {
+  availableTimes: ScheduledTime[];
+}
+
+interface CreateAvailableTimeResponse {
+  success: boolean;
+  message: string;
+}
+
+interface DeleteAvailableTimeResponse {
+  success: boolean;
+  message: string;
+}
+
 
 const TutorTimeScheduling: React.FC = () => {
   const [courses, setCourses] = useState<Course[]>([]);
@@ -41,8 +59,8 @@ const TutorTimeScheduling: React.FC = () => {
 
   const fetchTutorCourses = async () => {
     try {
-      const response = await axios.get(`http://localhost:8000/api/tutor/takeTheCourses/${tutorId}`);
-      setCourses(response.data.courses);
+      const response = await apiService.get<TutorCoursesResponse>(`/tutor/takeTheCourses/${tutorId}`);
+      setCourses(response.courses);
     } catch (error) {
       console.error('Error fetching tutor courses:', error);
     }
@@ -50,8 +68,8 @@ const TutorTimeScheduling: React.FC = () => {
 
   const fetchNonExpiredScheduledTimes = async () => {
     try {
-      const response = await axios.get(`http://localhost:8000/api/tutor/non-expired-available-times/${tutorId}`);
-      setScheduledTimes(response.data.availableTimes);
+      const response = await apiService.get<AvailableTimesResponse>(`/tutor/non-expired-available-times/${tutorId}`);
+      setScheduledTimes(response.availableTimes);
     } catch (error) {
       console.error('Error fetching non-expired scheduled times:', error);
     }
@@ -86,21 +104,26 @@ const TutorTimeScheduling: React.FC = () => {
     }
   
     try {
-      await axios.post(`http://localhost:8000/api/tutor/create-available-time`, {
+      const response = await apiService.post<CreateAvailableTimeResponse>('/tutor/create-available-time', {
         tutorId,
         courseId: selectedCourse,
         startTime: startTime.toISOString(),
         endTime: endTime.toISOString(),
       });
-      Swal.fire({
-        icon: 'success',
-        title: 'Success!',
-        text: 'Time scheduled successfully!',
-      });
-      setStartTime(null);
-      setEndTime(null);
-      setSelectedCourse('');
-      fetchNonExpiredScheduledTimes();
+      
+      if (response.success) {
+        Swal.fire({
+          icon: 'success',
+          title: 'Success!',
+          text: response.message,
+        });
+        setStartTime(null);
+        setEndTime(null);
+        setSelectedCourse('');
+        fetchNonExpiredScheduledTimes();
+      } else {
+        throw new Error(response.message);
+      }
     } catch (error) {
       console.error('Error scheduling time:', error);
       Swal.fire({
@@ -124,13 +147,17 @@ const TutorTimeScheduling: React.FC = () => {
   
     if (result.isConfirmed) {
       try {
-        await axios.delete(`http://localhost:8000/api/tutor/delete-available-time/${timeId}`);
-        Swal.fire({
-          icon: 'success',
-          title: 'Deleted!',
-          text: 'Your scheduled time has been deleted.',
-        });
-        fetchNonExpiredScheduledTimes();
+        const response = await apiService.delete<DeleteAvailableTimeResponse>(`/tutor/delete-available-time/${timeId}`);
+        if (response.success) {
+          Swal.fire({
+            icon: 'success',
+            title: 'Deleted!',
+            text: response.message,
+          });
+          fetchNonExpiredScheduledTimes();
+        } else {
+          throw new Error(response.message);
+        }
       } catch (error) {
         console.error('Error deleting scheduled time:', error);
         Swal.fire({
