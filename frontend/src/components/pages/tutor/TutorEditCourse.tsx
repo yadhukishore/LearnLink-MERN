@@ -1,11 +1,11 @@
 // TutorEditCourse.tsx
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import axios from 'axios';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../store/store';
 import TutorHeader from './TutorHeader';
 import Swal from 'sweetalert2';
+import { apiService } from '../../../services/api';
 
 interface ICourse {
   _id: string;
@@ -24,7 +24,10 @@ interface ICourse {
     videoUrl: string;
   }>;
 }
-
+interface ApiResponse {
+  course: ICourse;
+  message: string;
+}
 const TutorEditCourse: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const [course, setCourse] = useState<ICourse | null>(null);
@@ -35,12 +38,8 @@ const TutorEditCourse: React.FC = () => {
   useEffect(() => {
     const fetchCourse = async () => {
       try {
-        const response = await axios.get(`http://localhost:8000/api/tutor/tutorCourseDetail/${id}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        setCourse(response.data.course);
+        const response = await apiService.get<ApiResponse>(`/tutor/tutorCourseDetail/${id}`);
+        setCourse(response.course);
         setLoading(false);
       } catch (err) {
         console.error('Error fetching course:', err);
@@ -56,16 +55,8 @@ const TutorEditCourse: React.FC = () => {
 
   const handleEdit = async (field: string, value: string | number) => {
     try {
-      const response = await axios.patch(
-        `http://localhost:8000/api/tutor/updateCourse/${id}`,
-        { [field]: value },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      setCourse(response.data.course);
+      const response = await apiService.patch<ApiResponse>(`/tutor/updateCourse/${id}`, { [field]: value });
+      setCourse(response.course);
       Swal.fire({
         icon: 'success',
         title: 'Updated!',
@@ -75,23 +66,15 @@ const TutorEditCourse: React.FC = () => {
       Swal.fire({
         icon: 'error',
         title: 'Oops...',
-        text: `Failed to update ${field}\n ${err}`,
+        text: `Failed to update ${field}`,
       });
     }
   };
 
   const handleVideoEdit = async (videoId: string, field: string, value: string) => {
     try {
-      const response = await axios.patch(
-        `http://localhost:8000/api/tutor/updateCourseVideo/${id}/${videoId}`,
-        { [field]: value },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      setCourse(response.data.course);
+      const response = await apiService.patch<ApiResponse>(`/tutor/updateCourseVideo/${id}/${videoId}`, { [field]: value });
+      setCourse(response.course);
       Swal.fire({
         icon: 'success',
         title: 'Updated!',
@@ -131,7 +114,6 @@ const TutorEditCourse: React.FC = () => {
           return;
         }
   
-        // Show loading spinner or progress bar
         Swal.fire({
           title: 'Uploading Video...',
           html: `<div id="progressBar" style="width: 100%; background-color: #ddd;">
@@ -148,27 +130,22 @@ const TutorEditCourse: React.FC = () => {
         formData.append('description', description);
         formData.append('video', file);
   
-        const response = await axios.post(
-          `http://localhost:8000/api/tutor/addCourseVideo/${id}`,
-          formData,
-          {
-            headers: {
-              'Content-Type': 'multipart/form-data',
-              Authorization: `Bearer ${token}`,
-            },
-            onUploadProgress: (progressEvent) => {
-              const percentCompleted = Math.round(
-                (progressEvent.loaded * 100) / (progressEvent.total || progressEvent.loaded)
-              );
-              const progressBar = document.getElementById('progress');
-              if (progressBar) {
-                progressBar.style.width = `${percentCompleted}%`;
-              }
-            },
-          }
-        );
+        const response = await apiService.post<ApiResponse>(`/tutor/addCourseVideo/${id}`, formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+          onUploadProgress: (progressEvent) => {
+            const percentCompleted = Math.round(
+              (progressEvent.loaded * 100) / (progressEvent.total || progressEvent.loaded)
+            );
+            const progressBar = document.getElementById('progress');
+            if (progressBar) {
+              progressBar.style.width = `${percentCompleted}%`;
+            }
+          },
+        });
   
-        setCourse(response.data.course);
+        setCourse(response.course);
   
         Swal.fire({
           icon: 'success',
@@ -184,7 +161,6 @@ const TutorEditCourse: React.FC = () => {
       });
     }
   };
-  
 
   const handleDeleteVideo = async (videoId: string) => {
     try {
@@ -199,15 +175,8 @@ const TutorEditCourse: React.FC = () => {
       });
 
       if (result.isConfirmed) {
-        const response = await axios.delete(
-          `http://localhost:8000/api/tutor/deleteCourseVideo/${id}/${videoId}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-        setCourse(response.data.course);
+        const response = await apiService.delete<ApiResponse>(`/tutor/deleteCourseVideo/${id}/${videoId}`);
+        setCourse(response.course);
         Swal.fire('Deleted!', 'Your video has been deleted.', 'success');
       }
     } catch (err) {
@@ -218,6 +187,7 @@ const TutorEditCourse: React.FC = () => {
       });
     }
   };
+
 
   if (loading) return <div>Loading course details...</div>;
   if (error) return <div>{error}</div>;
