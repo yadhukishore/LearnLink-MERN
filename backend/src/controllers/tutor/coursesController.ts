@@ -397,7 +397,6 @@ export const createQuiz = async (req: Request, res: Response) => {
     const { courseId } = req.params;
     const { questions } = req.body;
 
-    // Find the course by ID
     const course = await Course.findById(courseId);
     if (!course) {
       return res.status(404).json({ message: 'Course not found' });
@@ -406,18 +405,15 @@ export const createQuiz = async (req: Request, res: Response) => {
     let quiz = await Quiz.findOne({ courseId });
 
     if (quiz) {
-      // If the quiz exists, update the questions
       quiz.questions = questions;
       await quiz.save();
     } else {
-      // If the quiz doesn't exist, create a new one and link it to the course
       quiz = new Quiz({
         courseId,
         questions
       });
       await quiz.save();
 
-      // Update the course document with the quiz ID
       course.quiz = quiz._id as mongoose.Types.ObjectId;
       await course.save();
     }
@@ -471,7 +467,7 @@ export const updateQuiz = async (req: Request, res: Response) => {
       return res.status(404).json({ message: 'No quiz found for this course' });
     }
 
-    // Update quiz questions
+
     quiz.questions = questions;
     await quiz.save();
 

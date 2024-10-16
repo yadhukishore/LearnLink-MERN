@@ -1,14 +1,25 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import axios from 'axios';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../store/store';
 import TutorHeader from './TutorHeader';
+import { apiService } from '../../../services/api';
 
 interface Question {
   questionText: string;
   options: string[];
   correctAnswer: number;
+}
+
+interface Quiz {
+  id: string;
+  courseId: string;
+  questions: Question[];
+}
+
+interface ApiResponse {
+  message: string;
+  quiz: Quiz;
 }
 
 const TutorQuiz: React.FC = () => {
@@ -30,12 +41,8 @@ const TutorQuiz: React.FC = () => {
 
   const fetchQuiz = async () => {
     try {
-      const response = await axios.get(`http://localhost:8000/api/tutor/getQuiz/${courseId}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      setQuestions(response.data.quiz.questions);
+      const response = await apiService.get<ApiResponse>(`/tutor/getQuiz/${courseId}`);
+      setQuestions(response.quiz.questions);
     } catch (error) {
       console.error('Error fetching quiz:', error);
     }
@@ -83,14 +90,7 @@ const TutorQuiz: React.FC = () => {
 
   const saveQuiz = async () => {
     try {
-      await axios.post(`http://localhost:8000/api/tutor/createQuiz/${courseId}`, 
-        { questions },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      await apiService.post<ApiResponse>(`/tutor/createQuiz/${courseId}`, { questions });
       navigate(`/tutorCourseDetail/${courseId}`);
     } catch (error) {
       console.error('Error saving quiz:', error);
