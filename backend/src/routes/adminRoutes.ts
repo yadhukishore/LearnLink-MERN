@@ -13,8 +13,8 @@ router.post('/admin-login',loginAdmin);
 // router.use(authMiddleware('admin'));
 // router.use(adminAuthMiddleware); 
 
-router.get('/adminStudentsList',authMiddleware(['admin']),getUsers);
-router.put('/toggleUserBlockStatus/:userId',authMiddleware(['admin']) ,toggleUserBlockStatus);
+router.get('/adminStudentsList',getUsers);
+router.put('/toggleUserBlockStatus/:userId' ,toggleUserBlockStatus);
 router.get('/adminApprove-tutor',getPendingTutors);
 router.get('/tutor-details/:tutorId',getTutorDetails);
 router.post('/approve-tutor/:tutorId',approveTutor);

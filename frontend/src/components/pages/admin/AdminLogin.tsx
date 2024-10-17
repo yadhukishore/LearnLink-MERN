@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { adminLoginSuccess, setAdminError } from '../../../features/admin/adminSlice';
@@ -8,6 +7,15 @@ import 'react-toastify/dist/ReactToastify.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 import { RootState } from '../../store/store';
+import { apiService } from '../../../services/api';
+
+interface LoginResponse {
+  token: string;
+  admin: {
+    id: string;
+    username: string;
+  };
+}
 
 const AdminLogin: React.FC = () => {
   const [username, setUsername] = useState('');
@@ -17,6 +25,7 @@ const AdminLogin: React.FC = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const isAuthenticated = useSelector((state: RootState) => state.admin.isAuthenticated);
+ 
   useEffect(() => {
     if (isAuthenticated) {
       navigate('/adminDashboard');
@@ -41,36 +50,30 @@ const AdminLogin: React.FC = () => {
 
     setIsLoading(true);
     try {
-      const response = await axios.post('http://localhost:8000/api/admin/admin-login', {
+      const response = await apiService.post<LoginResponse>('/admin/admin-login', {
         username,
         password
       });
-      const { token, admin } = response.data;
+
+      const { token, admin } = response;
            
       dispatch(adminLoginSuccess({ token, admin }));
 
-   localStorage.setItem('adminToken', token);
-   localStorage.setItem('adminUser', JSON.stringify(admin));
+      localStorage.setItem('adminToken', token);
+      localStorage.setItem('adminUser', JSON.stringify(admin));
 
-   axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+      // Instead of setting the header directly, we store the token in localStorage
+      // The apiService will use this token for future requests
+      localStorage.setItem('accessToken', token);
 
-   navigate('/adminDashboard');
-      if (response.status === 200) {
-        dispatch(adminLoginSuccess(response.data));
-        toast.success('Login successful');
-        navigate('/adminDashboard');
-      } else {
-        console.error('Login failed:', response.data.message);
-        dispatch(setAdminError(response.data.message));
-        toast.error(response.data.message || 'Login failed');
-      }
+      toast.success('Login successful');
+      navigate('/adminDashboard');
     } catch (error) {
-      if (axios.isAxiosError(error) && error.response) {
-        console.error('Axios error response:', error.response.data);
-        dispatch(setAdminError(error.response.data.message || 'An error occurred during login'));
-        toast.error(error.response.data.message || 'Invalid credentials');
+      console.error('Error during login:', error);
+      if (error instanceof Error) {
+        dispatch(setAdminError(error.message || 'An error occurred during login'));
+        toast.error(error.message || 'Invalid credentials');
       } else {
-        console.error('Error during login:', error);
         toast.error('An unexpected error occurred');
       }
     } finally {

@@ -1,10 +1,10 @@
 // src/components/admin/UsersList.tsx
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
 import Sidebar from './Sidebar';
 import Header from './Header';
 import Swal from 'sweetalert2';
 import { Pagination } from 'flowbite-react';
+import { apiService } from '../../../services/api';
 
 interface User {
   _id: string;
@@ -13,7 +13,10 @@ interface User {
   createdAt: string; 
   isBlocked: boolean;
 }
-
+interface UsersResponse {
+  users: User[];
+  totalPages: number;
+}
 
 const formatDate = (dateString: string): string => {
     const date = new Date(dateString);
@@ -37,11 +40,11 @@ const UsersList: React.FC = () => {
   const fetchUsers = async (page: number) => {
     setLoading(true);
     try {
-      const response = await axios.get('http://localhost:8000/api/admin/adminStudentsList', {
-        params: { page, limit: 6 }, 
+      const response = await apiService.get<UsersResponse>('/admin/adminStudentsList', {
+        params: { page, limit: 6 },
       });
-      setUsers(response.data.users);
-      setTotalPages(response.data.totalPages);
+      setUsers(response.users);
+      setTotalPages(response.totalPages);
       setLoading(false);
     } catch (error: any) {
       setError(error.message);
@@ -62,7 +65,7 @@ const UsersList: React.FC = () => {
       });
 
       if (result.isConfirmed) {
-        await axios.put(`http://localhost:8000/api/admin/toggleUserBlockStatus/${userId}`);
+        await apiService.put(`/admin/toggleUserBlockStatus/${userId}`);
         Swal.fire('Updated!', `User has been ${currentStatus ? 'unblocked' : 'blocked'}.`, 'success');
         fetchUsers(currentPage);
       }
@@ -71,7 +74,6 @@ const UsersList: React.FC = () => {
       setError(error.message);
     }
   };
-
   const onPageChange = (page: number) => {
     setCurrentPage(page);
   };
