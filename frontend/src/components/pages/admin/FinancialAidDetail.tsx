@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import Header from './Header';
 import Sidebar from './Sidebar';
+import { apiService } from '../../../services/api';
 
 interface ApplicationDetails {
   _id: string;
@@ -37,23 +37,21 @@ const FinancialAidApplicationDetails: React.FC = () => {
 
   const fetchApplicationDetails = async (applicationId: string) => {
     try {
-      const response = await axios.get(`http://localhost:8000/api/admin/financial-aid-details/${applicationId}`);
-      setApplication(response.data);
+      const response = await apiService.get<ApplicationDetails>(`/admin/financial-aid-details/${applicationId}`);
+      setApplication(response);
     } catch (error) {
       console.error('Error fetching application details:', error);
     }
   };
-
   const updateApplicationStatus = async (status: 'approved' | 'rejected') => {
     if (!application) return;
     try {
-      await axios.put(`http://localhost:8000/api/admin/financial-aid-status/${application._id}`, { status });
+      await apiService.put(`/admin/financial-aid-status/${application._id}`, { status });
       navigate('/adminFinancial-aids');
     } catch (error) {
       console.error('Error updating application status:', error);
     }
   };
-
   const getStatusColor = (status: string) => {
     switch (status.toLowerCase()) {
       case 'approved':
