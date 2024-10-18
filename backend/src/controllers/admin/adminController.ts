@@ -52,6 +52,7 @@ export const getUsers = async (req: Request, res: Response): Promise<void> => {
 
 
 export const getAllCoursesForAdmin = async (req: Request, res: Response): Promise<void> => {
+  console.log("Admin course list")
   try {
     const page = parseInt(req.query.page as string, 10) || 1; 
     const limit = parseInt(req.query.limit as string, 10) || 6; 

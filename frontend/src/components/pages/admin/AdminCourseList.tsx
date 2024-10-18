@@ -1,4 +1,3 @@
-// src/components/admin/CoursesList.tsx
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { apiService } from '../../../services/api';
@@ -19,7 +18,13 @@ interface Course {
   createdAt: string;
   tutorId: {
     name: string;
-  };
+  } | null;
+}
+
+interface ApiResponse {
+  courses: Course[];
+  totalPages: number;
+  currentPage: number;
 }
 
 const CoursesList: React.FC = () => {
@@ -47,12 +52,14 @@ const CoursesList: React.FC = () => {
   const fetchCourses = async (page: number) => {
     setIsLoading(true);
     try {
-      const response = await apiService.get<{ courses: Course[], totalPages: number }>(
+      const response = await apiService.get<ApiResponse>(
         '/admin/adminCoursesList', 
         { params: { page, limit: 6 } }
       );
+      // console.log('API Response:', response); 
       setCourses(response.courses);
       setTotalPages(response.totalPages);
+      setCurrentPage(response.currentPage);
     } catch (error) {
       console.error('Error fetching courses:', error);
       setError('Error fetching courses');
@@ -73,7 +80,9 @@ const CoursesList: React.FC = () => {
     return null; // Later i will add a loading spinner
   }
 
-   return (
+  // console.log('Render - Courses:', courses); 
+
+  return (
     <div className="flex h-screen bg-gray-100">
       <Sidebar />
       <div className="flex flex-col flex-1">
@@ -86,6 +95,8 @@ const CoursesList: React.FC = () => {
             </div>
           ) : error ? (
             <div className="text-red-500 text-center">{error}</div>
+          ) : courses.length === 0 ? (
+            <div className="text-center text-gray-500">No courses found.</div>
           ) : (
             <>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -96,7 +107,7 @@ const CoursesList: React.FC = () => {
                     onClick={() => handleCourseClick(course._id)}
                   >
                     <img
-                      src={course.thumbnail.url}
+                      src={course.thumbnail?.url || '/placeholder-image.jpg'}
                       alt={course.name}
                       className="w-full h-48 object-cover"
                     />
@@ -108,7 +119,7 @@ const CoursesList: React.FC = () => {
                       </div>
                       <div className="flex items-center text-gray-600">
                         <FaUserTie className="mr-2" />
-                        <p>Tutor: {course.tutorId.name}</p>
+                        <p>Tutor: {course.tutorId?.name || 'Unknown'}</p>
                       </div>
                     </div>
                     <div className="bg-purple-500 text-white py-2 px-4 flex items-center justify-center">

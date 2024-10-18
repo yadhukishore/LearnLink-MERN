@@ -60,42 +60,43 @@ const CourseDetails: React.FC = () => {
   useEffect(() => {
     if (!isAuthenticated) {
       navigate('/admin-login');
-    } else {
+    } else if (courseId) {
       fetchCourseDetails();
       fetchEnrolledStudents();
     }
   }, [isAuthenticated, navigate, courseId]);
 
   const fetchCourseDetails = async () => {
+    if (!courseId) return;
+    setIsLoading(true);
     try {
       const data = await apiService.get<CourseDetails>(`/admin/adminCourseDetails/${courseId}`);
+      console.log('Course Details:', data);
       setCourse(data);
     } catch (error) {
-      setError('Failed to fetch course details. Please try again.');
       console.error('Error fetching course details:', error);
+      setError('Failed to fetch course details. Please try again.');
     } finally {
       setIsLoading(false);
     }
   };
 
   const fetchEnrolledStudents = async () => {
+    if (!courseId) return;
     try {
       const data = await apiService.get<EnrollmentData>(`/admin/adminEnrolledStudents/${courseId}`);
-      const paidCount = data.paidCount;
-      const financialAidCount = data.financialAidApprovedCount;
-      const totalEnrollment = paidCount + financialAidCount;
-  
+      console.log('Enrollment Data:', data);
       setEnrollmentData({
-        enrolledStudents: data.enrolledStudents,
-        totalEnrollmentCount: totalEnrollment,
-        financialAidApprovedCount: financialAidCount,
-        paidCount: paidCount,
-        paidStudents: data.paidStudents,
-        financialAidStudents: data.financialAidStudents,
+        enrolledStudents: data.enrolledStudents || [],
+        totalEnrollmentCount: data.totalEnrollmentCount || 0,
+        financialAidApprovedCount: data.financialAidApprovedCount || 0,
+        paidCount: data.paidCount || 0,
+        paidStudents: data.paidStudents || [],
+        financialAidStudents: data.financialAidStudents || [],
       });
     } catch (error) {
-      setError('Failed to fetch enrolled students. Please try again.');
       console.error('Error fetching enrolled students:', error);
+      setError('Failed to fetch enrolled students. Please try again.');
     }
   };
 
@@ -109,6 +110,10 @@ const CourseDetails: React.FC = () => {
     }
   };
 
+  if (!isAuthenticated) {
+    return null;
+  }
+
   if (isLoading) {
     return (
       <div className="flex justify-center items-center h-screen">
@@ -117,9 +122,23 @@ const CourseDetails: React.FC = () => {
     );
   }
 
-  if (!isAuthenticated) {
-    console.log("Not Authenticated!!!")
-    return null; 
+  if (error) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+          <strong className="font-bold">Error:</strong>
+          <span className="block sm:inline"> {error}</span>
+        </div>
+      </div>
+    );
+  }
+
+  if (!course) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        No course data available.
+      </div>
+    );
   }
 
   return (
@@ -128,68 +147,61 @@ const CourseDetails: React.FC = () => {
       <div className="flex flex-col flex-1">
         <Header />
         <main className="flex-1 overflow-y-auto p-6">
-          {error && (
-            <div className="mb-4 p-4 text-red-700 bg-red-100 rounded">
-              {error}
-            </div>
-          )}
-          {course && (
-            <div className="bg-white shadow-lg rounded-lg overflow-hidden">
-              <img
-                src={course.thumbnail.url}
-                alt={course.name}
-                className="w-full h-64 object-cover"
-              />
-              <div className="p-6">
-                <h1 className="text-3xl font-bold mb-4 text-gray-800">{course.name}</h1>
-                <div className="grid grid-cols-2 gap-4 mb-6">
-                  <div className="flex items-center text-gray-600">
-                    <FaUserTie className="mr-2" />
-                    <p>Tutor: {course.tutorId.name}</p>
-                  </div>
-                  <div className="flex items-center text-gray-600">
-                    <FaCalendarAlt className="mr-2" />
-                    <p>Created: {new Date(course.createdAt).toLocaleDateString()}</p>
-                  </div>
-                  <div className="flex items-center text-gray-600">
-                    <FaDollarSign className="mr-2" />
-                    <p>Price: ₹{course.price}</p>
-                  </div>
-                  <div className="flex items-center text-gray-600">
-                    <FaUsers className="mr-2" />
-                    <p>Total Enrollment: {enrollmentData.totalEnrollmentCount}</p>
-                  </div>
-                  <div className="flex items-center text-gray-600">
-                    <FaGraduationCap className="mr-2" />
-                    <p>Financial Aid Approved: {enrollmentData.financialAidApprovedCount}</p>
-                  </div>
-                  <div className="flex items-center text-gray-600">
-                    <FaDollarSign className="mr-2" />
-                    <p>Paid Enrollments: {enrollmentData.paidCount}</p>
-                  </div>
-                  <div className="flex items-center text-gray-600">
-                    <FaStar className="mr-2" />
-                    <p>Rating: {course.ratings.toFixed(1)}</p>
-                  </div>
-                  <div className="flex items-center text-gray-600">
-                    <FaBook className="mr-2" />
-                    <p>Status: {course.isDelete ? 'Suspended' : 'Active'}</p>
-                  </div>
+          <div className="bg-white shadow-lg rounded-lg overflow-hidden">
+            <img
+              src={course.thumbnail.url}
+              alt={course.name}
+              className="w-full h-64 object-cover"
+            />
+            <div className="p-6">
+              <h1 className="text-3xl font-bold mb-4 text-gray-800">{course.name}</h1>
+              <div className="grid grid-cols-2 gap-4 mb-6">
+                <div className="flex items-center text-gray-600">
+                  <FaUserTie className="mr-2" />
+                  <p>Tutor: {course.tutorId?.name || 'N/A'}</p>
                 </div>
-                <p className="text-gray-700 mb-6">{course.description}</p>
-                <button
-                  onClick={handleToggleSuspension}
-                  className={`px-4 py-2 rounded ${
-                    course.isDelete
-                      ? 'bg-green-500 hover:bg-green-600'
-                      : 'bg-red-500 hover:bg-red-600'
-                  } text-white`}
-                >
-                  {course.isDelete ? 'Activate Course' : 'Suspend Course'}
-                </button>
+                <div className="flex items-center text-gray-600">
+                  <FaCalendarAlt className="mr-2" />
+                  <p>Created: {new Date(course.createdAt).toLocaleDateString()}</p>
+                </div>
+                <div className="flex items-center text-gray-600">
+                  <FaDollarSign className="mr-2" />
+                  <p>Price: ₹{course.price}</p>
+                </div>
+                <div className="flex items-center text-gray-600">
+                  <FaUsers className="mr-2" />
+                  <p>Total Enrollment: {enrollmentData.totalEnrollmentCount}</p>
+                </div>
+                <div className="flex items-center text-gray-600">
+                  <FaGraduationCap className="mr-2" />
+                  <p>Financial Aid Approved: {enrollmentData.financialAidApprovedCount}</p>
+                </div>
+                <div className="flex items-center text-gray-600">
+                  <FaDollarSign className="mr-2" />
+                  <p>Paid Enrollments: {enrollmentData.paidCount}</p>
+                </div>
+                <div className="flex items-center text-gray-600">
+                  <FaStar className="mr-2" />
+                  <p>Rating: {course.ratings.toFixed(1)}</p>
+                </div>
+                <div className="flex items-center text-gray-600">
+                  <FaBook className="mr-2" />
+                  <p>Status: {course.isDelete ? 'Suspended' : 'Active'}</p>
+                </div>
               </div>
+              <p className="text-gray-700 mb-6">{course.description}</p>
+              <button
+                onClick={handleToggleSuspension}
+                className={`px-4 py-2 rounded ${
+                  course.isDelete
+                    ? 'bg-green-500 hover:bg-green-600'
+                    : 'bg-red-500 hover:bg-red-600'
+                } text-white`}
+              >
+                {course.isDelete ? 'Activate Course' : 'Suspend Course'}
+              </button>
             </div>
-          )}
+          </div>
 
           {/* Paid Enrolled Students */}
           <div className="mt-8">

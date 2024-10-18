@@ -4,9 +4,12 @@ import { addCategory, adminRemovePost, approveTutor,  deleteCategory,  getAdminF
 import { getCoursesCountByCategory, getStudentEnrollmentsByDate, getTutorLoginData, getUserLoginData } from '../controllers/admin/adminDashboardController';
 import authMiddleware from '../middlewares/jwt';
 import adminAuthMiddleware from '../middlewares/adminAuth';
+import { addEvent, deleteEvent, getEvents, updateEvent } from '../controllers/admin/adminEventController';
+import multer from 'multer';
 
 
 const router =express.Router();
+const upload = multer({ dest: 'uploads/' });
 
 router.post('/admin-login',loginAdmin);
 
@@ -37,6 +40,11 @@ router.get('/tutor-login-data', getTutorLoginData);
 router.get('/courses-count-by-category', getCoursesCountByCategory);
 router.get('/student-enrollments', getStudentEnrollmentsByDate);
 
-router.get('/adminReportedCourses' ,getReportedCourses);
+router.post('/events', upload.single('image'), addEvent);
+router.put('/events/:id', upload.single('image'), updateEvent); 
+router.get('/events', getEvents);
+router.put('/events/:id', updateEvent);
+router.delete('/events/:id', deleteEvent);
+
 
 export default router;

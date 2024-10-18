@@ -8,7 +8,7 @@ const Sidebar: React.FC = () => {
 
   const menuItems = [
     { name: 'Dashboard', path: '/adminDashboard' },
-    { name: 'Books List', path: '/admin/books' },
+    // { name: 'Books List', path: '/admin/books' },
     { name: 'Reported Courses', path: '/adminCourseReports' },
     { name: 'Students', path: '/adminStudentsList' },
     { name: 'Courses', path: '/adminCoursesList' },
@@ -17,8 +17,8 @@ const Sidebar: React.FC = () => {
     { name: 'Financial aids', path: '/adminFinancial-aids'},
     { name: 'Approve New Tutors', path: '/adminApprove-tutor' },
     { name: 'Tutors', path: '/adminTutorsList' },
-    { name: 'Events/Offers', path: '/admin/events-offers' },
-    { name: 'Chat', path: '/admin/chat' },
+    { name: 'Events/Offers', path: '/adminEvents-offers' },
+    // { name: 'Chat', path: '/admin/chat' },
     { name: 'Wallet', path: '/admin/wallet' }
   ];
 
