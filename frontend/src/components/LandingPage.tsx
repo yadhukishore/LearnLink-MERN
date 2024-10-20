@@ -8,6 +8,7 @@ import StatisticsSection from './landingPageHelper/StatisticsSection';
 import SpecialOffersSection from './landingPageHelper/SpecialOffers';
 import ThemeToggleButton from './landingPageHelper/ThemeToggleButton';
 import LatestUpdatesSection from './landingPageHelper/LandingUpfateSection';
+import Footer from './landingPageHelper/FooterLanding';
 
 interface SpecialOffer {
   _id: string;
@@ -243,10 +244,8 @@ const LandingPage: React.FC = () => {
           </motion.div>
         </div>
 
-        {/* Footer */}
-        <footer className="mt-32 py-8 border-t border-gray-400 text-center">
-          <p>&copy; 2024 Your Website. All Rights Reserved.</p>
-        </footer>
+      {/* Footer */}
+    <Footer />
       </motion.div>
 
       <TutorModal isOpen={isModalOpen} onClose={closeModal} />
