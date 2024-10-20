@@ -1,20 +1,64 @@
-import React, { useState, useRef } from 'react';
-import InfoCard from './InfoCard';
+import React, { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import TutorModal from './pages/TutorModal';
 import { FaChalkboardTeacher, FaUsers, FaLaptop, FaVolumeMute, FaVolumeUp } from 'react-icons/fa';
 import { motion } from 'framer-motion';
-import { CgDarkMode } from 'react-icons/cg'; 
-import CountUp from 'react-countup';
+import { apiService } from '../services/api';
+import StatisticsSection from './landingPageHelper/StatisticsSection';
+import SpecialOffersSection from './landingPageHelper/SpecialOffers';
+import ThemeToggleButton from './landingPageHelper/ThemeToggleButton';
+import LatestUpdatesSection from './landingPageHelper/LandingUpfateSection';
+
+interface SpecialOffer {
+  _id: string;
+  title: string;
+  description: string;
+  imageUrl: string;
+  createdAt: string;
+}
+
+interface LatestUpdate {
+  _id: string;
+  title: string;
+  description: string;
+  imageUrl: string;
+  createdAt: string;
+}
+
 
 const LandingPage: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isMuted, setIsMuted] = useState(true);
   const [isDarkTheme, setIsDarkTheme] = useState(false); 
+  const [latestUpdates, setLatestUpdates] = useState<LatestUpdate[]>([]);
+  const [specialOffers, setSpecialOffers] = useState<SpecialOffer[]>([]);
+  const [currentUpdateIndex, setCurrentUpdateIndex] = useState(0);
+  const [currentOfferIndex, setCurrentOfferIndex] = useState(0);
   const aboutRef = useRef<HTMLDivElement>(null);
   const servicesRef = useRef<HTMLDivElement>(null);
   const contactRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLIFrameElement>(null);
+
+  useEffect(() => {
+    fetchSpecialOffers();
+    fetchLatestUpdates();
+  }, []);
+  const fetchSpecialOffers = async () => {
+    try {
+      const response = await apiService.get<{ specialOffers: SpecialOffer[] }>('/admin/special-offers');
+      setSpecialOffers(response.specialOffers);
+    } catch (error) {
+      console.error('Error fetching special offers:', error);
+    }
+  };
+  const fetchLatestUpdates = async () => {
+    try {
+      const response = await apiService.get<{ latestUpdate: LatestUpdate[] }>('/admin/latest_update');
+      setLatestUpdates(response.latestUpdate);
+    } catch (error) {
+      console.error('Error fetching latest updates:', error);
+    }
+  };
 
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
@@ -32,23 +76,29 @@ const LandingPage: React.FC = () => {
     setIsDarkTheme(!isDarkTheme);
   };
 
+  const nextOffer = () => {
+    setCurrentOfferIndex((prevIndex) => (prevIndex + 1) % specialOffers.length);
+  };
+
+  const prevOffer = () => {
+    setCurrentOfferIndex((prevIndex) => (prevIndex - 1 + specialOffers.length) % specialOffers.length);
+  };
+
+  const nextUpdate = () => {
+    setCurrentUpdateIndex((prevIndex) => (prevIndex + 1) % latestUpdates.length);
+  };
+
+  const prevUpdate = () => {
+    setCurrentUpdateIndex((prevIndex) => (prevIndex - 1 + latestUpdates.length) % latestUpdates.length);
+  };
+
   return (
     <div
       className={`min-h-screen overflow-hidden transition-colors duration-500 ${
         isDarkTheme ? 'bg-gray-900 text-gray-200' : 'bg-gradient-to-br from-indigo-900 via-purple-800 to-pink-700 text-white'
       }`}
     >
-      {/* Theme Toggle Button */}
-      <motion.div
-        className="fixed bottom-10 right-10 bg-gray-800 text-white p-3 rounded-full shadow-lg cursor-pointer hover:bg-gray-600 z-50"
-        drag
-        whileHover={{ scale: 1.1 }}
-        onClick={toggleTheme}
-        transition={{ type: 'spring', stiffness: 400 }}
-      >
-        <CgDarkMode size={28} />
-      </motion.div>
-
+       <ThemeToggleButton toggleTheme={toggleTheme} />
       {/* Main container */}
       <motion.div
         className="container mx-auto px-4 py-16 text-center relative"
@@ -76,46 +126,28 @@ const LandingPage: React.FC = () => {
           </button>
         </motion.div>
 
-        {/* InfoCard Section */}
-        <motion.div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-16" initial={{ y: 50, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ duration: 0.8 }}>
-          <InfoCard title="Latest Updates" content="Stay tuned for the latest features and improvements!" />
-          <InfoCard title="Special Offers" content="It will be updated soon! The Website is under construction..!" />
-        </motion.div>
+    {/* New Statistics Section */}
+    <StatisticsSection isDarkTheme={isDarkTheme} />
 
-        
-            {/* New Statistics Section */}
-      <motion.div 
-        className="mt-32"
-        initial={{ opacity: 0, y: 50 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8 }}
-      >
-        {/* <h2 className="text-4xl font-bold mb-12">Our Impact</h2> */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-          {[
-            { title: "Expert Tutors", endValue: 878, suffix: "+" },
-            { title: "Hours of Content", endValue: 20132, suffix: "+" },
-            { title: "Subjects & Courses", endValue: 232, suffix: "+" },
-            { title: "Active Students", endValue: 72213, suffix: "+" },
-          ].map((stat, index) => (
-            <motion.div 
-              key={index}
-              className={`p-6 rounded-lg shadow-xl ${isDarkTheme ? 'bg-gray-800' : 'bg-white bg-opacity-10'}`}
-              whileHover={{ scale: 1.05 }}
-              transition={{ type: 'spring', stiffness: 300 }}
-            >
-              <h3 className="text-2xl font-bold mb-4">{stat.title}</h3>
-              <CountUp 
-                end={stat.endValue} 
-                duration={2.5} 
-                separator="," 
-                suffix={stat.suffix}
-                className="text-4xl font-extrabold text-teal-400"
-              />
-            </motion.div>
-          ))}
+    {/* Updated Latest Updates and Special Offers Section */}
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-16">
+          <LatestUpdatesSection
+            latestUpdates={latestUpdates}
+            currentUpdateIndex={currentUpdateIndex}
+            nextUpdate={nextUpdate}
+            prevUpdate={prevUpdate}
+            isDarkTheme={isDarkTheme}
+          />
+          <SpecialOffersSection
+            specialOffers={specialOffers}
+            currentOfferIndex={currentOfferIndex}
+            nextOffer={nextOffer}
+            prevOffer={prevOffer}
+            isDarkTheme={isDarkTheme}
+          />
         </div>
-      </motion.div>
+        
+ 
 
         {/* Floating Service Cards */}
         <div ref={servicesRef} id="services" className="mt-32">

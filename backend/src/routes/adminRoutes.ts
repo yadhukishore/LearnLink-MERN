@@ -4,7 +4,7 @@ import { addCategory, adminRemovePost, approveTutor,  deleteCategory,  getAdminF
 import { getCoursesCountByCategory, getStudentEnrollmentsByDate, getTutorLoginData, getUserLoginData } from '../controllers/admin/adminDashboardController';
 import authMiddleware from '../middlewares/jwt';
 import adminAuthMiddleware from '../middlewares/adminAuth';
-import { addEvent, deleteEvent, getEvents, updateEvent } from '../controllers/admin/adminEventController';
+import { addEvent, deleteEvent, getEvents, renderLatestUpdates, renderSpecialOffers, updateEvent } from '../controllers/admin/adminEventController';
 import multer from 'multer';
 
 
@@ -45,6 +45,7 @@ router.put('/events/:id', upload.single('image'), updateEvent);
 router.get('/events', getEvents);
 router.put('/events/:id', updateEvent);
 router.delete('/events/:id', deleteEvent);
-
+router.get('/special-offers', renderSpecialOffers);
+router.get('/latest_update',renderLatestUpdates);
 
 export default router;

@@ -73,3 +73,42 @@ export const deleteEvent = async (req: Request, res: Response) => {
     res.status(500).json({ message: 'Error deleting event', error });
   }
 };
+
+
+export const renderSpecialOffers = async (req: Request, res: Response) => {
+  try {
+    const specialOffers = await Event.find({ type: 'special_offer' }).sort({ createdAt: -1 });
+    
+    const formattedOffers = specialOffers.map(offer => ({
+      _id: offer._id,
+      title: offer.title,
+      description: offer.description,
+      imageUrl: offer.imageUrl,
+      createdAt: offer.createdAt
+    }));
+
+    res.status(200).json({ specialOffers: formattedOffers });
+  } catch (error) {
+    console.error('Error fetching special offers:', error);
+    res.status(500).json({ message: 'Error fetching special offers', error });
+  }
+};
+
+export const renderLatestUpdates = async (req: Request, res: Response) => {
+  try {
+    const latestUpdate = await Event.find({ type: 'latest_update' }).sort({ createdAt: -1 });
+    
+    const formattedOffers = latestUpdate.map(offer => ({
+      _id: offer._id,
+      title: offer.title,
+      description: offer.description,
+      imageUrl: offer.imageUrl,
+      createdAt: offer.createdAt
+    }));
+
+    res.status(200).json({ latestUpdate: formattedOffers });
+  } catch (error) {
+    console.error('Error fetching Latest updates:', error);
+    res.status(500).json({ message: 'Error fetching latest updates', error });
+  }
+};
