@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import { useNavigate, useParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import TutorHeader from './TutorHeader';
+import { apiService } from '../../../services/api';
 
 interface ApplicationDetails {
     _id: string;
@@ -37,20 +37,20 @@ const FinancialAidDetailsTutor: React.FC = () => {
   }, [id]);
 
   const fetchApplicationDetails = async (applicationId: string) => {
-  try {
-    console.log('Fetching application details for ID:', applicationId);
-    const response = await axios.get(`http://localhost:8000/api/tutor/FinacialapplyDetail/${applicationId}`);
-    console.log('Received response:', response.data);
-    setApplication(response.data);
-  } catch (error) {
-    console.error('Error fetching application detailsz:', error);
-    
-  }
-};
+    try {
+      console.log('Fetching application details for ID:', applicationId);
+      const response = await apiService.get<ApplicationDetails>(`/tutor/FinacialapplyDetail/${applicationId}`);
+      setApplication(response);
+      console.log("getResponse:",response)
+    } catch (error) {
+      console.error('Error fetching application detailsz:', error);
+    }
+  };
+
   const updateApplicationStatus = async (status: 'approved' | 'rejected') => {
     if (!application) return;
     try {
-      await axios.put(`http://localhost:8000/api/tutor/financial-aid-status/${application._id}`, { status });
+      await apiService.put(`/tutor/financial-aid-status/${application._id}`, { status });
       navigate('/tutorFinacial-aids');
     } catch (error) {
       console.error('Error updating application status:', error);
