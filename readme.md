@@ -46,26 +46,26 @@ LearnLink is an innovative e-learning platform designed to connect students with
 - **Admin Side Management:** Admin dashboard for managing and verifying users using Node.js and Express.js.
 
 ## UI Demo
+`user home`
+<p align="center">
+    <picture>
+    <img alt="LearnLink" src="./assets/Screenshot_2.png" width=80%>
+    </picture>
+</p>
 
-<table>
-    <tr>
-        <td>
-            ![Project UI 1](./assets/screenshot_1.png)
-        </td>
-        <td>
-            ![Project UI 2](./assets/screenshot_2.png)
-        </td>
-    </tr>
-    <tr>
-        <td>
-            ![Project UI 3](./assets/screenshot_3.png)
-        </td>
-        <td>
-            ![Project UI 4](./assets/screenshot_4.png)
-        </td>
-    </tr>
-</table>
+`user course`
+<p align="center">
+    <picture>
+    <img alt="LearnLink" src="./assets/Screenshot_3.png" width=80%>
+    </picture>
+</p>
 
+`tutor home`
+<p align="center">
+    <picture>
+    <img alt="LearnLink" src="./assets/Screenshot_4.png" width=80%>
+    </picture>
+</p>
 ## Tech stack
 Main web-frameworks and libraries:
 - **React js:** JavaScript library for building user interfaces, facilitating the creation of interactive and dynamic web applications.
