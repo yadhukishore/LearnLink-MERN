@@ -52,24 +52,24 @@ LearnLink is an innovative e-learning platform designed to connect students with
         <tr>
             <td>
                 <picture>
-                    <img alt="Project UI 1" src="./assets/screenshot_1.png" width="400">
+                    <img alt="Project UI 1" src="./assets/screenshot_1.png" width="90%">
                 </picture>
             </td>
             <td>
                 <picture>
-                    <img alt="Project UI 2" src="./assets/screenshot_2.png" width="400">
+                    <img alt="Project UI 2" src="./assets/screenshot_2.png" width="90%">
                 </picture>
             </td>
         </tr>
         <tr>
             <td>
                 <picture>
-                    <img alt="Project UI 3" src="./assets/screenshot_3.png" width="400">
+                    <img alt="Project UI 3" src="./assets/screenshot_3.png" width="90%">
                 </picture>
             </td>
             <td>
                 <picture>
-                    <img alt="Project UI 4" src="./assets/screenshot_4.png" width="400">
+                    <img alt="Project UI 4" src="./assets/screenshot_4.png" width="90%">
                 </picture>
             </td>
         </tr>
