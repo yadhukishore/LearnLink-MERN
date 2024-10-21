@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 
 
 <p align="center">    
@@ -113,3 +114,6 @@ If you're interested in contributing to TutorNest, please read the [CONTRIBUTING
 ## License
 
 This project is licensed under the  Apache License - see the [LICENSE](LICENSE) file for details.
+=======
+Init
+>>>>>>> ba563639e0fbc921f5da0ab693a18b9be681b4da
