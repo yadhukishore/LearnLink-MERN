@@ -6,6 +6,8 @@
     </picture>
 </p>
 
+<h3 align="center" >I buid it from scratch</h3>
+
 <p align="center">    
     <a href="">
         <img alt="Node.js" src="https://img.shields.io/badge/node.js-6DA55F?&logo=node.js&logoColor=white">
@@ -35,6 +37,7 @@
         <a href="https://learn-link-mern.vercel.app/">Deployed URL</a>
     <p>
 </h4>
+
 
 LearnLink is an innovative e-learning platform designed to connect students with qualified tutors for personalized learning experiences. With a range of features aimed at enhancing the teaching and learning process, LearnLink provides a seamless and efficient platform for both students and tutors. Below are the key features implemented in the project:
 
