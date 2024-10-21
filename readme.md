@@ -51,18 +51,26 @@ LearnLink is an innovative e-learning platform designed to connect students with
     <table>
         <tr>
             <td>
-                <img alt="Project UI 1" src="https://raw.githubusercontent.com/your-username/your-repo-name/main/assets/screenshot_1.png" width="400">
+                <picture>
+                    <img alt="Project UI 1" src="./assets/screenshot_1.png" width="400">
+                </picture>
             </td>
             <td>
-                <img alt="Project UI 2" src="https://raw.githubusercontent.com/your-username/your-repo-name/main/assets/screenshot_2.png" width="400">
+                <picture>
+                    <img alt="Project UI 2" src="./assets/screenshot_2.png" width="400">
+                </picture>
             </td>
         </tr>
         <tr>
             <td>
-                <img alt="Project UI 3" src="https://raw.githubusercontent.com/your-username/your-repo-name/main/assets/screenshot_3.png" width="400">
+                <picture>
+                    <img alt="Project UI 3" src="./assets/screenshot_3.png" width="400">
+                </picture>
             </td>
             <td>
-                <img alt="Project UI 4" src="https://raw.githubusercontent.com/your-username/your-repo-name/main/assets/screenshot_4.png" width="400">
+                <picture>
+                    <img alt="Project UI 4" src="./assets/screenshot_4.png" width="400">
+                </picture>
             </td>
         </tr>
     </table>
