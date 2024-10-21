@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import axios from 'axios';
 import { motion } from 'framer-motion';
 import Header from './HeaderUser';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../store/store';
 import FeedbackCourse from './FeedbackCourse';
 import CourseReviews from './CourseReviews';
+import { apiService } from '../../../services/api';
 
 interface CourseDetail {
   _id: string;
@@ -42,21 +42,19 @@ const UserCourseDetail: React.FC = () => {
   useEffect(() => {
     const fetchCourseDetails = async () => {
       try {
-        const response = await axios.get(`http://localhost:8000/api/user/courses/${courseId}`, {
-          params: { userId: user?.id } 
+        const response = await apiService.get<{ course: CourseDetail }>(`/user/courses/${courseId}`, {
+          params: { userId: user?.id },
         });
-        setCourse(response.data.course);
-        console.log("Full response:", response.data);
-        console.log("Course data:", response.data.course);
+        setCourse(response.course);
         setLoading(false);
       } catch (error) {
         console.error('Error fetching course details:', error);
         setLoading(false);
       }
     };
-
+  
     fetchCourseDetails();
-  }, [courseId]);
+  }, [courseId, user?.id]);
 
   if (loading) {
     return (
