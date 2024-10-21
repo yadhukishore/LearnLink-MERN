@@ -66,6 +66,7 @@ LearnLink is an innovative e-learning platform designed to connect students with
     <img alt="LearnLink" src="./assets/Screenshot_4.png" width=80%>
     </picture>
 </p>
+
 ## Tech stack
 Main web-frameworks and libraries:
 - **React js:** JavaScript library for building user interfaces, facilitating the creation of interactive and dynamic web applications.
