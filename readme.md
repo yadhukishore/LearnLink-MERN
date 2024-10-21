@@ -41,11 +41,23 @@ LearnLink is an innovative e-learning platform designed to connect students with
 ## Features
 
 - **Secure Authentication:** Utilizes JWT for token-based authentication and account management, ensuring secure access for users.
-- **Real-time Personal Chat:** Connect with users in real-time using Socket.io.
-- **Purchase Course and Certificate Download:** Integrated with Razorpay for secure payment transactions.
-- **Admin Side Management:** Admin dashboard for managing and verifying users using Node.js and Express.js.
 
-## UI Demo
+- **Real-time Personal Chat:** Connect with tutors in real-time through personal chat functionality, implemented using Socket.io for seamless communication.
+
+- **Real-time Video Conference:** Engage in live video conferences with tutors for interactive learning experiences, leveraging Zego Cloud for high-quality video streaming.
+
+- **Posts Creation for Students:** Students can create posts and interact with tutors and peers, facilitated by MongoDB for efficient data storage and retrieval.
+
+- **Purchase Course and Certificate Download:** Seamlessly purchase courses and download certificates upon completion, integrated with Razorpay for secure and hassle-free payment transactions.
+
+- **Connecting with Verified Tutors:** Students can connect with verified tutors, ensuring quality learning experiences.
+
+- **Admin Side Management:** Admin dashboard for managing and verifying users, implemented with Node.js and Express.js using MVC Architecture for efficient administration.
+
+- **Firebase Storage and Google Cloud:** Utilizes Firebase Storage for data synchronization and Google Cloud for scalable infrastructure, ensuring reliability and performance.
+  
+## UI demo
+
 `user home`
 <p align="center">
     <picture>
@@ -82,8 +94,3 @@ Main web-frameworks and libraries:
 
 LearnLink is successfully hosted on Frontend on Vercel and backend on AWS, and you can access the live site [https://learn-link-mern.vercel.app/](YOUR_DEPLOYED_URL)
 
-## How to Host the Project Locally on Your System
-
-1. **Clone the repository:**
-   ```bash
-   git clone YOUR_REPOSITORY_URL
