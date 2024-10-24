@@ -39,7 +39,7 @@ router.get('/user-login-data', getUserLoginData);
 router.get('/tutor-login-data', getTutorLoginData);
 router.get('/courses-count-by-category', getCoursesCountByCategory);
 router.get('/student-enrollments', getStudentEnrollmentsByDate);
-
+router.get('/adminReportedCourses',getReportedCourses);
 router.post('/events', upload.single('image'), addEvent);
 router.put('/events/:id', upload.single('image'), updateEvent); 
 router.get('/events', getEvents);
