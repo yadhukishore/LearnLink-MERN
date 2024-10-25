@@ -1,12 +1,13 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useNavigate, Link } from 'react-router-dom';
-import { tutorLoginSuccess,setTutorError } from '../../../features/tutor/tutorSlice'; 
+import { tutorLoginSuccess,setTutorError, checkTutorAuthStatus } from '../../../features/tutor/tutorSlice'; 
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 import { apiService } from '../../../services/api';
+// import { RootState } from '../../store/store';
 interface LoginResponse {
   success: boolean;
   message: string;
@@ -23,8 +24,20 @@ const TutorLogin: React.FC = () => {
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  // const tutor = useSelector((state: RootState) => state.tutor);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const checkAuthStatus = async () => {
+      try {
+        await dispatch(checkTutorAuthStatus());
+      } catch (error) {
+        console.error('Error checking auth status:', error);
+      }
+    };
+    checkAuthStatus();
+  }, [dispatch]);
 
   const validateForm = () => {
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
