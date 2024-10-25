@@ -1,14 +1,18 @@
 import { useEffect, useState } from 'react';
-import axios from 'axios';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../store/store';
 import { checkTutorAuthStatus } from '../../../features/tutor/tutorSlice';
 import TutorHeader from './TutorHeader';
 import { motion } from 'framer-motion';
+import { apiService } from '../../../services/api';
 
 interface TutorCourse {
   name: string;
   paidEnrollments: number;
+}
+interface TutorWalletResponse {
+  totalAmount: number;
+  courses: TutorCourse[];
 }
 
 const TutorWallet = () => {
@@ -22,12 +26,13 @@ const TutorWallet = () => {
     const fetchTutorWalletDetails = async () => {
       try {
         await dispatch(checkTutorAuthStatus());
+
         if (tutor?.id) {
-          const response = await axios.get('http://localhost:8000/api/tutor/tutorWallet', {
+          const response = await apiService.get<TutorWalletResponse>(`/tutor/tutorWallet`, {
             headers: { 'Tutor-Id': tutor.id },
           });
-          setTotalAmount(response.data.totalAmount);
-          setCourses(response.data.courses);
+          setTotalAmount(response.totalAmount);
+          setCourses(response.courses);
           setError(null);
         } else {
           setError('Tutor ID is not available.');
@@ -40,6 +45,7 @@ const TutorWallet = () => {
 
     fetchTutorWalletDetails();
   }, [dispatch, tutor?.id]);
+
 
   return (
     <div className="min-h-screen bg-[#071A2B] text-white flex flex-col">

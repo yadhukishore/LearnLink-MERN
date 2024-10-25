@@ -125,12 +125,17 @@ function generateUniqueCourseId(): string {
 // Get all courses
 export const getCourses = async (req: Request, res: Response) => {
   try {
+    const tutorId = req.headers['tutor-id'];
+    
+    if (!tutorId) {
+      return res.status(400).json({ message: 'No Tutor ID provided' });
+    }
     console.log("getCourses controller called");
-    const tutorId = req.params.tutorId;
     const page = parseInt(req.query.page as string) || 1;
     const limit = parseInt(req.query.limit as string) || 10;
 
     if (!tutorId) {
+      console.log("TutorId is Req")
       return res.status(400).json({ success: false, message: 'Tutor ID is required' });
     }
 

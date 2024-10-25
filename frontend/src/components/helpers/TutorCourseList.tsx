@@ -1,11 +1,12 @@
 // TutorCourseList.tsx
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../store/store';
 import { useNavigate } from 'react-router-dom';
 import { Pagination } from 'flowbite-react';
 import { apiService } from '../../services/api';
+import { checkTutorAuthStatus } from '../../features/tutor/tutorSlice';
 
 interface ICourse {
   _id: string;
@@ -30,6 +31,7 @@ const TutorCourseList: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1); 
+  const dispatch = useDispatch();
   const token = useSelector((state: RootState) => state.tutor.token);
   const tutorId = useSelector((state: RootState) => state.tutor.tutor?.id);
   const navigate = useNavigate();
@@ -37,30 +39,38 @@ const TutorCourseList: React.FC = () => {
     const fetchCourses = async () => {
       setLoading(true);
       try {
-        const response = await apiService.get<FetchCoursesResponse>(`/tutor/getCourses/${tutorId}`, {
-          params: { page: currentPage, limit: 6 },
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        await dispatch(checkTutorAuthStatus());
 
-        if (response.success) {
-          setCourses(response.courses);
-          setTotalPages(response.totalPages);
+        if (token && tutorId) {
+          const response = await apiService.get<FetchCoursesResponse>(`/tutor/getCourses/${tutorId}`, {
+            params: { page: currentPage, limit: 6 },
+            headers: {
+              Authorization: `Bearer ${token}`,
+              'Tutor-Id': tutorId
+            },
+          });
+          console.log("response:",response);
+
+          if (response.success) {
+            setCourses(response.courses);
+            setTotalPages(response.totalPages);
+            setError(null);
+          } else {
+            setError('Failed to fetch courses');
+          }
         } else {
-          setError('Failed to fetch courses');
+          setError('Authentication required');
         }
       } catch (err) {
+        console.error('Error fetching courses:', err);
         setError('Failed to fetch courses');
       } finally {
         setLoading(false);
       }
     };
 
-    if (token && tutorId) {
-      fetchCourses();
-    }
-  }, [token, tutorId, currentPage]);
+    fetchCourses();
+  }, [dispatch, token, tutorId, currentPage]);
   const handleCourseClick = (courseId: string) => {
     navigate(`/tutorCourseDetail/${courseId}`);
   };

@@ -13,28 +13,26 @@ import User from '../../models/User';
     tutor?:{_id:string};
   }
 
-  export const getTutorProfile = async (req: Request, res: Response) => {
+  export const getTutorProfile = async (req: CustomRequest, res: Response) => {
     try {
-        const { tutorId } = req.query; 
-        console.log("Getting TutorProfile", tutorId);
-
-        if (!tutorId) {
-            console.log("Tutor ID is required");
-            return res.status(400).json({ message: 'Tutor ID is required' });
-        }
-
-        const tutor = await Tutor.findById(tutorId).select('-password');
-        if (!tutor) {
-            console.log("Tutor not found");
-            return res.status(404).json({ message: 'Tutor not found' });
-        }
-
-        res.json({ tutor });
+      const tutorId = req.headers['tutor-id'];
+      
+      if (!tutorId) {
+        console.log("No Tutor");
+        return res.status(400).json({ message: 'No Tutor ID provided' });
+      }
+  
+      const tutor = await Tutor.findById(tutorId).select('-password');
+      if (!tutor) {
+        return res.status(404).json({ message: 'Tutor not found' });
+      }
+  
+      res.json({ tutor });
     } catch (error) {
-        console.error('Error fetching tutor profile:', error);
-        res.status(500).json({ message: 'Server error', error });
+      console.error('Error fetching tutor profile:', error);
+      res.status(500).json({ message: 'Server error', error });
     }
-};
+  };
 
 
   export const updateTutorProfile = async (req: Request, res: Response) => {

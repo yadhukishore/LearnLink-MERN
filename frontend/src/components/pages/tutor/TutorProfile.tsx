@@ -4,7 +4,7 @@ import { RootState } from '../../store/store';
 import TutorHeader from './TutorHeader';
 import Swal from 'sweetalert2';
 import TutorProfileShimmer from '../../helpers/TutorProfileShimmer';
-import { tutorLoginSuccess } from '../../../features/tutor/tutorSlice';
+import { tutorLoginSuccess, checkTutorAuthStatus } from '../../../features/tutor/tutorSlice';
 import { apiService } from '../../../services/api';
 
 
@@ -25,36 +25,47 @@ const TutorProfile: React.FC = () => {
   }
   useEffect(() => {
     const fetchTutorProfile = async () => {
-        try {
-        
-          const response = await apiService.get<{ tutor: ITutor }>(`/tutor/tutorProfile?tutorId=${tutorFromRedux?.id}`);
+      try {
+        // First check auth status, similar to TutorWallet
+        await dispatch(checkTutorAuthStatus());
 
-            setTutor(response.tutor);
-            setLoading(false);
-        } catch (err) {
-            console.error('Error fetching tutor profile:', err);
-            setError('Failed to fetch tutor profile');
-            setLoading(false);
+        if (tutorFromRedux?.id) {
+          const response = await apiService.get<{ tutor: ITutor }>('/tutor/tutorProfile', {
+            params: { tutorId: tutorFromRedux.id },
+            headers: { 'Tutor-Id': tutorFromRedux.id }  // Add this header for consistency
+          });
+
+          setTutor(response.tutor);
+          setError(null);
+        } else {
+          setError('Tutor ID is not available.');
         }
+      } catch (err) {
+        console.error('Error fetching tutor profile:', err);
+        setError('Failed to fetch tutor profile');
+      } finally {
+        setLoading(false);
+      }
     };
-    
-    if (token && tutorFromRedux?.id) {
-        fetchTutorProfile();
-    }
-}, [token, tutorFromRedux]);
+
+    fetchTutorProfile();
+  }, [dispatch, tutorFromRedux?.id]);
 
   const handleEdit = async (field: string, value: string | string[]) => {
     try {
       const response = await apiService.patch<{ tutor: ITutor }>(
         '/tutor/updateProfile',
         {
-          tutorId: tutorFromRedux?.id, // Send the tutor ID from Redux
+          tutorId: tutorFromRedux?.id,
           [field]: value,
+        },
+        {
+          headers: { 'Tutor-Id': tutorFromRedux?.id }  
         }
       );
+
       setTutor(response.tutor);
 
-      // Update the Redux state after a successful edit
       if (field === 'name') {
         dispatch(
           tutorLoginSuccess({
@@ -82,7 +93,7 @@ const TutorProfile: React.FC = () => {
       });
     }
   };
-
+  
   if (loading) return <TutorProfileShimmer />;
   if (error) return <div className="text-red-500 text-center mt-10">{error}</div>;
   if (!tutor) return <div className="text-white text-center mt-10">Tutor profile not found</div>;

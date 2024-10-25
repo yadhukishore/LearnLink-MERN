@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
 import { motion } from 'framer-motion';
 import { apiService } from '../../../services/api';
+import { RootState } from '../../../components/store/store';
+import { checkTutorAuthStatus } from '../../../features/tutor/tutorSlice';
 
 interface TrendingCourse {
   _id: string;
@@ -12,19 +15,38 @@ interface TrendingCourse {
 
 const TrendingCourseTutor: React.FC = () => {
   const [trendingCourses, setTrendingCourses] = useState<TrendingCourse[]>([]);
+  const [error, setError] = useState<string | null>(null);
+  const dispatch = useDispatch();
+  const tutorFromRedux = useSelector((state: RootState) => state.tutor.tutor);
 
   useEffect(() => {
     const fetchTrendingCourses = async () => {
       try {
-        const response = await apiService.get<TrendingCourse[]>('/tutor/trending-courses'); 
-        setTrendingCourses(response);
+        // First check auth status
+        await dispatch(checkTutorAuthStatus());
+
+        if (tutorFromRedux?.id) {
+          const response = await apiService.get<TrendingCourse[]>('/tutor/trending-courses', {
+            headers: { 'Tutor-Id': tutorFromRedux.id }
+          }); 
+          setTrendingCourses(response);
+          setError(null);
+        } else {
+          setError('Authentication required');
+        }
       } catch (error) {
         console.error('Error fetching trending courses:', error);
+        setError('Failed to fetch trending courses');
       }
     };
 
     fetchTrendingCourses();
-  }, []);
+  }, [dispatch, tutorFromRedux?.id]);
+
+  if (error) {
+    return <div className="text-red-500 text-center">{error}</div>;
+  }
+
   // Sort by averageRating and limit to the top 3 courses
   const topCourses = trendingCourses
     .sort((a, b) => b.averageRating - a.averageRating)
@@ -41,7 +63,7 @@ const TrendingCourseTutor: React.FC = () => {
         {topCourses.map((course, index) => (
           <motion.div
             key={course._id}
-            className="bg-gradient-to-br from-blue-600 to-purple-600 p-1 rounded-lg shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1"
+            className="bg-gradient-to-br from-blue-600 to-purple-600 p-1 rounded-lg shadow-lg hover:shadow-2xl transition-all duration-1000 transform hover:-translate-y-1"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: index * 0.1 }}
