@@ -6,6 +6,10 @@ import Swal from 'sweetalert2';
 import { Pagination } from 'flowbite-react';
 import { apiService } from '../../../services/api';
 import { motion } from 'framer-motion';
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState } from '../../store/store';
+import { checkAdminAuthStatus } from '../../../features/admin/adminSlice';
+import { useNavigate } from 'react-router-dom';
 
 interface User {
   _id: string;
@@ -34,6 +38,19 @@ const UsersList: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
+  const isAuthenticated = useSelector((state: RootState) => state.admin.isAuthenticated);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    dispatch(checkAdminAuthStatus());
+  }, [dispatch]);
+
+  useEffect(() => {
+    if (!isAuthenticated) {
+      navigate('/admin-login');
+    }
+  }, [isAuthenticated, navigate]);
   
   const fetchUsers = async (page: number) => {
     setLoading(true);

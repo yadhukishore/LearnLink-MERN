@@ -4,6 +4,9 @@ import { motion } from 'framer-motion';
 import Header from './Header';
 import Sidebar from './Sidebar';
 import { apiService } from '../../../services/api';
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState } from '../../store/store';
+import { checkAdminAuthStatus } from '../../../features/admin/adminSlice';
 
 interface ApplicationDetails {
   _id: string;
@@ -28,6 +31,20 @@ const FinancialAidApplicationDetails: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const [application, setApplication] = useState<ApplicationDetails | null>(null);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const isAuthenticated = useSelector((state: RootState) => state.admin.isAuthenticated);
+
+  useEffect(() => {
+    dispatch(checkAdminAuthStatus());
+  }, [dispatch]);
+
+  useEffect(() => {
+    if (!isAuthenticated) {
+      navigate('/admin-login');
+    }
+  }, [isAuthenticated, navigate]);
+
+
 
   useEffect(() => {
     if (id) {

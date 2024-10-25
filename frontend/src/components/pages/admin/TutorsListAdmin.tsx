@@ -6,6 +6,10 @@ import Header from './Header';
 import Swal from 'sweetalert2';
 import { Pagination } from 'flowbite-react';
 import { motion } from 'framer-motion';
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState } from '../../store/store';
+import { checkAdminAuthStatus } from '../../../features/admin/adminSlice';
+import { useNavigate } from 'react-router-dom';
 
 interface Tutor {
   _id: string;
@@ -38,6 +42,19 @@ const TutorList: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const isAuthenticated = useSelector((state: RootState) => state.admin.isAuthenticated);
+
+  useEffect(() => {
+    dispatch(checkAdminAuthStatus());
+  }, [dispatch]);
+
+  useEffect(() => {
+    if (!isAuthenticated) {
+      navigate('/admin-login');
+    }
+  }, [isAuthenticated, navigate]);
 
   const fetchTutors = async (page: number) => {
     setLoading(true);

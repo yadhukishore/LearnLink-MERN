@@ -5,6 +5,9 @@ import { motion } from 'framer-motion';
 import Header from './Header';
 import Sidebar from './Sidebar';
 import { Pagination } from 'flowbite-react';
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState } from '../../store/store';
+import { checkAdminAuthStatus } from '../../../features/admin/adminSlice';
 
 interface Application {
   _id: string;
@@ -28,6 +31,18 @@ const FinancialAidApplicationList: React.FC = () => {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const isAuthenticated = useSelector((state: RootState) => state.admin.isAuthenticated);
+
+  useEffect(() => {
+    dispatch(checkAdminAuthStatus());
+  }, [dispatch]);
+
+  useEffect(() => {
+    if (!isAuthenticated) {
+      navigate('/admin-login');
+    }
+  }, [isAuthenticated, navigate]);
 
 
   useEffect(() => {
