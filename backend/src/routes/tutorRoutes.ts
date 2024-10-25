@@ -26,7 +26,7 @@ router.post('/tutorCreateCourse', upload.fields([
   { name: 'thumbnailFile', maxCount: 1 },
   { name: 'videos', maxCount: 10 }, 
 ]), createCourse);
-router.get('/getCourses/:tutorId',getCourses);
+router.get('/getCourses/:tutorId',authMiddleware(['tutor']),getCourses);
 router.get('/tutorCourseDetail/:courseId', getCourseById);
 router.patch('/updateCourse/:id', updateCourse);
 router.patch('/updateCourseVideo/:id/:videoId', updateCourseVideo);

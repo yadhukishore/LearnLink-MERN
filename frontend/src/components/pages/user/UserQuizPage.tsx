@@ -31,6 +31,9 @@ const UserQuizPage: React.FC = () => {
 
   const user = useSelector((state: RootState) => state.auth.user);
   const userId = user?.id;
+  if(!user){
+    navigate("/login");
+  }
 
   const formatTime = (seconds: number): string => {
     const minutes = Math.floor(seconds / 60);

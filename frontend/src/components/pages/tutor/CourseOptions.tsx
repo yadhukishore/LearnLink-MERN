@@ -1,6 +1,6 @@
 import  { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import axios from 'axios';
+import { apiService } from '../../../services/api';
 
 interface CourseData {
   name: string;
@@ -41,8 +41,8 @@ const CourseOptions: React.FC<CourseOptionsProps> = ({ courseData, handleInputCh
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await axios.get('http://localhost:8000/api/tutor/getAllCategoriesForTutor');
-        setCategories(response.data);
+        const data = await apiService.get<Category[]>('/tutor/getAllCategoriesForTutor');
+        setCategories(data);
       } catch (error) {
         console.error('Error fetching categories:', error);
       }
@@ -50,6 +50,7 @@ const CourseOptions: React.FC<CourseOptionsProps> = ({ courseData, handleInputCh
 
     fetchCategories();
   }, []);
+
 
   const handleAddItem = (field: 'benefits' | 'prerequisites') => {
     setCourseData((prevState) => ({
