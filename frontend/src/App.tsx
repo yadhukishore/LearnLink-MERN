@@ -144,8 +144,8 @@ import AdminShowEvents from './components/pages/admin/AdminShowEvents.tsx';
       <Route path="/tutorChat" element={<TutorChat />} /> */}
       <Route path="/tutorCreateQuiz/:courseId" element={<TutorQuiz />} />
       <Route path="/tutorChat" element={<ChatListTutor />} />
-<Route path="/tutorHome" element={tutorState.isAuthenticated ? <TutorHome /> : <Navigate to="/tutorLogin" />} />
-<Route path="/tutorCreateCourse" element={tutorState.isAuthenticated ? <TutorCreateCourse /> : <Navigate to="/tutorLogin" />} />
+<Route path="/tutorHome" element={<TutorHome />} />
+<Route path="/tutorCreateCourse" element={ <TutorCreateCourse />} />
 <Route path="/tutorCourseDetail/:id" element={<TutorCourseDetail />} />
 <Route path="/tutorEditCourse/:id" element={<TutorEditCourse />} />
 <Route path='/waiting-for-approval' element={<WaitingForApproval/>}/>

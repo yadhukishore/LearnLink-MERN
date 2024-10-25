@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { apiService } from '../../../services/api';
 import { FaUserCircle } from 'react-icons/fa';
 import TutorHeader from './TutorHeader';
+import TutorLoginPrompt from '../../notAuthenticatedPages/TutorLoginPrompt';
 
 interface ChatRoom {
   roomId: string;
@@ -42,6 +43,9 @@ const ChatListTutor: React.FC = () => {
   const handleChatRoomClick = (roomId: string) => {
     navigate(`/chat/${roomId}`);
   };
+  if(!tutor){
+    return <TutorLoginPrompt/>
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">

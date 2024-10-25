@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../store/store';
+import { checkTutorAuthStatus } from '../../../features/tutor/tutorSlice';
 import TutorHeader from './TutorHeader';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import Swal from 'sweetalert2';
 import { useNavigate } from 'react-router-dom';
 import { apiService } from '../../../services/api';
+import TutorLoginPrompt from '../../notAuthenticatedPages/TutorLoginPrompt';
 
 interface Course {
   _id: string;
@@ -49,7 +51,21 @@ const TutorTimeScheduling: React.FC = () => {
   const [endTime, setEndTime] = useState<Date | null>(null);
   const [scheduledTimes, setScheduledTimes] = useState<ScheduledTime[]>([]);
   const tutorId = useSelector((state: RootState) => state.tutor.tutor?.id);
+  const dispatch = useDispatch();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const checkAuthStatus = async () => {
+      try {
+        await dispatch(checkTutorAuthStatus());
+      } catch (error) {
+        console.error('Error checking auth status:', error);
+      }
+    };
+    checkAuthStatus();
+  }, [dispatch]);
+
+
   useEffect(() => {
     if (tutorId) {
       fetchTutorCourses();
@@ -176,6 +192,10 @@ const TutorTimeScheduling: React.FC = () => {
   const isTimeExpired = (endTime: string) => {
     return new Date(endTime) < new Date();
   };
+
+  if(!tutorId){
+    return <TutorLoginPrompt/>
+  }
 
   return (
     <div className="min-h-screen bg-[#071A2B] text-white">

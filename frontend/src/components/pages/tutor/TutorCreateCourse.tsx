@@ -1,9 +1,10 @@
 // TutorCreateCourse.tsx
-import React, { useState, ChangeEvent, FormEvent } from 'react';
+import React, { useState, ChangeEvent, FormEvent, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../store/store';
+import { checkTutorAuthStatus } from '../../../features/tutor/tutorSlice';
 import CourseInformation from './CourseInformation';
 import CourseOptions from './CourseOptions';
 import CourseContent from './CourseContent';
@@ -12,6 +13,7 @@ import StepIndicator from '../../helpers/StepIndicator';
 import Swal from 'sweetalert2';
 import TutorHeader from './TutorHeader';
 import { apiService } from '../../../services/api';
+import TutorLoginPrompt from '../../notAuthenticatedPages/TutorLoginPrompt';
 
 
 interface VideoData {
@@ -44,10 +46,22 @@ interface CourseCreationResponse {
 
 const TutorCreateCourse: React.FC = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const token = useSelector((state: RootState) => state.tutor.token);
   const tutorId = useSelector((state: RootState) => state.tutor.tutor?.id);
   const [currentStep, setCurrentStep] = useState(0);
   const steps = ['Course Information', 'Course Options', 'Course Content', 'Course Preview'];
+
+  useEffect(() => {
+    const checkAuthStatus = async () => {
+      try {
+        await dispatch(checkTutorAuthStatus());
+      } catch (error) {
+        console.error('Error checking auth status:', error);
+      }
+    };
+    checkAuthStatus();
+  }, [dispatch]);
 
   const [courseData, setCourseData] =  useState<CourseData>({
     name: '',
@@ -69,6 +83,11 @@ const TutorCreateCourse: React.FC = () => {
       previewUrl: string | null;
     }[], 
   });
+
+  if(!tutorId){
+    return <div><TutorLoginPrompt/></div>
+  }
+
 
 const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
   const { name, value } = e.target;

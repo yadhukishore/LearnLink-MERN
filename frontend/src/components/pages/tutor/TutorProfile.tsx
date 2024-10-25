@@ -6,6 +6,7 @@ import Swal from 'sweetalert2';
 import TutorProfileShimmer from '../../helpers/TutorProfileShimmer';
 import { tutorLoginSuccess, checkTutorAuthStatus } from '../../../features/tutor/tutorSlice';
 import { apiService } from '../../../services/api';
+import TutorLoginPrompt from '../../notAuthenticatedPages/TutorLoginPrompt';
 
 
 
@@ -93,7 +94,9 @@ const TutorProfile: React.FC = () => {
       });
     }
   };
-  
+  if(!tutorFromRedux){
+    return <TutorLoginPrompt/>
+  }
   if (loading) return <TutorProfileShimmer />;
   if (error) return <div className="text-red-500 text-center mt-10">{error}</div>;
   if (!tutor) return <div className="text-white text-center mt-10">Tutor profile not found</div>;

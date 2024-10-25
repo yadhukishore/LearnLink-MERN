@@ -5,6 +5,7 @@ import { checkTutorAuthStatus } from '../../../features/tutor/tutorSlice';
 import TutorHeader from './TutorHeader';
 import { motion } from 'framer-motion';
 import { apiService } from '../../../services/api';
+import TutorLoginPrompt from '../../notAuthenticatedPages/TutorLoginPrompt';
 
 interface TutorCourse {
   name: string;
@@ -45,6 +46,10 @@ const TutorWallet = () => {
 
     fetchTutorWalletDetails();
   }, [dispatch, tutor?.id]);
+
+  if(!tutor){
+    return <TutorLoginPrompt/>
+  }
 
 
   return (

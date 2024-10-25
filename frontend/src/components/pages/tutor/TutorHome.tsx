@@ -9,6 +9,7 @@ import TutorHeader from './TutorHeader';
 import { motion } from 'framer-motion';
 import TutorCourseList from '../../helpers/TutorCourseList';
 import TrendingCourseTutor from './TrendingCoursesTutor';
+import TutorLoginPrompt from '../../notAuthenticatedPages/TutorLoginPrompt';
 
 
 
@@ -31,7 +32,7 @@ const TutorHome = () => {
   const { tutor } = useSelector((state: RootState) => state.tutor);
 
   if (!tutor) {
-    return <div>Loading...</div>;
+    return <div><TutorLoginPrompt/></div>;
   }
 
   const { name } = tutor;

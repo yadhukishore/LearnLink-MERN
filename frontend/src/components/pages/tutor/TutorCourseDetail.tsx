@@ -5,6 +5,7 @@ import { RootState } from '../../store/store';
 import TutorHeader from './TutorHeader';
 import { apiService } from '../../../services/api';
 import Swal from 'sweetalert2';
+import TutorLoginPrompt from '../../notAuthenticatedPages/TutorLoginPrompt';
 
 interface ICourse {
   _id: string;
@@ -39,6 +40,7 @@ const TutorCourseDetail: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const token = useSelector((state: RootState) => state.tutor.token);
+  const tutor = useSelector((state:RootState)=>state.tutor);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -100,8 +102,11 @@ const TutorCourseDetail: React.FC = () => {
       }
     }
   };
+  if(!tutor){
+    return <TutorLoginPrompt/>
+  }
 
-  if (loading) return <div>Loading course details...</div>;
+  if (loading) return <div><TutorLoginPrompt/></div>;
   if (error) return <div>{error}</div>;
   if (!course) return <div>Course not found</div>;
 

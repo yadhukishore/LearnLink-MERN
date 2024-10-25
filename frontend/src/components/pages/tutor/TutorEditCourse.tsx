@@ -6,6 +6,7 @@ import { RootState } from '../../store/store';
 import TutorHeader from './TutorHeader';
 import Swal from 'sweetalert2';
 import { apiService } from '../../../services/api';
+import TutorLoginPrompt from '../../notAuthenticatedPages/TutorLoginPrompt';
 
 interface ICourse {
   _id: string;
@@ -189,7 +190,7 @@ const TutorEditCourse: React.FC = () => {
   };
 
 
-  if (loading) return <div>Loading course details...</div>;
+  if (loading) return <div><TutorLoginPrompt/></div>;
   if (error) return <div>{error}</div>;
   if (!course) return <div>Course not found</div>;
 
