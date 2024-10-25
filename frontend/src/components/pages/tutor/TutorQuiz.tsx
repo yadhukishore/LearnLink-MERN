@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../store/store';
 import TutorHeader from './TutorHeader';
 import { apiService } from '../../../services/api';
+import { checkTutorAuthStatus } from '../../../features/tutor/tutorSlice';
+import TutorLoginPrompt from '../../notAuthenticatedPages/TutorLoginPrompt';
 
 interface Question {
   questionText: string;
@@ -25,7 +27,9 @@ interface ApiResponse {
 const TutorQuiz: React.FC = () => {
   const { courseId } = useParams<{ courseId: string }>();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const token = useSelector((state: RootState) => state.tutor.token);
+  const isAuthenticated = useSelector((state: RootState) => state.tutor.isAuthenticated);
 
   const [questions, setQuestions] = useState<Question[]>([]);
   const [currentQuestion, setCurrentQuestion] = useState<Question>({
@@ -34,6 +38,11 @@ const TutorQuiz: React.FC = () => {
     correctAnswer: 0,
   });
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
+
+  useEffect(() => {
+    dispatch(checkTutorAuthStatus());
+  }, [dispatch]);
+
 
   useEffect(() => {
     fetchQuiz();
@@ -96,6 +105,11 @@ const TutorQuiz: React.FC = () => {
       console.error('Error saving quiz:', error);
     }
   };
+
+
+  if (!isAuthenticated) {
+    return <TutorLoginPrompt />;
+  }
 
   return (
     <div className="min-h-screen bg-[#071A2B] text-white">

@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../store/store';
 import { useNavigate } from 'react-router-dom';
 import { apiService } from '../../../services/api';
 import { FaUserCircle } from 'react-icons/fa';
 import TutorHeader from './TutorHeader';
 import TutorLoginPrompt from '../../notAuthenticatedPages/TutorLoginPrompt';
+import { checkTutorAuthStatus } from '../../../features/tutor/tutorSlice';
 
 interface ChatRoom {
   roomId: string;
@@ -22,12 +23,28 @@ interface ApiResponse {
 }
 const ChatListTutor: React.FC = () => {
   const [chatRooms, setChatRooms] = useState<ChatRoom[]>([]);
+  const [loading, setLoading] = useState(true);
   const tutor = useSelector((state: RootState) => state.tutor.tutor);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    const initializeAuth = async () => {
+      try {
+        await dispatch(checkTutorAuthStatus());
+        setLoading(false);
+      } catch (error) {
+        console.error('Error checking auth status:', error);
+        setLoading(false);
+      }
+    };
+
+    initializeAuth();
+  }, [dispatch]);
 
   useEffect(() => {
     const fetchChatRooms = async () => {
-      if (tutor) {
+      if (tutor?.id) {
         try {
           const response = await apiService.get<ApiResponse>(`/chat/tutorChat/${tutor.id}`);
           setChatRooms(response.chatRooms);
@@ -37,21 +54,31 @@ const ChatListTutor: React.FC = () => {
       }
     };
 
-    fetchChatRooms();
-  }, [tutor]);
+    if (!loading) {
+      fetchChatRooms();
+    }
+  }, [tutor, loading]);
 
   const handleChatRoomClick = (roomId: string) => {
     navigate(`/chat/${roomId}`);
   };
+
+  if (loading) {
+    return <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="text-xl text-gray-600">Loading...</div>
+    </div>;
+  }
+  
   if(!tutor){
     return <TutorLoginPrompt/>
   }
+  
 
   return (
     <div className="min-h-screen bg-gray-50">
         <TutorHeader/>
       <div className="max-w-4xl mx-auto py-8 px-4">
-        <h1 className="text-4xl font-bold mb-8 text-center text-gray-600">Chats</h1>
+        <h1 className="text-4xl font-bold mb-8 text-center text-gray-600">Chatz</h1>
         {chatRooms.length === 0 ? (
           <p className="text-center text-gray-500 text-lg">No students connected yet.</p>
         ) : (

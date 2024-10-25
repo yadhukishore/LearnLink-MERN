@@ -27,13 +27,12 @@ const TutorProfile: React.FC = () => {
   useEffect(() => {
     const fetchTutorProfile = async () => {
       try {
-        // First check auth status, similar to TutorWallet
         await dispatch(checkTutorAuthStatus());
 
         if (tutorFromRedux?.id) {
           const response = await apiService.get<{ tutor: ITutor }>('/tutor/tutorProfile', {
             params: { tutorId: tutorFromRedux.id },
-            headers: { 'Tutor-Id': tutorFromRedux.id }  // Add this header for consistency
+            headers: { 'Tutor-Id': tutorFromRedux.id } 
           });
 
           setTutor(response.tutor);
