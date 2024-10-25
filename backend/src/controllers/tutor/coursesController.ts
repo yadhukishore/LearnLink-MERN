@@ -22,6 +22,7 @@ interface MongoError extends Error {
 
 export const createCourse = async (req: Request, res: Response): Promise<void> => {
   const multerReq = req as MulterRequest;
+  console.log("trying to  createCourses");
   try {
     console.log("Entered createCourses");
     console.log("Body:", multerReq.body);

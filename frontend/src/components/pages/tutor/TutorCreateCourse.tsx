@@ -153,6 +153,7 @@ const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement
           'Content-Type': 'multipart/form-data',
         },
       });
+      console.log("tutorCreateCourse Response:",response)
 
       if (response.success) {
         Swal.fire('Success', 'Course created successfully!', 'success');
