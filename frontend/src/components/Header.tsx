@@ -18,7 +18,7 @@ const Header: React.FC = () => {
           <img 
             src="/Navi.png" 
             alt="Logo" 
-            className="h-8 w-auto sm:h-10 md:h-12"
+            className="h-8 w-auto sm:h-10 md:h-12 rounded-md"
           />
           <span className="ml-2 text-lg sm:text-xl md:text-2xl font-bold">LearnLink</span>
         </div>
